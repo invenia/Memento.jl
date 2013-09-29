@@ -1,4 +1,4 @@
 Lumberjack.jl
 =============
 
-A Julia package for producing nicely formatted log files
+WIP - A Julia package for making nice logs

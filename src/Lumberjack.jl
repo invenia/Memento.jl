@@ -1,0 +1,4 @@
+
+module Lumberjack
+
+end
