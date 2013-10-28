@@ -2,15 +2,16 @@
 module Lumberjack
 
 import Base.show
+
 using Datetime
 
 # -------
 
-abstract LogFmt
+abstract LogFormat
 
 # -------
 
-type CommonLog <: LogFmt
+type CommonLog <: LogFormat
     remotehost
     rfc931
     authuser
@@ -30,7 +31,7 @@ end
 
 # -------
 
-type ExtendedLog <: LogFmt
+type ExtendedLog <: LogFormat
 end
 
 # -------
