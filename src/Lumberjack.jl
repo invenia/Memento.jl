@@ -1,7 +1,7 @@
 
 module Lumberjack
 
-import Base.show, Base.info, Base.warn, Base.error, Base.add!
+import Base.show, Base.log, Base.info, Base.warn, Base.error, Base.add!
 
 using Datetime
 

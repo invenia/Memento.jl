@@ -28,13 +28,7 @@ function log(lm::LumberMill, level::String, msg::String, meta::Dict)
     end
 end
 
-function log(level::String, msg::String, meta::Dict)
-
-end
-
-function log(level::String, loggLogFormat)
-
-end
+log(level::String, msg::String, meta::Dict) = log(lumber_mill, level, msg, meta)
 
 info(msg::String, meta::Dict) = log("info", msg, meta)
 
