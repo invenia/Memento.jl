@@ -21,10 +21,14 @@ delete!(lm::LumberMill, logger::String) = delete!(lm.loggers, logger)
 # Interface for logging messages
 
 function log(lm::LumberMill, level::String, msg::String, meta::Dict)
-    formatted_log = (lm.format)(level, msg, meta)
+    fmt = (lm.format)(level, msg, meta)
+
+    buff = IOBuffer()
+    println(buff, fmt)
+    formatted_msg = takebuf_string(buff)
 
     for (l,io) in lm.loggers
-        println(io, formatted_log)
+        println(io, formatted_msg)
     end
 end
 
