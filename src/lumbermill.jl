@@ -5,14 +5,21 @@ type LumberMill
 
     modes::Array
 
-    function LumberMill(; timber_trucks = Dict{String, TimberTruck}(), saws = Any[], modes = ["debug", "info", "warn", "error"], curr_mode = 1)
-        new(timber_trucks, saws, modes, curr_mode)
+    function LumberMill(; timber_trucks = Dict{String, TimberTruck}(), saws = Any[], modes = Any[])
+        lm = new(timber_trucks, saws, modes)
+        configure(lm)
+        lm
     end
 end
 
-_lumber_mill = LumberMill()
-
 # -------
+
+function configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
+    lm.modes = modes
+end
+
+configure(; args...) = configure(_lumber_mill; args...)
+
 
 function log(lm::LumberMill, mode::String, msg::String, args::Dict)
     args[:mode] = mode
@@ -29,3 +36,10 @@ end
 
 log(mode::String, msg::String, args::Dict) = log(_lumber_mill, mode, msg, args)
 
+log(mode::String, args::Dict) = log(_lumber_mill, mode, "", args)
+
+# -------
+
+_lumber_mill = LumberMill()
+
+# -------
