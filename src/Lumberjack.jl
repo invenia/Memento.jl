@@ -1,9 +1,10 @@
 
 module Lumberjack
 
-import Base.show, Base.log, Base.info, Base.warn, Base.error, Base.add!
+import Base.show, Base.log, Base.info, Base.warn, Base.error
 
 using Datetime
+using UUID
 
 export log, info, warn, error
 
