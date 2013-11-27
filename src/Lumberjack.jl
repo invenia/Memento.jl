@@ -10,6 +10,7 @@ export log, info, warn, error
 
 # -------
 
+include("saws.jl")
 include("timbertruck.jl")
 include("lumbermill.jl")
 
