@@ -11,7 +11,7 @@ type LumberMill
         # defaults
         configure(lm)
         add_saw(lm, date_saw)
-        add_truck(lm, CommonLog(STDOUT, nothing, nothing))
+        add_truck(lm, LumberjackLog(STDOUT, nothing, nothing))
 
         lm
     end

@@ -15,7 +15,29 @@ type CommonLog <: TimberTruck
 end
 
 function log(truck::CommonLog, l::Dict)
-    print(truck.out, "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])")
+    println(truck.out, "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])")
+end
+
+# -------
+
+type LumberjackLog <: TimberTruck
+    out::IO
+
+    _mode
+    _scope
+end
+
+function log(truck::LumberjackLog, l::Dict)
+    record = "$(l[:date]) $(l[:mode]): \"$(l[:msg])\""
+    delete!(l, :date)
+    delete!(l, :mode)
+    delete!(l, :msg)
+
+    for (k, v) in l
+        record = string(record, " $(k):$(v)")
+    end
+
+    println(truck.out, record)
 end
 
 # -------
