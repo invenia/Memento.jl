@@ -28,13 +28,16 @@ type LumberjackLog <: TimberTruck
 end
 
 function log(truck::LumberjackLog, l::Dict)
-    record = "$(l[:date]) $(l[:mode]): \"$(l[:msg])\""
+    date_stamp = get(l, :date, nothing)
+    record = date_stamp == nothing ? "" : "$date_stamp "
+
+    record = string(record, "$(l[:mode]):$(repr(l[:msg]))")
     delete!(l, :date)
     delete!(l, :mode)
     delete!(l, :msg)
 
     for (k, v) in l
-        record = string(record, " $(k):$(v)")
+        record = string(record, " $k:$(repr(v))")
     end
 
     println(truck.out, record)
