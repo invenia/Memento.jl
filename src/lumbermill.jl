@@ -52,10 +52,10 @@ add_saw(saw_fn::Function, index = length(_lumber_mill.saws)+1) = add_saw(_lumber
 
 
 function remove_saw(lm::LumberMill, index = length(lm.saws))
-    delete!(lm.saws, index)
+    splice!(lm.saws, index)
 end
 
-remove_saw(index = length(lm.saws)) = remove_saw(_lumber_mill, index)
+remove_saw(index = length(_lumber_mill.saws)) = remove_saw(_lumber_mill, index)
 
 
 function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
