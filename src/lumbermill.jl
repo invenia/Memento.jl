@@ -7,7 +7,12 @@ type LumberMill
 
     function LumberMill(; timber_trucks = Dict{Any, TimberTruck}(), saws = Any[], modes = Any[])
         lm = new(timber_trucks, saws, modes)
+
+        # defaults
         configure(lm)
+        add_saw(lm, date_saw)
+        add_truck(lm, CommonLog(STDOUT, nothing, nothing))
+
         lm
     end
 end
