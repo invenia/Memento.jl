@@ -39,18 +39,18 @@ log(mode::String, msg::String, args::Dict) = log(_lumber_mill, mode, msg, args)
 log(mode::String, args::Dict) = log(_lumber_mill, mode, "", args)
 
 
-function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws))
+function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws)+1)
     insert!(lm.saws, index, saw_fn)
 end
 
-add_saw(saw_fn::Function, index = length(_lumber_mill.saws)) = add_saw(_lumber_mill, saw_fn, index)
+add_saw(saw_fn::Function, index = length(_lumber_mill.saws)+1) = add_saw(_lumber_mill, saw_fn, index)
 
 
 function remove_saw(lm::LumberMill, index = length(lm.saws))
     delete!(lm.saws, index)
 end
 
-remove_saw(index = -1) = remove_saw(_lumber_mill, index)
+remove_saw(index = length(lm.saws)) = remove_saw(_lumber_mill, index)
 
 
 function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
