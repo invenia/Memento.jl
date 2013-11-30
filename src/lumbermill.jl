@@ -11,7 +11,7 @@ type LumberMill
         # defaults
         configure(lm)
         add_saw(lm, date_saw)
-        add_truck(lm, LumberjackLog(STDOUT, nothing, nothing))
+        add_truck(lm, LumberjackLog(STDOUT, nothing, nothing), "console")
 
         lm
     end
@@ -63,6 +63,13 @@ function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
 end
 
 add_truck(truck::TimberTruck, name = string(UUID.v4())) = add_truck(_lumber_mill, truck, name)
+
+
+function remove_truck(lm::LumberMill, name)
+    delete!(lm.timber_trucks, name)
+end
+
+remove_truck(name) = remove_truck(_lumber_mill, name)
 
 # -------
 
