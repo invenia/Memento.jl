@@ -26,7 +26,7 @@ end
 configure(; args...) = configure(_lumber_mill; args...)
 
 
-function log(lm::LumberMill, mode::String, msg::String, args::Dict)
+function log(lm::LumberMill, mode::String, msg::String, args::Dict = Dict())
     args[:mode] = mode
     args[:msg] = msg
 
@@ -39,9 +39,9 @@ function log(lm::LumberMill, mode::String, msg::String, args::Dict)
     end
 end
 
-log(mode::String, msg::String, args::Dict) = log(_lumber_mill, mode, msg, args)
+log(mode::String, msg::String, args::Dict = Dict()) = log(_lumber_mill, mode, msg, args)
 
-log(mode::String, args::Dict) = log(_lumber_mill, mode, "", args)
+log(mode::String, args::Dict = Dict()) = log(_lumber_mill, mode, "", args)
 
 
 function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws)+1)
