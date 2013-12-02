@@ -7,8 +7,8 @@ using Datetime
 using UUID
 
 export log,
-       add_saw, remove_saw,
-       add_truck, remove_truck,
+       add_saw, remove_saw, remove_saws,
+       add_truck, remove_truck, remove_trucks,
        configure
 
 

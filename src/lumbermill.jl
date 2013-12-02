@@ -58,6 +58,11 @@ end
 remove_saw(index = length(_lumber_mill.saws)) = remove_saw(_lumber_mill, index)
 
 
+function remove_saws(lm::LumberMill = _lumber_mill)
+    empty!(lm.saws)
+end
+
+
 function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
     lm.timber_trucks[name] = truck
 end
@@ -70,6 +75,11 @@ function remove_truck(lm::LumberMill, name)
 end
 
 remove_truck(name) = remove_truck(_lumber_mill, name)
+
+
+function remove_trucks(lm::LumberMill = _lumber_mill)
+    empty!(lm.timber_trucks)
+end
 
 # -------
 
