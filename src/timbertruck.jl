@@ -11,7 +11,6 @@ type CommonLog <: TimberTruck
     # for use by the framework, will be
     # ignored if absent or set to nothing
     _mode
-    _scope
 end
 
 function log(truck::CommonLog, l::Dict)
@@ -24,7 +23,6 @@ type LumberjackLog <: TimberTruck
     out::IO
 
     _mode
-    _scope
 end
 
 function log(truck::LumberjackLog, l::Dict)

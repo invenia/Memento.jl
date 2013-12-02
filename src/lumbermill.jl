@@ -11,7 +11,7 @@ type LumberMill
         # defaults
         configure(lm)
         add_saw(lm, date_saw)
-        add_truck(lm, LumberjackLog(STDOUT, nothing, nothing), "console")
+        add_truck(lm, LumberjackLog(STDOUT, "warn"), "console")
 
         lm
     end
@@ -35,6 +35,13 @@ function log(lm::LumberMill, mode::String, msg::String, args::Dict = Dict())
     end
 
     for (truck_name, truck) in lm.timber_trucks
+        if (in(:_mode, names(truck))
+            && truck._mode != nothing
+            && get_mode_index(lm, mode) < get_mode_index(lm, truck._mode))
+
+            continue
+        end
+
         log(truck, args)
     end
 end
@@ -79,6 +86,13 @@ remove_truck(name) = remove_truck(_lumber_mill, name)
 
 function remove_trucks(lm::LumberMill = _lumber_mill)
     empty!(lm.timber_trucks)
+end
+
+# -------
+
+function get_mode_index(lm::LumberMill, mode)
+    index = findfirst(lm.modes, mode)
+    index > 0 ? index : length(lm.modes) + 1
 end
 
 # -------
