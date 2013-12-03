@@ -12,8 +12,8 @@ using Lumberjack
 julia> log("debug", "something innocuous happened!")
 2013-12-02T19:39:16 UTC debug:"something innocuous happened!"
 
-julia> log("info", "using some more memory...", {:mem_allocated => 9001, :mem_left => 22})
-2013-12-02T19:39:21 UTC info:"using some more memory..." mem_allocated:9001 mem_left:22
+julia> log("info", "using more memory!", {:mem_allocated => 9001, :mem_left => 22})
+2013-12-02T19:39:21 UTC info:"using more memory!" mem_allocated:9001 mem_left:22
 
 julia> log("warn", "running really low on memory...", {:mem_left => "22 k"})
 2013-12-02T19:39:44 UTC warn:"running really low on memory..." mem_left:"22 k"
@@ -36,4 +36,54 @@ A saw function simply takes in a dict of parameters, adds or removes things, and
 
 ### TimberTruck
 
-Timber trucks are used to send logs to their final destinations (files, the console, etc). A timber truck ingerits from the abstarct type `TimberTruck` and overloads the `log(t::TimberTruck, args::Dict)` function. By default, the framework will create a `LumberjackLog` truck that will print `args` as a string of `key:"value"` pairs to STDOUT.
+Timber trucks are used to send logs to their final destinations (files, the console, etc). A timber truck ingerits from the abstarct type `TimberTruck` and overloads the `log(t::TimberTruck, args::Dict)` function. By default, the framework will create a `LumberjackLog` truck that will print `args` as a string of `key:value` pairs to STDOUT.
+
+
+## API
+
+```
+log(lm::LumberMill, mode::String, msg::String, args::Dict) 
+```
++ `mode` is a string like "debug", "info", "warn", "error", etc
++ `msg` is an explanative message about what happened
++ `args` is an optional dictionary of data to be recorded alongside `msg`
+
+
+```
+add_saw(lm::LumberMill, saw_fn::Function, index)
+```
++ `index` is optional and will default to the end of the saw list
+
+
+```
+remove_saw(lm::LumberMill, index)
+```
++ `index` is optional, by default the last saw in the list will be removed
+
+
+```
+remove_saws(lm::LumberMill)  # removes ALL saws currently in use
+```
+
+
+```
+add_truck(lm::LumberMill, truck::TimberTruck, name)
+```
++ `name` is optional and will default to a unique id
+
+
+```
+remove_truck(lm::LumberMill, name)
+```
++ `name` is the id associated with the truck to be removed
+
+
+```
+remove_trucks(lm::LumberMill)  # removes ALL trucks currently in use
+```
+
+
+```
+configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
+```
++ `modes` is an ordered array of logging levels
