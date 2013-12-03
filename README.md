@@ -24,7 +24,7 @@ julia> log("error", "OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
 
 ## Architecture
 
-There are three main components of Lumberjack.jl that you can manipulate and use to produce the logs you've always dreamed of.
+There are three main components of Lumberjack.jl that you can manipulate to produce logs that would make Paul Bunyan proud.
 
 ### LumberMill
 
@@ -49,6 +49,7 @@ log(lm::LumberMill, mode::String, msg::String, args::Dict)
 + `msg` is an explanative message about what happened
 + `args` is an optional dictionary of data to be recorded alongside `msg`
 
+
 ### Saws
 ```julia
 add_saw(lm::LumberMill, saw_fn::Function, index)
@@ -66,6 +67,7 @@ remove_saw(lm::LumberMill, index)
 remove_saws(lm::LumberMill)  # removes ALL saws currently in use
 ```
 
+
 ### Trucks
 ```julia
 add_truck(lm::LumberMill, truck::TimberTruck, name)
@@ -82,6 +84,7 @@ remove_truck(lm::LumberMill, name)
 ```julia
 remove_trucks(lm::LumberMill)  # removes ALL trucks currently in use
 ```
+
 
 ### Configuration
 ```julia
