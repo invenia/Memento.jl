@@ -42,7 +42,7 @@ Timber trucks are used to send logs to their final destinations (files, the cons
 ## API
 
 ### Logging
-```
+```julia
 log(lm::LumberMill, mode::String, msg::String, args::Dict) 
 ```
 + `mode` is a string like "debug", "info", "warn", "error", etc
@@ -50,41 +50,41 @@ log(lm::LumberMill, mode::String, msg::String, args::Dict)
 + `args` is an optional dictionary of data to be recorded alongside `msg`
 
 ### Saws
-```
+```julia
 add_saw(lm::LumberMill, saw_fn::Function, index)
 ```
 + `index` is optional and will default to the end of the saw list
 
 
-```
+```julia
 remove_saw(lm::LumberMill, index)
 ```
 + `index` is optional, by default the last saw in the list will be removed
 
 
-```
+```julia
 remove_saws(lm::LumberMill)  # removes ALL saws currently in use
 ```
 
 ### Trucks
-```
+```julia
 add_truck(lm::LumberMill, truck::TimberTruck, name)
 ```
 + `name` is optional and will default to a unique id
 
 
-```
+```julia
 remove_truck(lm::LumberMill, name)
 ```
 + `name` is the id associated with the truck to be removed
 
 
-```
+```julia
 remove_trucks(lm::LumberMill)  # removes ALL trucks currently in use
 ```
 
 ### Configuration
-```
+```julia
 configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 ```
 + `modes` is an ordered array of logging levels
