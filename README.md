@@ -41,6 +41,7 @@ Timber trucks are used to send logs to their final destinations (files, the cons
 
 ## API
 
+### Logging
 ```
 log(lm::LumberMill, mode::String, msg::String, args::Dict) 
 ```
@@ -48,7 +49,7 @@ log(lm::LumberMill, mode::String, msg::String, args::Dict)
 + `msg` is an explanative message about what happened
 + `args` is an optional dictionary of data to be recorded alongside `msg`
 
-
+### Saws
 ```
 add_saw(lm::LumberMill, saw_fn::Function, index)
 ```
@@ -65,7 +66,7 @@ remove_saw(lm::LumberMill, index)
 remove_saws(lm::LumberMill)  # removes ALL saws currently in use
 ```
 
-
+### Trucks
 ```
 add_truck(lm::LumberMill, truck::TimberTruck, name)
 ```
@@ -82,7 +83,7 @@ remove_truck(lm::LumberMill, name)
 remove_trucks(lm::LumberMill)  # removes ALL trucks currently in use
 ```
 
-
+### Configuration
 ```
 configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 ```
