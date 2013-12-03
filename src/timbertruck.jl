@@ -37,7 +37,7 @@ function log(truck::LumberjackLog, l::Dict)
     l = copy(l)
 
     date_stamp = get(l, :date, nothing)
-    record = date_stamp == nothing ? "" : "$date_stamp "
+    record = date_stamp == nothing ? "" : "$date_stamp - "
 
     record = string(record, "$(l[:mode]):$(repr(l[:msg]))")
     delete!(l, :date)

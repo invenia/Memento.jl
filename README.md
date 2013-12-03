@@ -10,16 +10,16 @@ Pkg.clone("https://github.com/forio/Lumberjack.jl.git")
 using Lumberjack
 
 julia> log("debug", "something innocuous happened!")
-2013-12-02T19:39:16 UTC debug:"something innocuous happened!"
+2013-12-02T19:39:16 UTC - debug:"something innocuous happened!"
 
 julia> log("info", "using more memory!", {:mem_allocated => 9001, :mem_left => 22})
-2013-12-02T19:39:21 UTC info:"using more memory!" mem_allocated:9001 mem_left:22
+2013-12-02T19:39:21 UTC - info:"using more memory!" mem_allocated:9001 mem_left:22
 
 julia> log("warn", "running really low on memory...", {:mem_left => "22 k"})
-2013-12-02T19:39:44 UTC warn:"running really low on memory..." mem_left:"22 k"
+2013-12-02T19:39:44 UTC - warn:"running really low on memory..." mem_left:"22 k"
 
 julia> log("error", "OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
-2013-12-02T19:39:48 UTC error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
+2013-12-02T19:39:48 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
 ```
 
 ## Architecture
