@@ -24,7 +24,7 @@ julia> log("error", "OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
 
 ## Architecture
 
-There are three main components of Lumberjack.jl that you can manipulate to produce logs that would make Paul Bunyan proud.
+There are three main components of Lumberjack.jl that you can manipulate:
 
 ### LumberMill
 
