@@ -1,5 +1,6 @@
 Lumberjack.jl
 =============
+[![Build Status](https://magnum.travis-ci.com/forio/Lumberjack.jl.png?token=g2BATAK3ptx7LojqfRxq&branch=master)](https://magnum.travis-ci.com/forio/Lumberjack.jl)
 
 ## Quick Start
 ```julia
