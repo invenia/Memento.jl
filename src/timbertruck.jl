@@ -49,6 +49,7 @@ function log(truck::LumberjackLog, l::Dict)
     end
 
     println(truck.out, record)
+    flush(truck.out)
 end
 
 # -------
