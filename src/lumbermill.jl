@@ -19,8 +19,15 @@ end
 
 # -------
 
-function configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
+function configure(lm::LumberMill;
+                   modes = ["debug", "info", "warn", "error"],
+                   trucks = Dict{Any, Dict}())
+
     lm.modes = modes
+
+    for (truck, settings) in trucks
+        configure(lm.timber_trucks[truck]; settings...)
+    end
 end
 
 configure(; args...) = configure(_lumber_mill; args...)

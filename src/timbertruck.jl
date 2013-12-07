@@ -3,6 +3,13 @@ abstract TimberTruck
 
 log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)), args::Dict)`")
 
+
+function configure(t::TimberTruck; mode = nothing)
+    !in(:_mode, names(t)) && return
+    t._mode = mode
+end
+
+
 # -------
 
 type CommonLog <: TimberTruck
