@@ -4,7 +4,7 @@ using Base.Test
 const LOG_FILE = "lumberjacklog-out.log"
 
 configure(; modes = ["debug", "info", "warn", "error", "crazy"])
-add_truck(Lumberjack.LumberjackLog(LOG_FILE), "lumberjacklogfile")
+add_truck(Lumberjack.LumberjackTruck(LOG_FILE), "lumberjacklogfile")
 
 
 # test without dates
