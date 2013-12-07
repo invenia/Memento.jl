@@ -12,7 +12,7 @@ end
 
 # -------
 
-type CommonLog <: TimberTruck
+type CommonLogTruck <: TimberTruck
     out::IO
 
     # for use by the framework, will be
@@ -20,19 +20,19 @@ type CommonLog <: TimberTruck
     _mode
 end
 
-function log(truck::CommonLog, l::Dict)
+function log(truck::CommonLogTruck, l::Dict)
     println(truck.out, "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])")
 end
 
 # -------
 
-type LumberjackLog <: TimberTruck
+type LumberjackTruck <: TimberTruck
     out::IO
 
     _mode
 
-    LumberjackLog(out::IO, mode = nothing) = new(out, mode)
-    function LumberjackLog(filename::String, mode = nothing)
+    LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
+    function LumberjackTruck(filename::String, mode = nothing)
         file = open(filename, "a")
         truck = new(file, mode)
         finalizer(truck, (t)->close(t.out))
@@ -40,7 +40,7 @@ type LumberjackLog <: TimberTruck
     end
 end
 
-function log(truck::LumberjackLog, l::Dict)
+function log(truck::LumberjackTruck, l::Dict)
     l = copy(l)
 
     date_stamp = get(l, :date, nothing)
