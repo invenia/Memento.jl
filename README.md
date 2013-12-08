@@ -34,6 +34,16 @@ Now there is a truck named "my-file-logger", and it will write all of your logs 
 julia> Lumberjack.remove_truck("console")
 ```
 
+### Manage logging modes / levels
+Each timber truck is configured to log messages above a certain level / mode, and by default they will log everything. There are 4 built-in modes: `["debug", "info", "warn", "error"]`. To create a timber truck that will only record warnings and errors, you can:
+```julia
+julia> Lumberjack.add_truck(LumberjackTruck(STDOUT, "warn"), "dangerous-logger")
+```
+
+Or to configure an existing truck, you can call:
+```
+julia> configure(timber_truck; mode = "warn")
+```
 ## Architecture
 
 There are three main components of Lumberjack.jl that you can manipulate:
