@@ -27,7 +27,7 @@ julia> log("error", "OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
 ### Add and remove `TimberTrucks`
 Logs are brought to different output streams by `TimberTrucks`. To create a truck that will dump logs into a file, simply:
 ```julia
-julia> Lumberjack.add_truck(LuberjackTruck("mylogfile.log"), "my-file-logger")
+julia> Lumberjack.add_truck(LumberjackTruck("mylogfile.log"), "my-file-logger")
 ```
 Now there is a truck named "my-file-logger", and it will write all of your logs to `mylogfile.log`. Your logs will still show up in the console, however, because -by default- there is a truck named "console" already hard at work. Remove it by calling:
 ```julia
