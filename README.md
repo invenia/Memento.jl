@@ -7,6 +7,7 @@ Lumberjack.jl
 Pkg.clone("https://github.com/forio/Lumberjack.jl.git")
 ```
 
+### Create logs
 ```julia
 using Lumberjack
 
@@ -21,6 +22,16 @@ julia> log("warn", "running really low on memory...", {:mem_left => "22 k"})
 
 julia> log("error", "OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
 2013-12-02T19:39:48 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
+```
+
+### Add and remove `TimberTrucks`
+Logs are brought to different output streams by `TimberTrucks`. To create a truck that will dump logs into a file, simply:
+```julia
+julia> Lumberjack.add_truck(LuberjackTruck("mylogfile.log"), "my-file-logger")
+```
+Now there is a truck named "my-file-logger", and it will write all of your logs to `mylogfile.log`. Your logs will still show up in the console, however, because -by default- there is a truck named "console" already hard at work. Remove it by calling:
+```julia
+julia> Lumberjack.remove_truck("console")
 ```
 
 ## Architecture
@@ -44,7 +55,7 @@ Timber trucks are used to send logs to their final destinations (files, the cons
 
 ### Logging
 ```julia
-log(lm::LumberMill, mode::String, msg::String, args::Dict) 
+log(lm::LumberMill, mode::String, msg::String, args::Dict)
 ```
 + `mode` is a string like "debug", "info", "warn", "error", etc
 + `msg` is an explanative message about what happened
