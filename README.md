@@ -9,7 +9,7 @@ Pkg.clone("https://github.com/forio/Lumberjack.jl.git")
 
 ### Create logs
 ```julia
-using Lumberjack
+julia> using Lumberjack
 
 julia> log("debug", "something innocuous happened!")
 2013-12-02T19:39:16 UTC - debug:"something innocuous happened!"
