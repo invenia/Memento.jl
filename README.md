@@ -35,7 +35,7 @@ julia> Lumberjack.remove_truck("console")
 ```
 
 ### Manage logging modes / levels
-Each timber truck is configured to log messages above a certain level / mode, and by default they will log everything. There are 4 built-in modes: `["debug", "info", "warn", "error"]`. To create a timber truck that will only record warnings and errors, you can:
+Each timber truck is configured to log messages _above_ a certain level / mode, and by default they will log everything. There are 4 built-in modes: `["debug", "info", "warn", "error"]`. To create a timber truck that will only record warnings and errors, you can:
 ```julia
 julia> Lumberjack.add_truck(LumberjackTruck(STDOUT, "warn"), "dangerous-logger")
 ```
