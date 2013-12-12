@@ -96,8 +96,12 @@ warn(err::Exception; prefix = "error: ", kw...) =
 
 
 function error(lm::LumberMill, msg::String, args::Dict = Dict())
+    exception_msg = copy(msg)
+    length(args) > 0 && (exception_msg *= " $args")
+
     log(lm, "error", msg, args)
-    throw(ErrorException(string(msg, " ", args)))
+
+    throw(ErrorException(exception_msg))
 end
 
 error(msg::String, args::Dict) = error(_lumber_mill, msg, args)
