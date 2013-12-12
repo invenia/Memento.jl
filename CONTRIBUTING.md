@@ -9,9 +9,13 @@ To start hacking code or writing docs, simply:
 2. ???
 3. ~~Profit~~ Share with the world!
 
+### Bugs, features, and requests
+Feel free to [file issues](https://github.com/forio/Lumberjack.jl/issues) when you encounter bugs, think of interesting features you'd like to see, or when there are important changes not yet included in a release and you'd like us to tag a new version.
+
+
 ## Submitting your contributions
 
-*By contributing code to Lumberjack, you are agreeing to release it under the [MIT License](https://github.com/forio/Lumberjack.jl/blob/master/LICENSE.md).*
+*By contributing code to Lumberjack, you are agreeing to release your work under the [MIT License](https://github.com/forio/Lumberjack.jl/blob/master/LICENSE.md).*
 
 We love contributions in the form of pull requests! Assuming you've been working in a repo checked out as above, this should be easy to do. For a detailed walkthrough, check [here](https://help.github.com/articles/fork-a-repo), otherwise:
 
