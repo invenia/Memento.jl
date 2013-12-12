@@ -58,6 +58,53 @@ log(mode::String, msg::String, args::Dict = Dict()) = log(_lumber_mill, mode, ms
 log(mode::String, args::Dict = Dict()) = log(_lumber_mill, mode, "", args)
 
 
+debug(lm::LumberMill, msg::String, args::Dict = Dict()) = log(lm, "debug", msg, args)
+
+debug(msg::String, args::Dict) = debug(_lumber_mill, msg, args)
+
+debug(msg::String...) = debug(_lumber_mill, string(msg...))
+
+
+info(lm::LumberMill, msg::String, args::Dict = Dict()) = log(lm, "info", msg, args)
+
+info(msg::String, args::Dict) = info(_lumber_mill, msg, args)
+
+info(msg::String...; prefix = "info: ") = info(_lumber_mill, string(msg...))
+
+
+warn(lm::LumberMill, msg::String, args::Dict = Dict()) = log(lm, "warn", msg, args)
+
+warn(msg::String, args::Dict) = warn(_lumber_mill, msg, args)
+
+function warn(msg::String...; prefix="warning: ", once = false, key = nothing, bt = nothing)
+    str = chomp(bytestring(msg...))
+
+    if once
+        if key === nothing
+            key = str
+        end
+
+        (key in Base.have_warned) && return
+        push!(Base.have_warned, key)
+    end
+
+    warn(_lumber_mill, str, bt !== nothing ? {:backtrace => sprint(show_backtrace, bt)} : Dict())
+end
+
+warn(err::Exception; prefix = "error: ", kw...) =
+    warn(sprint(io->showerror(io,err)), prefix = prefix; kw...)
+
+
+function error(lm::LumberMill, msg::String, args::Dict = Dict())
+    log(lm, "error", msg, args)
+    throw(ErrorException(string(msg, " ", args)))
+end
+
+error(msg::String, args::Dict) = error(_lumber_mill, msg, args)
+
+error(msg...) = error(_lumber_mill, string(msg...))
+
+
 function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws)+1)
     insert!(lm.saws, index, saw_fn)
 end
