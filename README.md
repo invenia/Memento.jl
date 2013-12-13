@@ -23,12 +23,9 @@ julia> warn("running really low on memory...", {:mem_left => "22 k"})
 julia> try
          error("OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
        catch err
-         println("Acts like Base.error, throws an ", typeof(err))
-         throw(err)
+         # Acts like Base.error, throws an `ErrorException`
        end
 2013-12-02T19:39:48 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
-Acts like Base.error, throws an ErrorException
-ERROR: OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH
 
 julia> log("info", "use `log` for user-defined modes, or to be verbose.")
 2013-12-12T23:58:56 UTC - info:"use `log` for user-defined modes, or to be verbose."
