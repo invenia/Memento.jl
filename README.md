@@ -30,8 +30,8 @@ julia> try
 Acts like Base.error, throws an ErrorException
 ERROR: OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH
 
-julia> log("info", "use `log(mode, ...)` for user-defined modes, or to be verbose.")
-2013-12-12T23:58:56 UTC - info:"use `log(mode, ...)` for user-defined modes, or to be verbose."
+julia> log("info", "use `log` for user-defined modes, or to be verbose.")
+2013-12-12T23:58:56 UTC - info:"use `log` for user-defined modes, or to be verbose."
 ```
 
 ### Add and remove `TimberTrucks`
