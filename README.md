@@ -26,7 +26,6 @@ julia> try
          println("Acts like Base.error, throws an ", typeof(err))
          throw(err)
        end
-
 2013-12-02T19:39:48 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
 Acts like Base.error, throws an ErrorException
 ERROR: OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH
