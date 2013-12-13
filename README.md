@@ -79,6 +79,15 @@ log(lm::LumberMill, mode::String, msg::String, args::Dict)
 + `args` is an optional dictionary of data to be recorded alongside `msg`
 
 
+```julia
+debug(lm::LumberMill, msg::String, args::Dict)
+info(lm::LumberMill, msg::String, args::Dict)
+warn(lm::LumberMill, msg::String, args::Dict)
+error(lm::LumberMill, msg::String, args::Dict)
+```
++ each call `log` with `mode` filled in appropriately
+
+
 ### Saws
 ```julia
 add_saw(lm::LumberMill, saw_fn::Function, index)
