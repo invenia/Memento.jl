@@ -129,3 +129,7 @@ remove_trucks(lm::LumberMill)  # removes ALL trucks currently in use
 configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 ```
 + `modes` is an ordered array of logging levels
+
+
+## Questions
+Feel free to file issues, submit pull requests, and email. Originally authored by Westley Hennigh (whennigh@forio.com)
