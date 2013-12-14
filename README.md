@@ -132,4 +132,4 @@ configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 
 
 ## Questions
-Feel free to file issues, submit pull requests, and email. Originally authored by Westley Hennigh (whennigh@forio.com)
+Feel free to file issues, submit pull requests, and email. Originally authored by @WestleyArgentum (whennigh@forio.com)
