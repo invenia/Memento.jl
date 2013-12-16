@@ -131,5 +131,4 @@ configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 + `modes` is an ordered array of logging levels
 
 
-## Questions
-Feel free to file issues, submit pull requests, and email. Originally authored by [@WestleyArgentum](https://github.com/WestleyArgentum) (whennigh@forio.com)
+
