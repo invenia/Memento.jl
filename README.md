@@ -6,7 +6,7 @@ Lumberjack.jl
 
 ## Quick Start
 ```julia
-Pkg.clone("https://github.com/forio/Lumberjack.jl.git")
+Pkg.add("Lumberjack")
 ```
 
 ### Create logs
