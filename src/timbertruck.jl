@@ -18,10 +18,20 @@ type CommonLogTruck <: TimberTruck
     # for use by the framework, will be
     # ignored if absent or set to nothing
     _mode
+
+    CommonLogTruck(out::IO, mode = nothing) = new(out, mode)
+
+    function CommonLogTruck(filename::String, mode = nothing)
+        file = open(filename, "a")
+        truck = new(file, mode)
+        finalizer(truck, (t)->close(t.out))
+        truck
+    end
 end
 
 function log(truck::CommonLogTruck, l::Dict)
     println(truck.out, "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])")
+    flush(truck.out)
 end
 
 # -------
@@ -32,6 +42,7 @@ type LumberjackTruck <: TimberTruck
     _mode
 
     LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
+
     function LumberjackTruck(filename::String, mode = nothing)
         file = open(filename, "a")
         truck = new(file, mode)
