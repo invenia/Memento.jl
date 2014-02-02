@@ -132,5 +132,7 @@ configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 ```
 + `modes` is an ordered array of logging levels
 
+-------
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/forio/lumberjack.jl/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
