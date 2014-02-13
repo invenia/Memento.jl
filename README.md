@@ -53,6 +53,36 @@ Or to configure an existing truck, you can call:
 ```
 julia> configure(timber_truck; mode = "warn")
 ```
+
+### Logging Options
+`Lumberjack.add_truck` provides an optional third `Dict` argument. Possible keys are:
+
+#### is_colorized
+Colors can be added enabled using the following:
+
+```julia
+Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, {:is_colorized => true}), "console")
+```
+
+![colors](img/colors.png)
+
+By default the following colors are used:
+```julia
+{"debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red}
+```
+
+#### colors
+Custom colors/log levels can also be specified:
+```julia
+Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, :colors => {"debug" => :black, "info" => :blue, "warn" => :yellow, "error" => :red, "crazy" => :green}), "console")
+```
+
+#### uppercase
+Log levels can be made uppercase (INFO vs info, etc.) with the following option:
+```julia
+Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, {:uppercase => true}), "console")
+```
+
 ## Architecture
 
 There are three main components of Lumberjack.jl that you can manipulate:

@@ -1,4 +1,3 @@
-
 abstract TimberTruck
 
 log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)), args::Dict)`")
@@ -38,16 +37,39 @@ end
 
 type LumberjackTruck <: TimberTruck
     out::IO
-
     _mode
+    opts::Dict
+
+    function LumberjackTruck(out::IO, mode = nothing, opts = Dict())
+        setup_opts(opts)
+        new(out, mode, opts)
+    end
 
     LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
 
-    function LumberjackTruck(filename::String, mode = nothing)
+    function LumberjackTruck(filename::String, mode = nothing, opts = Dict())
         file = open(filename, "a")
-        truck = new(file, mode)
+        setup_opts(opts)
+        truck = new(file, mode, opts)
         finalizer(truck, (t)->close(t.out))
         truck
+    end
+
+    function setup_opts(opts)
+        if haskey(opts, :colors)
+            opts[:is_colorized] = true
+        elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
+            # set default colors
+            opts[:colors] = {"debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red}
+        else
+            opts[:is_colorized] = false
+        end
+
+        if (!haskey(opts, :uppercase))
+            opts[:uppercase] = false
+        end
+
+        opts
     end
 end
 
@@ -57,7 +79,13 @@ function log(truck::LumberjackTruck, l::Dict)
     date_stamp = get(l, :date, nothing)
     record = date_stamp == nothing ? "" : "$date_stamp - "
 
-    record = string(record, "$(l[:mode]):$(repr(l[:msg]))")
+    mode = l[:mode]
+
+    if (truck.opts[:uppercase])
+        l[:mode] = uppercase(l[:mode])
+    end
+
+    record = string(record, "$(l[:mode]): $(l[:msg])")
     delete!(l, :date)
     delete!(l, :mode)
     delete!(l, :msg)
@@ -66,7 +94,18 @@ function log(truck::LumberjackTruck, l::Dict)
         record = string(record, " $k:$(repr(v))")
     end
 
-    println(truck.out, record)
+
+    if (truck.opts[:is_colorized])
+        # check if color has been defined for key
+        if (haskey(truck.opts[:colors], mode))
+            print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
+        # if not, don't apply colors
+        else
+            println(truck.out, record)
+        end
+    else
+        println(truck.out, record)
+    end
     flush(truck.out)
 end
 

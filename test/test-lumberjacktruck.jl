@@ -41,11 +41,11 @@ log_lines = readlines(open(LOG_FILE, "r"))
 
 
 # test without dates
-@test log_lines[1] == "debug:\"some-msg\"\n"
-@test log_lines[2] == "info:\"some-msg\"\n"
-@test log_lines[3] == "warn:\"some-msg\"\n"
-@test log_lines[4] == "error:\"some-msg\"\n"
-@test log_lines[5] == "crazy:\"some-msg\"\n"
+@test log_lines[1] == "debug: some-msg\n"
+@test log_lines[2] == "info: some-msg\n"
+@test log_lines[3] == "warn: some-msg\n"
+@test log_lines[4] == "error: some-msg\n"
+@test log_lines[5] == "crazy: some-msg\n"
 
 
 # test with dates
@@ -58,11 +58,11 @@ date_regex = r"[\/|\-|\.|,|\s]"
 
 
 # test with extra params
-@test log_lines[11] == "debug:\"some-msg\" thing1:\"thing1\"\n"
-@test log_lines[12] == "info:\"some-msg\" thing2:69 thing1:\"thing1\"\n"
-@test log_lines[13] == "warn:\"some-msg\" thing2:69 thing3:[1,2,3] thing1:\"thing1\"\n"
-@test log_lines[14] == "error:\"some-msg\" thing2:69 thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
-@test log_lines[15] == "crazy:\"some-msg\" thing2:69 thing5::some_symbol thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
+@test log_lines[11] == "debug: some-msg thing1:\"thing1\"\n"
+@test log_lines[12] == "info: some-msg thing2:69 thing1:\"thing1\"\n"
+@test log_lines[13] == "warn: some-msg thing2:69 thing3:[1,2,3] thing1:\"thing1\"\n"
+@test log_lines[14] == "error: some-msg thing2:69 thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
+@test log_lines[15] == "crazy: some-msg thing2:69 thing5::some_symbol thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
 
 
 # clean up
