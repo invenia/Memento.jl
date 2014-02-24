@@ -79,6 +79,14 @@ function log(truck::LumberjackTruck, l::Dict)
     date_stamp = get(l, :date, nothing)
     record = date_stamp == nothing ? "" : "$date_stamp - "
 
+    lookup = get(l, :lookup, nothing)
+    if !is(lookup,nothing)
+        # lookup is a tuple
+        func , fname, linenum = lookup
+        lookup_str = "$(string(func))@$(basename(string(fname))):$(linenum) - "
+        record = record*lookup_str
+    end
+
     mode = l[:mode]
 
     if (truck.opts[:uppercase])
@@ -86,7 +94,9 @@ function log(truck::LumberjackTruck, l::Dict)
     end
 
     record = string(record, "$(l[:mode]): $(l[:msg])")
+
     delete!(l, :date)
+    delete!(l, :lookup)
     delete!(l, :mode)
     delete!(l, :msg)
 
