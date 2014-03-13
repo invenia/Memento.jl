@@ -1,4 +1,3 @@
-
 module Lumberjack
 
 import Base.show, Base.log
@@ -15,7 +14,9 @@ export log,
        add_truck, remove_truck, remove_trucks,
        configure,
 
-       LumberjackTruck, CommonLogTruck
+       TimberTruck,
+       LumberjackTruck,
+       CommonLogTruck
 
 
 # -------
