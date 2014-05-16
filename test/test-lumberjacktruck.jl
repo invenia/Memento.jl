@@ -58,12 +58,31 @@ date_regex = r"[\/|\-|\.|,|\s]"
 
 
 # test with extra params
-@test log_lines[11] == "debug: some-msg thing1:\"thing1\"\n"
-@test log_lines[12] == "info: some-msg thing2:69 thing1:\"thing1\"\n"
-@test log_lines[13] == "warn: some-msg thing2:69 thing3:[1,2,3] thing1:\"thing1\"\n"
-@test log_lines[14] == "error: some-msg thing2:69 thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
-@test log_lines[15] == "crazy: some-msg thing2:69 thing5::some_symbol thing3:[1,2,3] thing4:{\"a\"=>\"apple\"} thing1:\"thing1\"\n"
+@test contains(log_lines[11], "debug: some-msg")
+@test contains(log_lines[11], "thing1:\"thing1\"")
 
+@test contains(log_lines[12], "info: some-msg")
+@test contains(log_lines[12], "thing2:69")
+@test contains(log_lines[12], "thing1:\"thing1\"")
+
+
+@test contains(log_lines[13], "warn: some-msg")
+@test contains(log_lines[13], "thing2:69")
+@test contains(log_lines[13], "thing3:[1,2,3]")
+@test contains(log_lines[13], "thing1:\"thing1\"")
+
+@test contains(log_lines[14], "error: some-msg")
+@test contains(log_lines[14], "thing2:69")
+@test contains(log_lines[14], "thing3:[1,2,3]")
+@test contains(log_lines[14], "thing4:{\"a\"=>\"apple\"}")
+@test contains(log_lines[14], "thing1:\"thing1\"")
+
+@test contains(log_lines[15], "crazy: some-msg")
+@test contains(log_lines[15], "thing2:69")
+@test contains(log_lines[15], "thing5::some_symbol")
+@test contains(log_lines[15], "thing3:[1,2,3]")
+@test contains(log_lines[15], "thing4:{\"a\"=>\"apple\"}")
+@test contains(log_lines[15], "thing1:\"thing1\"")
 
 # clean up
 @test success(`rm $LOG_FILE`)

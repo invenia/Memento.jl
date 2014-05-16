@@ -3,7 +3,6 @@ using Base.Test
 const LOG_FILE_OPTS = "lumberjacklog-out-opts.log"
 
 configure(; modes = ["debug", "info", "warn", "error", "crazy"])
-
 add_truck(Lumberjack.LumberjackTruck(LOG_FILE_OPTS, nothing, {:is_colorized => true, :uppercase => true}), "colorlumberjacklogfile")
 
 log("debug", "some-msg")
