@@ -14,23 +14,23 @@ Pkg.add("Lumberjack")
 julia> using Lumberjack
 
 julia> debug("something innocuous happened!")
-2013-12-02T19:39:16 UTC - debug:"something innocuous happened!"
+2013-12-02T19:39:16.123 UTC - debug:"something innocuous happened!"
 
 julia> info("using more memory!", {:mem_allocated => 9001, :mem_left => 22})
-2013-12-02T19:39:21 UTC - info:"using more memory!" mem_allocated:9001 mem_left:22
+2013-12-02T19:39:21.345 UTC - info:"using more memory!" mem_allocated:9001 mem_left:22
 
 julia> warn("running really low on memory...", {:mem_left => "22 k"})
-2013-12-02T19:39:44 UTC - warn:"running really low on memory..." mem_left:"22 k"
+2013-12-02T19:39:44.456 UTC - warn:"running really low on memory..." mem_left:"22 k"
 
 julia> try
          error("OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH")
        catch err
          # Acts like Base.error, throws an `ErrorException`
        end
-2013-12-02T19:39:48 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
+2013-12-02T19:39:48.678 UTC - error:"OUT OF MEMORY - IT'S ALL OVER - ARRGGGHHHH"
 
 julia> log("info", "use `log` for user-defined modes, or to be verbose.")
-2013-12-12T23:58:56 UTC - info:"use `log` for user-defined modes, or to be verbose."
+2013-12-12T23:58:56.890 UTC - info:"use `log` for user-defined modes, or to be verbose."
 ```
 
 ### Add and remove `TimberTrucks`
