@@ -10,7 +10,7 @@ type LumberMill
 
         # defaults
         configure(lm)
-        add_saw(lm, date_saw)
+        add_saw(lm, msec_date_saw)
         add_truck(lm, LumberjackTruck(STDOUT, nothing, {:is_colorized => true}), "console")
 
         lm
