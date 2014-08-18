@@ -1,12 +1,7 @@
 
 # -------
 
-date_saw(args::Dict) = push!(args, :date, now())
-
-function msec_date_saw(args::Dict)
-    now = now()
-    push!(args, :date, string(now))
-end
+msec_date_saw(args::Dict) = push!(args, :date, now())
 
 function fn_call_saw(args::Dict)
     lookup = [ccall(:jl_lookup_code_address,
