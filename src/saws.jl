@@ -1,14 +1,7 @@
 
 # -------
 
-date_saw(args::Dict) = push!(args, :date, now())
-
-function msec_date_saw(args::Dict)
-    now = Datetime.now()
-    push!(args, :date,
-          join(split(string(now)),
-          "."*string(Datetime.milliseconds(now))*" "))
-end
+msec_date_saw(args::Dict) = push!(args, :date, now())
 
 function fn_call_saw(args::Dict)
     lookup = [ccall(:jl_lookup_code_address,
