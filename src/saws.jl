@@ -4,10 +4,8 @@
 date_saw(args::Dict) = push!(args, :date, now())
 
 function msec_date_saw(args::Dict)
-    now = Datetime.now()
-    push!(args, :date,
-          join(split(string(now)),
-          "."*string(Datetime.milliseconds(now))*" "))
+    now = now()
+    push!(args, :date, string(now))
 end
 
 function fn_call_saw(args::Dict)
