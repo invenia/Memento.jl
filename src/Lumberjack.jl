@@ -4,8 +4,6 @@ import Base.show, Base.log
 
 # To avoid warnings, intentionally do not import:
 # Base.error, Base.warn, Base.info
-
-using Dates
 using UUID
 
 export log,

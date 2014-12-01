@@ -60,7 +60,7 @@ type LumberjackTruck <: TimberTruck
             opts[:is_colorized] = true
         elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
             # set default colors
-            opts[:colors] = {"debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red}
+            opts[:colors] = Dict{ASCIIString,Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
         else
             opts[:is_colorized] = false
         end

@@ -11,7 +11,7 @@ type LumberMill
         # defaults
         configure(lm)
         add_saw(lm, msec_date_saw)
-        add_truck(lm, LumberjackTruck(STDOUT, nothing, {:is_colorized => true}), "console")
+        add_truck(lm, LumberjackTruck(STDOUT, nothing, Dict{Symbol,Any}(:is_colorized => true)), "console")
 
         lm
     end
@@ -88,7 +88,7 @@ function warn(msg::String...; prefix="warning: ", once = false, key = nothing, b
         push!(Base.have_warned, key)
     end
 
-    warn(_lumber_mill, str, bt !== nothing ? {:backtrace => sprint(show_backtrace, bt)} : Dict())
+    warn(_lumber_mill, str, bt !== nothing ? Dict{Symbol,Any}(:backtrace => sprint(show_backtrace, bt)) : Dict())
 end
 
 warn(err::Exception; prefix = "error: ", kw...) =
