@@ -4,7 +4,12 @@ import Base.show, Base.log
 
 # To avoid warnings, intentionally do not import:
 # Base.error, Base.warn, Base.info
-using UUID
+using UUID, Compat
+
+# for backwards compatability with 0.3:
+if VERSION < v"0.4.0-"
+	using Dates
+end
 
 export log,
        debug, info, warn, error,

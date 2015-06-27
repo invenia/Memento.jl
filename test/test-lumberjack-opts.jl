@@ -3,7 +3,7 @@ using Base.Test
 const LOG_FILE_OPTS = "lumberjacklog-out-opts.log"
 
 configure(; modes = ["debug", "info", "warn", "error", "crazy"])
-add_truck(Lumberjack.LumberjackTruck(LOG_FILE_OPTS, nothing, Dict{Any,Any}(:is_colorized => true, :uppercase => true)), "colorlumberjacklogfile")
+add_truck(Lumberjack.LumberjackTruck(LOG_FILE_OPTS, nothing, @compat Dict{Any,Any}(:is_colorized => true, :uppercase => true)), "colorlumberjacklogfile")
 
 log("debug", "some-msg")
 log("info", "some-msg")
@@ -14,7 +14,7 @@ log("crazy", "some-msg")
 remove_truck("optslumberjacklogfile")
 
 # custom colors
-add_truck(Lumberjack.LumberjackTruck(LOG_FILE_OPTS, nothing, Dict{Any,Any}(:colors => Dict{Any,Any}("debug" => :black, "info" => :red, "crazy" => :green), :uppercase => true)), "optslumberjacklogfile")
+add_truck(Lumberjack.LumberjackTruck(LOG_FILE_OPTS, nothing, @compat Dict{Any,Any}(:colors => Dict{Any,Any}("debug" => :black, "info" => :red, "crazy" => :green), :uppercase => true)), "optslumberjacklogfile")
 
 log("debug", "some-msg")
 log("info", "some-msg")
