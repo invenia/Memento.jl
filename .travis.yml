@@ -13,4 +13,4 @@ before_install:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
     - julia -e 'versioninfo(); Pkg.init(); Pkg.clone(pwd())'
-    - julia --color ./test/runtests.jl
+    - julia --color=yes ./test/runtests.jl
