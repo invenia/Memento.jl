@@ -1,5 +1,5 @@
 
-using Lumberjack
+using Lumberjack, Compat
 
 function reset_lumberjack()
     Lumberjack.remove_trucks()
@@ -14,7 +14,7 @@ files = readdir()
 # Run each file in the test directory that looks like "test-XXXX.jl"
 # Test files should assume the global lumber mill has been reset
 for file in files
-    !beginswith(file, "test-") && continue
+    !(@compat startswith(file, "test-")) && continue
 
     reset_lumberjack()
     include(abspath(file))
