@@ -28,11 +28,11 @@ remove_saws()
 
 
 # test with extra params
-log("debug", "some-msg", Dict{Any,Any}( :thing1 => "thing1" ))
-log("info", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
-log("warn", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
-log("error", "some-msg",  Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
-log("crazy", "some-msg",  Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
+log("debug", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1" ))
+log("info", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
+log("warn", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
+log("error", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
+log("crazy", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
 
 # -------
 
@@ -74,14 +74,14 @@ date_regex = r"[\/|\-|\.|,|\s]"
 @test contains(log_lines[14], "error: some-msg")
 @test contains(log_lines[14], "thing2:69")
 @test contains(log_lines[14], "thing3:[1,2,3]")
-@test contains(log_lines[14], "thing4:Dict{Any,Any}(\"a\"=>\"apple\")")
+@test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[14])
 @test contains(log_lines[14], "thing1:\"thing1\"")
 
 @test contains(log_lines[15], "crazy: some-msg")
 @test contains(log_lines[15], "thing2:69")
 @test contains(log_lines[15], "thing5::some_symbol")
 @test contains(log_lines[15], "thing3:[1,2,3]")
-@test contains(log_lines[15], "thing4:Dict{Any,Any}(\"a\"=>\"apple\")")
+@test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[15])
 @test contains(log_lines[15], "thing1:\"thing1\"")
 
 # clean up
