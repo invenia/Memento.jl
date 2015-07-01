@@ -26,16 +26,29 @@ log_lines = readlines(open(LOG_FILE_OPTS, "r"))
 
 # default colors: {"debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red}
 # test with default colors
-@test log_lines[1] == "$(Base.text_colors[:cyan])DEBUG: some-msg\n"
-@test log_lines[2] == "$(Base.text_colors[:normal]Base.text_colors[:blue])INFO: some-msg\n"
-@test log_lines[3] == "$(Base.text_colors[:normal]Base.text_colors[:yellow])WARN: some-msg\n"
-@test log_lines[4] == "$(Base.text_colors[:normal]Base.text_colors[:red])ERROR: some-msg\n"
-@test log_lines[5] == "$(Base.text_colors[:normal])CRAZY: some-msg\n"
+if VERSION >= v"0.4-"
+    @test log_lines[1] == "$(Base.text_colors[:cyan])DEBUG: some-msg\n"
+    @test log_lines[2] == "$(Base.text_colors[:normal]Base.text_colors[:blue])INFO: some-msg\n"
+    @test log_lines[3] == "$(Base.text_colors[:normal]Base.text_colors[:yellow])WARN: some-msg\n"
+    @test log_lines[4] == "$(Base.text_colors[:normal]Base.text_colors[:red])ERROR: some-msg\n"
+    @test log_lines[5] == "$(Base.text_colors[:normal])CRAZY: some-msg\n"
 
-# test with custom colors
-@test log_lines[6] == "$(Base.text_colors[:black])DEBUG: some-msg\n"
-@test log_lines[7] == "$(Base.text_colors[:normal]Base.text_colors[:red])INFO: some-msg\n"
-@test log_lines[8] == "$(Base.text_colors[:normal]Base.text_colors[:green])CRAZY: some-msg\n"
+    # test with custom colors
+    @test log_lines[6] == "$(Base.text_colors[:black])DEBUG: some-msg\n"
+    @test log_lines[7] == "$(Base.text_colors[:normal]Base.text_colors[:red])INFO: some-msg\n"
+    @test log_lines[8] == "$(Base.text_colors[:normal]Base.text_colors[:green])CRAZY: some-msg\n"
+else
+    @test contains(log_lines[1], "DEBUG: some-msg\n")
+    @test contains(log_lines[2], "INFO: some-msg\n")
+    @test contains(log_lines[3], "WARN: some-msg\n")
+    @test contains(log_lines[4], "ERROR: some-msg\n")
+    @test contains(log_lines[5], "CRAZY: some-msg\n")
+
+    # test with custom colors
+    @test contains(log_lines[6], "DEBUG: some-msg\n")
+    @test contains(log_lines[7], "INFO: some-msg\n")
+    @test contains(log_lines[8], "CRAZY: some-msg\n")
+end
 
 # clean up
 @test success(`rm $LOG_FILE_OPTS`)
