@@ -4,7 +4,7 @@ log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)),
 
 
 function configure(t::TimberTruck; mode = nothing)
-    !in(:_mode, names(t)) && return
+    !in(:_mode, @compat fieldnames(t)) && return
     t._mode = mode
 end
 
