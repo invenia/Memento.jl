@@ -6,9 +6,9 @@ import Base.show, Base.log
 # Base.error, Base.warn, Base.info
 using UUID, Compat
 
-# for backwards compatability with 0.3:
+# for backwards compatibility with 0.3:
 if VERSION < v"0.4.0-"
-	using Dates
+    using Dates
 end
 
 export log,
@@ -19,8 +19,8 @@ export log,
 
        TimberTruck,
        LumberjackTruck,
-       CommonLogTruck
-
+       CommonLogTruck,
+       JsonTruck
 
 # -------
 
