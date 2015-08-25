@@ -1,3 +1,5 @@
+using JSON
+
 abstract TimberTruck
 
 log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)), args::Dict)`")
@@ -120,3 +122,15 @@ function log(truck::LumberjackTruck, l::Dict)
 end
 
 # -------
+
+type JsonTruck <: TimberTruck
+    out::IO
+end
+
+function log(truck::JsonTruck, l::Dict)
+    if haskey(l, :date)
+        l[:date] = string(l[:date])
+    end
+    println(truck.out, json(l))
+    flush(truck.out)
+end
