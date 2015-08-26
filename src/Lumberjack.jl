@@ -20,13 +20,15 @@ export log,
        TimberTruck,
        LumberjackTruck,
        CommonLogTruck,
-       JsonTruck
+       JsonTruck,
+       FileRoller
 
 # -------
 
 include("saws.jl")
 include("timbertruck.jl")
 include("lumbermill.jl")
+include("FileRoller.jl")
 
 # -------
 
