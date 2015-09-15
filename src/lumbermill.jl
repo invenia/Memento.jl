@@ -1,4 +1,3 @@
-
 type LumberMill
     timber_trucks::Dict{Any, TimberTruck}
     saws::Array
@@ -152,9 +151,3 @@ function get_mode_index(lm::LumberMill, mode)
     index = findfirst(lm.modes, mode)
     index > 0 ? index : length(lm.modes) + 1
 end
-
-# -------
-
-_lumber_mill = LumberMill()
-
-# -------
