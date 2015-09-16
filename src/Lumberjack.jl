@@ -34,4 +34,10 @@ include("FileRoller.jl")
 
 # -------
 
+function __init__()
+    global const _lumber_mill = LumberMill()
+end
+
+# -------
+
 end
