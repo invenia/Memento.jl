@@ -127,11 +127,19 @@ function remove_saws(lm::LumberMill = _lumber_mill)
 end
 
 
-function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
-    lm.timber_trucks[name] = truck
-end
+if VERSION < v"0.4.0-"
+    function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
+        lm.timber_trucks[name] = truck
+    end
 
-add_truck(truck::TimberTruck, name = string(UUID.v4())) = add_truck(_lumber_mill, truck, name)
+    add_truck(truck::TimberTruck, name = string(UUID.v4())) = add_truck(_lumber_mill, truck, name)
+else
+    function add_truck(lm::LumberMill, truck::TimberTruck, name = string(Base.Random.uuid4()))
+        lm.timber_trucks[name] = truck
+    end
+
+    add_truck(truck::TimberTruck, name = string(Base.Random.uuid4())) = add_truck(_lumber_mill, truck, name)
+end
 
 
 function remove_truck(lm::LumberMill, name)
