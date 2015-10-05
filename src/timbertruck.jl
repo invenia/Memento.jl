@@ -22,7 +22,7 @@ type CommonLogTruck <: TimberTruck
 
     CommonLogTruck(out::IO, mode = nothing) = new(out, mode)
 
-    function CommonLogTruck(filename::String, mode = nothing)
+    function CommonLogTruck(filename::@compat(AbstractString), mode = nothing)
         file = open(filename, "a")
         truck = new(file, mode)
         finalizer(truck, (t)->close(t.out))
@@ -49,7 +49,7 @@ type LumberjackTruck <: TimberTruck
 
     LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
 
-    function LumberjackTruck(filename::String, mode = nothing, opts = Dict())
+    function LumberjackTruck(filename::@compat(AbstractString), mode = nothing, opts = Dict())
         file = open(filename, "a")
         setup_opts(opts)
         truck = new(file, mode, opts)
