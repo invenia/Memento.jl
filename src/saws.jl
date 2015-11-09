@@ -15,7 +15,7 @@ function fn_call_saw(args::Dict)
         args
     else
         # lookup is a tuple
-        push!(args, :lookup, lookup[1])
+        setindex!(args, lookup[1], :lookup)
     end
 end
 

@@ -47,8 +47,6 @@ type LumberjackTruck <: TimberTruck
         new(out, mode, opts)
     end
 
-    LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
-
     function LumberjackTruck(filename::@compat(AbstractString), mode = nothing, opts = Dict())
         file = open(filename, "a")
         setup_opts(opts)
@@ -128,9 +126,17 @@ type JsonTruck <: TimberTruck
 end
 
 function log(truck::JsonTruck, l::Dict)
+    l = copy(l)
+
     if haskey(l, :date)
         l[:date] = string(l[:date])
     end
+ 
+    if haskey(l, :lookup)
+        func, fname, linenum = l[:lookup]
+        l[:lookup] = "$(string(func))@$(basename(string(fname))):$(linenum)"
+    end
+
     println(truck.out, json(l))
     flush(truck.out)
 end
