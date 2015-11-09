@@ -97,7 +97,7 @@ A saw function simply takes in a dict of parameters, adds or removes things, and
 
 ### TimberTruck
 
-Timber trucks are used to send logs to their final destinations (files, the console, etc). A timber truck ingerits from the abstarct type `TimberTruck` and overloads the `log(t::TimberTruck, args::Dict)` function. By default, the framework will create a `LumberjackLog` truck that will print `args` as a string of `key:value` pairs to STDOUT.
+Timber trucks are used to send logs to their final destinations (files, the console, etc). A timber truck inherits from the abstract type `TimberTruck` and overloads the `log(t::TimberTruck, args::Dict)` function. By default, the framework will create a `LumberjackLog` truck that will print `args` as a string of `key:value` pairs to STDOUT.
 
 
 ## API
