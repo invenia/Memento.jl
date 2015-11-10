@@ -107,6 +107,29 @@ error(msg::AbstractString, args::Dict) = error(_lumber_mill, msg, args)
 
 error(msg...) = error(_lumber_mill, string(msg...))
 
+# -------
+
+# Allow the args dict to be passed in by kwargs instead.
+
+function log(lm::LumberMill, mode::AbstractString, msg::AbstractString; kwargs...)
+    log(lm, mode, msg, Dict{Symbol, Any}(kwargs))
+end
+
+function log(mode::AbstractString, msg::AbstractString; kwargs...)
+    log(_lumber_mill, mode, msg; kwargs...)
+end
+
+for mode in (:debug, :info, :warn, :error)
+    @eval begin
+        function $mode(lm::LumberMill, msg::AbstractString; kwargs...)
+            $mode(lm, msg, Dict{Symbol, Any}(kwargs))
+        end
+
+        $mode(msg::AbstractString; kwargs...) = $mode(_lumber_mill, msg; kwargs...)
+    end
+end
+
+# -------
 
 function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws)+1)
     insert!(lm.saws, index, saw_fn)
