@@ -1,6 +1,7 @@
 using Base.Test, JSON
 
-const JSON_FILE = "file.json"
+const JSON_FILE = tempname()
+println("Path to JSON_FILE: $JSON_FILE")
 
 Lumberjack.add_truck(JsonTruck(open(JSON_FILE, "w")))
 
@@ -23,11 +24,11 @@ log("crazy", "some-msg")
 remove_saws()
 
 # test with extra params
-log("debug", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1" ))
-log("info", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
-log("warn", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
-log("error", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
-log("crazy", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
+log("debug", "some-msg", Dict{Any,Any}( :thing1 => "thing1" ))
+log("info", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
+log("warn", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
+log("error", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
+log("crazy", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
 
 js = JSON.parse("[$(join(readlines(open(JSON_FILE)), ','))]")
 

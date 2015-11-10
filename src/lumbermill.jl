@@ -10,7 +10,7 @@ type LumberMill
         # defaults
         configure(lm)
         add_saw(lm, msec_date_saw)
-        add_truck(lm, LumberjackTruck(STDOUT, nothing, @compat Dict{Symbol,Any}(:is_colorized => true)), "console")
+        add_truck(lm, LumberjackTruck(STDOUT, nothing, Dict{Symbol,Any}(:is_colorized => true)), "console")
 
         lm
     end
@@ -32,7 +32,7 @@ end
 configure(; args...) = configure(_lumber_mill; args...)
 
 
-function log(lm::LumberMill, mode::@compat(AbstractString), msg::@compat(AbstractString), args::Dict = Dict())
+function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Dict = Dict())
     args[:mode] = mode
     args[:msg] = msg
 
@@ -41,7 +41,7 @@ function log(lm::LumberMill, mode::@compat(AbstractString), msg::@compat(Abstrac
     end
 
     for (truck_name, truck) in lm.timber_trucks
-        if (in(:_mode, @compat fieldnames(truck))
+        if (in(:_mode, fieldnames(truck))
             && truck._mode != nothing
             && get_mode_index(lm, mode) < get_mode_index(lm, truck._mode))
 
@@ -52,30 +52,30 @@ function log(lm::LumberMill, mode::@compat(AbstractString), msg::@compat(Abstrac
     end
 end
 
-log(mode::@compat(AbstractString), msg::@compat(AbstractString), args::Dict = Dict()) = log(_lumber_mill, mode, msg, args)
+log(mode::AbstractString, msg::AbstractString, args::Dict = Dict()) = log(_lumber_mill, mode, msg, args)
 
-log(mode::@compat(AbstractString), args::Dict = Dict()) = log(_lumber_mill, mode, "", args)
-
-
-debug(lm::LumberMill, msg::@compat(AbstractString), args::Dict = Dict()) = log(lm, "debug", msg, args)
-
-debug(msg::@compat(AbstractString), args::Dict) = debug(_lumber_mill, msg, args)
-
-debug(msg::@compat(AbstractString)...) = debug(_lumber_mill, string(msg...))
+log(mode::AbstractString, args::Dict = Dict()) = log(_lumber_mill, mode, "", args)
 
 
-info(lm::LumberMill, msg::@compat(AbstractString), args::Dict = Dict()) = log(lm, "info", msg, args)
+debug(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "debug", msg, args)
 
-info(msg::@compat(AbstractString), args::Dict) = info(_lumber_mill, msg, args)
+debug(msg::AbstractString, args::Dict) = debug(_lumber_mill, msg, args)
 
-info(msg::@compat(AbstractString)...; prefix = "info: ") = info(_lumber_mill, string(msg...))
+debug(msg::AbstractString...) = debug(_lumber_mill, string(msg...))
 
 
-warn(lm::LumberMill, msg::@compat(AbstractString), args::Dict = Dict()) = log(lm, "warn", msg, args)
+info(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "info", msg, args)
 
-warn(msg::@compat(AbstractString), args::Dict) = warn(_lumber_mill, msg, args)
+info(msg::AbstractString, args::Dict) = info(_lumber_mill, msg, args)
 
-function warn(msg::@compat(AbstractString)...; prefix="warning: ", once = false, key = nothing, bt = nothing)
+info(msg::AbstractString...; prefix = "info: ") = info(_lumber_mill, string(msg...))
+
+
+warn(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "warn", msg, args)
+
+warn(msg::AbstractString, args::Dict) = warn(_lumber_mill, msg, args)
+
+function warn(msg::AbstractString...; prefix="warning: ", once = false, key = nothing, bt = nothing)
     str = chomp(bytestring(msg...))
 
     if once
@@ -87,14 +87,14 @@ function warn(msg::@compat(AbstractString)...; prefix="warning: ", once = false,
         push!(Base.have_warned, key)
     end
 
-    warn(_lumber_mill, str, bt !== nothing ? @compat(Dict{Symbol,Any}(:backtrace => sprint(show_backtrace, bt))) : Dict())
+    warn(_lumber_mill, str, bt !== nothing ? Dict{Symbol,Any}(:backtrace => sprint(show_backtrace, bt)) : Dict())
 end
 
 warn(err::Exception; prefix = "error: ", kw...) =
     warn(sprint(io->showerror(io,err)), prefix = prefix; kw...)
 
 
-function error(lm::LumberMill, msg::@compat(AbstractString), args::Dict = Dict())
+function error(lm::LumberMill, msg::AbstractString, args::Dict = Dict())
     exception_msg = copy(msg)
     length(args) > 0 && (exception_msg *= " $args")
 
@@ -103,7 +103,7 @@ function error(lm::LumberMill, msg::@compat(AbstractString), args::Dict = Dict()
     throw(ErrorException(exception_msg))
 end
 
-error(msg::@compat(AbstractString), args::Dict) = error(_lumber_mill, msg, args)
+error(msg::AbstractString, args::Dict) = error(_lumber_mill, msg, args)
 
 error(msg...) = error(_lumber_mill, string(msg...))
 
@@ -127,19 +127,11 @@ function remove_saws(lm::LumberMill = _lumber_mill)
 end
 
 
-if VERSION < v"0.4.0-"
-    function add_truck(lm::LumberMill, truck::TimberTruck, name = string(UUID.v4()))
-        lm.timber_trucks[name] = truck
-    end
-
-    add_truck(truck::TimberTruck, name = string(UUID.v4())) = add_truck(_lumber_mill, truck, name)
-else
-    function add_truck(lm::LumberMill, truck::TimberTruck, name = string(Base.Random.uuid4()))
-        lm.timber_trucks[name] = truck
-    end
-
-    add_truck(truck::TimberTruck, name = string(Base.Random.uuid4())) = add_truck(_lumber_mill, truck, name)
+function add_truck(lm::LumberMill, truck::TimberTruck, name = string(Base.Random.uuid4()))
+    lm.timber_trucks[name] = truck
 end
+
+add_truck(truck::TimberTruck, name = string(Base.Random.uuid4())) = add_truck(_lumber_mill, truck, name)
 
 
 function remove_truck(lm::LumberMill, name)

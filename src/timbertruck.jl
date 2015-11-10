@@ -6,7 +6,7 @@ log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)),
 
 
 function configure(t::TimberTruck; mode = nothing)
-    !in(:_mode, @compat fieldnames(t)) && return
+    !in(:_mode, fieldnames(t)) && return
     t._mode = mode
 end
 
@@ -22,7 +22,7 @@ type CommonLogTruck <: TimberTruck
 
     CommonLogTruck(out::IO, mode = nothing) = new(out, mode)
 
-    function CommonLogTruck(filename::@compat(AbstractString), mode = nothing)
+    function CommonLogTruck(filename::AbstractString, mode = nothing)
         file = open(filename, "a")
         truck = new(file, mode)
         finalizer(truck, (t)->close(t.out))
@@ -47,7 +47,7 @@ type LumberjackTruck <: TimberTruck
         new(out, mode, opts)
     end
 
-    function LumberjackTruck(filename::@compat(AbstractString), mode = nothing, opts = Dict())
+    function LumberjackTruck(filename::AbstractString, mode = nothing, opts = Dict())
         file = open(filename, "a")
         setup_opts(opts)
         truck = new(file, mode, opts)
@@ -60,7 +60,7 @@ type LumberjackTruck <: TimberTruck
             opts[:is_colorized] = true
         elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
             # set default colors
-            opts[:colors] = @compat Dict{ASCIIString,Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
+            opts[:colors] = Dict{ASCIIString,Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
         else
             opts[:is_colorized] = false
         end

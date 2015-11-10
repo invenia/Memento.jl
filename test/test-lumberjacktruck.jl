@@ -1,7 +1,8 @@
 
 using Base.Test
 
-const LOG_FILE = "lumberjacklog-out.log"
+const LOG_FILE = tempname()
+println("Path to LOG_FILE: $LOG_FILE")
 
 configure(; modes = ["debug", "info", "warn", "error", "crazy"])
 add_truck(Lumberjack.LumberjackTruck(LOG_FILE), "lumberjacklogfile")
@@ -28,11 +29,11 @@ remove_saws()
 
 
 # test with extra params
-log("debug", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1" ))
-log("info", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
-log("warn", "some-msg", @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
-log("error", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
-log("crazy", "some-msg",  @compat Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
+log("debug", "some-msg", Dict{Any,Any}( :thing1 => "thing1" ))
+log("info", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
+log("warn", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
+log("error", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
+log("crazy", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
 
 # -------
 
