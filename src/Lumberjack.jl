@@ -2,7 +2,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Lumberjack
 
-import Base.show, Base.log
+import Base.show, Base.log, StackTraces
 
 # To avoid warnings, intentionally do not import:
 # Base.error, Base.warn, Base.info

@@ -80,11 +80,11 @@ function log(truck::LumberjackTruck, l::Dict)
     record = date_stamp == nothing ? "" : "$date_stamp - "
 
     lookup = get(l, :lookup, nothing)
-    if !is(lookup,nothing)
-        # lookup is a tuple
-        func , fname, linenum = lookup
-        lookup_str = "$(string(func))@$(basename(string(fname))):$(linenum) - "
-        record = record*lookup_str
+    if !is(lookup, nothing)
+        # lookup is a StackFrame
+        name, file, line = l[:lookup].name, l[:lookup].file, l[:lookup].line
+        lookup_str = "$(name)@$(basename(string(file))):$(line) - "
+        record = record * lookup_str
     end
 
     mode = l[:mode]
@@ -95,15 +95,26 @@ function log(truck::LumberjackTruck, l::Dict)
 
     record = string(record, "$(l[:mode]): $(l[:msg])")
 
+    stacktrace = get(l, :stacktrace, nothing)
+    if !is(stacktrace, nothing)
+        # stacktrace is a vector of StackFrames
+        record = record * string(" stack:[",
+            join(
+                map(f -> "$(f.name)@$(basename(string(f.file))):$(f.line)", stacktrace),
+                ", "
+            ), "]"
+        )
+    end
+
     delete!(l, :date)
     delete!(l, :lookup)
+    delete!(l, :stacktrace)
     delete!(l, :mode)
     delete!(l, :msg)
 
     for (k, v) in l
         record = string(record, " $k:$(repr(v))")
     end
-
 
     if (truck.opts[:is_colorized])
         # check if color has been defined for key
@@ -131,10 +142,21 @@ function log(truck::JsonTruck, l::Dict)
     if haskey(l, :date)
         l[:date] = string(l[:date])
     end
- 
+
     if haskey(l, :lookup)
-        func, fname, linenum = l[:lookup]
-        l[:lookup] = "$(string(func))@$(basename(string(fname))):$(linenum)"
+        # lookup is a StackFrame
+        l[:lookup] = Dict(
+            :name => l[:lookup].name, :file => basename(string(l[:lookup].file)),
+            :line => l[:lookup].line
+        )
+    end
+
+    if haskey(l, :stacktrace)
+        # stacktrace is a vector of StackFrames
+        l[:stacktrace] = map(
+            f -> Dict(:name => f.name, :file => basename(string(f.file)), :line => f.line),
+            l[:stacktrace]
+        )
     end
 
     println(truck.out, json(l))
