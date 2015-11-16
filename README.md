@@ -54,6 +54,8 @@ Or to configure an existing truck, you can call:
 julia> configure(timber_truck; mode = "warn")
 ```
 
+See [Log Level Example](#log-level-example) below.
+
 ### Logging Options
 `Lumberjack.add_truck` provides an optional third `Dict` argument. Possible keys are:
 
@@ -163,3 +165,92 @@ configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 + `modes` is an ordered array of logging levels
 
 
+## Recipes and Examples
+
+### Log Level Example
+
+```julia
+julia> using Lumberjack
+
+# We already have console output of all modes/log levels via the default console truck.
+
+# Let's add a truck that will ignore debug messages (only outputting warning-level and up).
+julia> add_truck(JsonTruck(STDOUT, "info"), "json-logger")
+Lumberjack.JsonTruck(Base.TTY(open, 0 bytes waiting),"info")
+
+# Let's add another that will only output logs at warning-level and above.
+julia> add_truck(LumberjackTruck(STDOUT, "warn"), "new-logger")
+Lumberjack.LumberjackTruck(Base.TTY(open, 0 bytes waiting),"warn",Dict{Any,Any}(:is_colorized=>false,:uppercase=>false))
+
+# Warnings should show up for all three trucks: json-logger, new-logger, console (default).
+julia> Lumberjack.warn("Message")
+{"date":"2015-11-16T12:09:57","msg":"Message","mode":"warn"}
+2015-11-16T12:09:57 - warn: Message
+2015-11-16T12:09:57 - warn: Message
+
+# Info is less important than a warning, so won't show up for new-logger.
+julia> Lumberjack.info("Something")
+{"date":"2015-11-16T12:10:09","msg":"Something","mode":"info"}
+2015-11-16T12:10:09 - info: Something
+
+# Debug level isn't important enough to log for either json-logger or new-logger.
+julia> Lumberjack.debug("Not very important")
+2015-11-16T12:10:15 - debug: Not very important
+```
+
+### Including Additional Fields
+
+Additional parameters may be specified in calls to `log` (and `debug`, `info`, `warn`, and `error`) by passing a `Dict` as the final positional argument. This is useful if you'd like to specify values for fields other than `mode` and `msg` that are not provided by saws.
+
+These additional parameters can also be specified with keyword arguments:
+
+```julia
+julia> using Lumberjack
+
+# The easy way.
+julia> Lumberjack.warn("Something happened."; id="LoggingTest", impact="None, really.", resolve="Next steps.", cause="Needed an example.")
+2015-11-16T15:23:54 - warn: Something happened. resolve: "Next steps." id: "LoggingTest" cause: "Needed an example." impact: "None, really."
+
+# The hard(er) way.
+julia> Lumberjack.warn("Something happened.", Dict{Any, Any}(:id=>"LoggingTest", :impact=>"None, really.", :resolve=>"Next steps.", :cause=>"Needed an example."))
+2015-11-16T15:24:54 - warn: Something happened. resolve: "Next steps." id: "LoggingTest" cause: "Needed an example." impact: "None, really."
+```
+
+### Syslog and Stack Trace Example
+
+Please note that syslog output is only available on systems that have `logger` utility installed. (This should include both Linux and OS X, but typically excludes Windows.)
+
+```julia
+julia> using Lumberjack
+
+# Output to syslog on facility "local0", with tag "julia", and include Julia's process ID.
+julia> syslog_io = Syslog(:local0, "julia", true)
+Lumberjack.Syslog(:local0,"julia",63474)
+
+# Send logs in JSON format to syslog_io, but only if they're warnings or above.
+julia> add_truck(JsonTruck(syslog_io, "warn"), "syslog-json")
+Lumberjack.JsonTruck(Lumberjack.Syslog(:local0,"julia",63474),"warn")
+
+# Add a stacktrace to each log entry.
+add_saw(Lumberjack.stacktrace_saw)
+2-element Array{Any,1}:
+ Lumberjack.msec_date_saw 
+ Lumberjack.stacktrace_saw
+
+julia> log("crit", "Critical message!")
+julia> log("error", "Error message!")
+julia> log("warn", "Warning message!")
+julia> log("info", "Info message!")
+```
+
+Run `tail /var/log/system.log` (modifying as needed, depeding on where your system stores its logs) and you should see something like this:
+
+```
+Nov 16 15:00:03 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:03","msg":"Critical message!","mode":"crit"}
+Nov 16 15:00:33 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:33","msg":"Error message!","mode":"error"}
+Nov 16 15:00:45 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:45","msg":"Warning message!","mode":"warn"}
+```
+
+The info message is missing because we set our truck to only output logs at warning level and above.
+
+Note that BSD's `logger` (used on OS X) will append a second process ID, which is the PID of the `logger` tool itself.

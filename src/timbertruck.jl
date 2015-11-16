@@ -137,7 +137,10 @@ end
 
 type JsonTruck <: TimberTruck
     out::IO
+    _mode
 end
+
+JsonTruck(out::IO) = JsonTruck(out, nothing)
 
 function log(truck::JsonTruck, l::Dict)
     l = copy(l)
