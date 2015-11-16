@@ -105,65 +105,65 @@ line += 1; @test ismatch(Regex("error: some-msg.+" * stacktrace_regex), log_line
 # test with extra params
 line += 1
 @test contains(log_lines[line], "debug: some-msg")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "info: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "warn: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing3:[1,2,3]")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing3: [1,2,3]")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "error: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing3:[1,2,3]")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing3: [1,2,3]")
 @test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[line])
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "crazy: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing5::some_symbol")
-@test contains(log_lines[line], "thing3:[1,2,3]")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing5: :some_symbol")
+@test contains(log_lines[line], "thing3: [1,2,3]")
 @test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[line])
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 
 # test with kwarg params
 line += 1
 @test contains(log_lines[line], "debug: some-msg")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "info: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "warn: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing3:[1,2,3]")
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing3: [1,2,3]")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "error: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing3:[1,2,3]")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing3: [1,2,3]")
 @test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[line])
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 line += 1
 @test contains(log_lines[line], "crazy: some-msg")
-@test contains(log_lines[line], "thing2:69")
-@test contains(log_lines[line], "thing5::some_symbol")
-@test contains(log_lines[line], "thing3:[1,2,3]")
+@test contains(log_lines[line], "thing2: 69")
+@test contains(log_lines[line], "thing5: :some_symbol")
+@test contains(log_lines[line], "thing3: [1,2,3]")
 @test ismatch(r"thing4:.*\"a\"=>\"apple\"", log_lines[line])
-@test contains(log_lines[line], "thing1:\"thing1\"")
+@test contains(log_lines[line], "thing1: \"thing1\"")
 
 # clean up
 @test success(`rm $LOG_FILE`)

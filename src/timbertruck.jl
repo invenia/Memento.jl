@@ -88,7 +88,6 @@ function log(truck::LumberjackTruck, l::Dict)
     end
 
     mode = l[:mode]
-
     if (truck.opts[:uppercase])
         l[:mode] = uppercase(l[:mode])
     end
@@ -100,8 +99,7 @@ function log(truck::LumberjackTruck, l::Dict)
         # stacktrace is a vector of StackFrames
         record = record * string(" stack:[",
             join(
-                map(f -> "$(f.name)@$(basename(string(f.file))):$(f.line)", stacktrace),
-                ", "
+                map(f->"$(f.name)@$(basename(string(f.file))):$(f.line)", stacktrace), ", "
             ), "]"
         )
     end
@@ -113,21 +111,26 @@ function log(truck::LumberjackTruck, l::Dict)
     delete!(l, :msg)
 
     for (k, v) in l
-        record = string(record, " $k:$(repr(v))")
+        record = string(record, " $k: $(repr(v))")
     end
 
-    if (truck.opts[:is_colorized])
-        # check if color has been defined for key
-        if (haskey(truck.opts[:colors], mode))
-            print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
-        # if not, don't apply colors
+    if isa(truck.out, Syslog)
+        # Syslog needs to be explicitly told what the error level is.
+        println(truck.out, mode, record)
+    else
+        if (truck.opts[:is_colorized])
+            # check if color has been defined for key
+            if (haskey(truck.opts[:colors], mode))
+                print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
+            # if not, don't apply colors
+            else
+                println(truck.out, record)
+            end
         else
             println(truck.out, record)
         end
-    else
-        println(truck.out, record)
+        flush(truck.out)
     end
-    flush(truck.out)
 end
 
 # -------
@@ -159,6 +162,11 @@ function log(truck::JsonTruck, l::Dict)
         )
     end
 
-    println(truck.out, json(l))
-    flush(truck.out)
+    if isa(truck.out, Syslog)
+        # Syslog needs to be explicitly told what the error level is.
+        println(truck.out, l[:mode], json(l))
+    else
+        println(truck.out, json(l))
+        flush(truck.out)
+    end
 end

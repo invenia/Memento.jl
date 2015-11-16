@@ -17,7 +17,8 @@ export log,
        LumberjackTruck,
        CommonLogTruck,
        JsonTruck,
-       FileRoller
+       FileRoller,
+       Syslog
 
 # -------
 
@@ -25,6 +26,7 @@ include("saws.jl")
 include("timbertruck.jl")
 include("lumbermill.jl")
 include("FileRoller.jl")
+include("Syslog.jl")
 
 # -------
 
