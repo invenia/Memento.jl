@@ -17,6 +17,7 @@ export log,
        LumberjackTruck,
        CommonLogTruck,
        JsonTruck,
+       Saw,
        FileRoller,
        Syslog
 

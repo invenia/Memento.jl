@@ -1,3 +1,11 @@
+type Saw
+    saw_fn::Function
+    _mode
+
+    Saw(saw_fn::Function, mode=nothing) = new(saw_fn, mode)
+end
+
+
 # -------
 
 msec_date_saw(args::Dict) = setindex!(args, now(), :date)

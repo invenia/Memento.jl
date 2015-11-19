@@ -1,10 +1,10 @@
 type LumberMill
     timber_trucks::Dict{Any, TimberTruck}
-    saws::Array
+    saws::Vector{Saw}
 
     modes::Array
 
-    function LumberMill(; timber_trucks = Dict{Any, TimberTruck}(), saws = Any[], modes = Any[])
+    function LumberMill(; timber_trucks = Dict{Any, TimberTruck}(), saws = Vector{Saw}(), modes = Any[])
         lm = new(timber_trucks, saws, modes)
 
         # defaults
@@ -37,7 +37,13 @@ function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Di
     args[:msg] = msg
 
     for saw in lm.saws
-        args = saw(args)
+        if (saw._mode != nothing
+            && get_mode_index(lm, mode) < get_mode_index(lm, saw._mode))
+
+            continue
+        end
+
+        args = saw.saw_fn(args)
     end
 
     for (truck_name, truck) in lm.timber_trucks
@@ -131,11 +137,23 @@ end
 
 # -------
 
-function add_saw(lm::LumberMill, saw_fn::Function, index = length(lm.saws)+1)
-    insert!(lm.saws, index, saw_fn)
+function add_saw(lm::LumberMill, saw_fn::Function, index::Integer = length(lm.saws)+1)
+    insert!(lm.saws, index, Saw(saw_fn))
 end
 
-add_saw(saw_fn::Function, index = length(_lumber_mill.saws)+1) = add_saw(_lumber_mill, saw_fn, index)
+function add_saw(saw_fn::Function, index::Integer = length(_lumber_mill.saws)+1)
+    add_saw(_lumber_mill, saw_fn, index)
+end
+
+# Like trucks, saws that are only used only for certain logging modes can be added.
+
+function add_saw(lm::LumberMill, saw::Saw, index::Integer=length(lm.saws)+1)
+    insert!(lm.saws, index, saw)
+end
+
+function add_saw(saw::Saw, index::Integer=length(_lumber_mill.saws)+1)
+    add_saw(_lumber_mill, saw, index)
+end
 
 
 function remove_saw(lm::LumberMill, index = length(lm.saws))

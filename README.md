@@ -1,7 +1,7 @@
 Lumberjack.jl
 =============
 
-[![Build Status](https://travis-ci.org/forio/Lumberjack.jl.png?branch=master)](https://travis-ci.org/forio/Lumberjack.jl)
+[![Build Status](https://travis-ci.org/invenia/Lumberjack.jl.png?branch=master)](https://travis-ci.org/invenia/Lumberjack.jl)
 
 
 ## Quick Start
@@ -36,25 +36,52 @@ julia> log("info", "use `log` for user-defined modes, or to be verbose.")
 ### Add and remove `TimberTrucks`
 Logs are brought to different output streams by `TimberTrucks`. To create a truck that will dump logs into a file, simply:
 ```julia
-julia> Lumberjack.add_truck(LumberjackTruck("mylogfile.log"), "my-file-logger")
+julia> add_truck(LumberjackTruck("mylogfile.log"), "my-file-logger")
 ```
 Now there is a truck named "my-file-logger", and it will write all of your logs to `mylogfile.log`. Your logs will still show up in the console, however, because -by default- there is a truck named "console" already hard at work. Remove it by calling:
 ```julia
-julia> Lumberjack.remove_truck("console")
+julia> remove_truck("console")
 ```
 
-### Manage logging modes / levels
-Each timber truck is configured to log messages _above_ a certain level / mode, and by default they will log everything. There are 4 built-in modes: `["debug", "info", "warn", "error"]`. To create a timber truck that will only record warnings and errors, you can:
+### Manage logging modes/levels
+
+#### Defining Modes
+
+Timber trucks and saws can both be configured to work only at/above certain log levels/modes.
+
+There are 4 built-in modes: `["debug", "info", "warn", "error"]`. If you'd like to use logging levels/modes beyond the four default modes, you'll want to tell your lumber mill (Lumberjack's log controller) what order the modes are in. You can do this with a call to `configure`:
+
 ```julia
-julia> Lumberjack.add_truck(LumberjackTruck(STDOUT, "warn"), "dangerous-logger")
+julia> configure(; modes=["debug", "info", "notice", "warn", "error", "crit", "alert", "emerg"])
 ```
 
-Or to configure an existing truck, you can call:
+This way, if you only want a truck to log something at warning-level or above and it sees a "notice" message, the truck will know not to log it.
+
+#### Timber Truck Modes
+
+Each timber truck is configured to log messages _at or above_ a certain level/mode, and by default they will log everything. To create a timber truck that will only record warnings and errors, you can:
+
+```julia
+julia> add_truck(LumberjackTruck(STDOUT, "warn"), "dangerous-logger")
 ```
+
+Or to configure an existing truck, you can call `configure` and specify the truck in question:
+
+```julia
 julia> configure(timber_truck; mode = "warn")
 ```
 
-See [Log Level Example](#log-level-example) below.
+For additional examples, see the [Log Level Example](#log-level-example) below.
+
+#### Saw Modes
+
+When saws are added, they can also be configured such that they are only included for logs at or above a certain level. For example, you may want to include a stack trace for each log that's a warning or above:
+
+```julia
+julia> add_saw(Saw(Lumberjack.stacktrace_saw, "warn"))
+```
+
+For additional examples, see the [Log Level Example](#log-level-example) below.
 
 ### Logging Options
 `Lumberjack.add_truck` provides an optional third `Dict` argument. Possible keys are:
@@ -63,7 +90,7 @@ See [Log Level Example](#log-level-example) below.
 Colors can be added enabled using the following:
 
 ```julia
-Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, {:is_colorized => true}), "console")
+add_truck(LumberjackTruck(STDOUT, nothing, {:is_colorized => true}), "console")
 ```
 
 ![colors](img/colors.png)
@@ -76,13 +103,13 @@ By default the following colors are used:
 #### colors
 Custom colors/log levels can also be specified:
 ```julia
-Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, :colors => {"debug" => :black, "info" => :blue, "warn" => :yellow, "error" => :red, "crazy" => :green}), "console")
+add_truck(LumberjackTruck(STDOUT, nothing, :colors => {"debug" => :black, "info" => :blue, "warn" => :yellow, "error" => :red, "crazy" => :green}), "console")
 ```
 
 #### uppercase
 Log levels can be made uppercase (INFO vs info, etc.) with the following option:
 ```julia
-Lumberjack.add_truck(LumberjackTruck(STDOUT, nothing, {:uppercase => true}), "console")
+add_truck(LumberjackTruck(STDOUT, nothing, {:uppercase => true}), "console")
 ```
 
 ## Architecture
@@ -124,10 +151,12 @@ error(lm::LumberMill, msg::String, args::Dict)
 
 ### Saws
 ```julia
-add_saw(lm::LumberMill, saw_fn::Function, index)
+add_saw(lm::LumberMill, saw::Saw, index::Integer)
+add_saw(lm::LumberMill, saw_fn::Function, index::Integer)
 ```
 + `index` is optional and will default to the end of the saw list
 
+Typically when adding a saw you will simply specify the saw function itself, but if you'd like to limit your saw to certain logging levels/modes then you'll want to use the `Lumberjack.Saw` type. See the [Log Level Example](#log-level-example) below.
 
 ```julia
 remove_saw(lm::LumberMill, index)
@@ -167,37 +196,6 @@ configure(lm::LumberMill; modes = ["debug", "info", "warn", "error"])
 
 ## Recipes and Examples
 
-### Log Level Example
-
-```julia
-julia> using Lumberjack
-
-# We already have console output of all modes/log levels via the default console truck.
-
-# Let's add a truck that will ignore debug messages (only outputting warning-level and up).
-julia> add_truck(JsonTruck(STDOUT, "info"), "json-logger")
-Lumberjack.JsonTruck(Base.TTY(open, 0 bytes waiting),"info")
-
-# Let's add another that will only output logs at warning-level and above.
-julia> add_truck(LumberjackTruck(STDOUT, "warn"), "new-logger")
-Lumberjack.LumberjackTruck(Base.TTY(open, 0 bytes waiting),"warn",Dict{Any,Any}(:is_colorized=>false,:uppercase=>false))
-
-# Warnings should show up for all three trucks: json-logger, new-logger, console (default).
-julia> Lumberjack.warn("Message")
-{"date":"2015-11-16T12:09:57","msg":"Message","mode":"warn"}
-2015-11-16T12:09:57 - warn: Message
-2015-11-16T12:09:57 - warn: Message
-
-# Info is less important than a warning, so won't show up for new-logger.
-julia> Lumberjack.info("Something")
-{"date":"2015-11-16T12:10:09","msg":"Something","mode":"info"}
-2015-11-16T12:10:09 - info: Something
-
-# Debug level isn't important enough to log for either json-logger or new-logger.
-julia> Lumberjack.debug("Not very important")
-2015-11-16T12:10:15 - debug: Not very important
-```
-
 ### Including Additional Fields
 
 Additional parameters may be specified in calls to `log` (and `debug`, `info`, `warn`, and `error`) by passing a `Dict` as the final positional argument. This is useful if you'd like to specify values for fields other than `mode` and `msg` that are not provided by saws.
@@ -216,12 +214,61 @@ julia> Lumberjack.warn("Something happened.", Dict{Any, Any}(:id=>"LoggingTest",
 2015-11-16T15:24:54 - warn: Something happened. resolve: "Next steps." id: "LoggingTest" cause: "Needed an example." impact: "None, really."
 ```
 
+### Log Level Example
+
+```julia
+julia> using Lumberjack
+
+# We already have console output of all modes/log levels via the default console truck.
+
+# Define some additional log levels.
+julia> configure(; modes=["debug", "info", "warn", "error", "crit"])
+
+# Let's add a truck that will ignore debug/info messages (only outputting info-level and up).
+julia> add_truck(LumberjackTruck(STDOUT, "info"), "new-logger")
+Lumberjack.LumberjackTruck(Base.TTY(open, 0 bytes waiting),"info",Dict{Any,Any}(:is_colorized=>false,:uppercase=>false))
+
+# Let's add another that will only output logs at warning-level and above.
+julia> add_truck(JsonTruck(STDOUT, "warn"), "json-logger")
+Lumberjack.JsonTruck(Base.TTY(open, 0 bytes waiting),"warn")
+
+# Add the function call saw to each log entry that is error-level or above.
+add_saw(Saw(Lumberjack.fn_call_saw, "error"))
+2-element Array{Lumberjack.Saw,1}:
+ Lumberjack.Saw(Lumberjack.msec_date_saw,nothing)
+ Lumberjack.Saw(Lumberjack.fn_call_saw,"error")
+
+# Crticial messages will show up for all three trucks: json-logger, new-logger, console (default).
+julia> log("crit", "Message")
+{"date":"2015-11-19T11:24:31","lookup":{"name":"eval_user_input","file":"REPL.jl","line":62},"msg":"Message","mode":"crit"}
+2015-11-19T11:24:31 - eval_user_input@REPL.jl:62 - crit: Message
+2015-11-19T11:24:31 - eval_user_input@REPL.jl:62 - crit: Message
+
+# Warning messages also show up for all trucks (but without function call information).
+julia> log("warn", "Message")
+{"date":"2015-11-19T11:24:49","msg":"Message","mode":"warn"}
+2015-11-19T11:24:49 - warn: Message
+2015-11-19T11:24:49 - warn: Message
+
+# Info is less important than a warning, so won't show up for new-logger.
+julia> log("info", "Something")
+2015-11-19T11:25:52 - info: Message
+2015-11-19T11:25:52 - info: Message
+
+# Debug level isn't important enough to log for either json-logger or new-logger.
+julia> log("debug", "Not very important")
+2015-11-19T11:26:16 - debug: Not very important
+```
+
 ### Syslog and Stack Trace Example
 
 Please note that syslog output is only available on systems that have `logger` utility installed. (This should include both Linux and OS X, but typically excludes Windows.)
 
 ```julia
 julia> using Lumberjack
+
+# Configure Lumberjack to recognize all Syslog log levels.
+julia> configure(; modes=["debug", "info", "notice", "warn", "error", "crit", "alert", "emerg"])
 
 # Output to syslog on facility "local0", with tag "julia", and include Julia's process ID.
 julia> syslog_io = Syslog(:local0, "julia", true)
@@ -231,24 +278,22 @@ Lumberjack.Syslog(:local0,"julia",63474)
 julia> add_truck(JsonTruck(syslog_io, "warn"), "syslog-json")
 Lumberjack.JsonTruck(Lumberjack.Syslog(:local0,"julia",63474),"warn")
 
-# Add a stacktrace to each log entry.
-add_saw(Lumberjack.stacktrace_saw)
-2-element Array{Any,1}:
- Lumberjack.msec_date_saw 
- Lumberjack.stacktrace_saw
+# Add a stacktrace to each log entry that is error-level or above.
+add_saw(Saw(Lumberjack.stacktrace_saw, "error"))
+2-element Array{Lumberjack.Saw,1}:
+ Lumberjack.Saw(Lumberjack.msec_date_saw,nothing)
+ Lumberjack.Saw(Lumberjack.stacktrace_saw,"error")
 
-julia> log("crit", "Critical message!")
-julia> log("error", "Error message!")
-julia> log("warn", "Warning message!")
-julia> log("info", "Info message!")
+julia> log("crit", "Error message!")		# Includes stack trace.
+julia> log("warn", "Warning message!")		# No stack trace.
+julia> log("notice", "Notice message!")		# Not logged.
 ```
 
 Run `tail /var/log/system.log` (modifying as needed, depeding on where your system stores its logs) and you should see something like this:
 
 ```
-Nov 16 15:00:03 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:03","msg":"Critical message!","mode":"crit"}
-Nov 16 15:00:33 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:33","msg":"Error message!","mode":"error"}
-Nov 16 15:00:45 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-16T15:00:45","msg":"Warning message!","mode":"warn"}
+Nov 17 15:00:03 localhost julia[63474]: {"stacktrace":[{"name":"eval_user_input","file":"REPL.jl","line":62},{"name":"anonymous","file":"REPL.jl","line":92}],"date":"2015-11-17T15:00:03","msg":"Error message!","mode":"error"}
+Nov 17 15:00:45 localhost julia[63474]: {"date":"2015-11-17T15:00:45","msg":"Warning message!","mode":"warn"}
 ```
 
 The info message is missing because we set our truck to only output logs at warning level and above.
