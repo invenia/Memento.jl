@@ -1,7 +1,7 @@
 Lumberjack.jl
 =============
 
-[![Build Status](https://travis-ci.org/forio/Lumberjack.jl.png?branch=master)](https://travis-ci.org/forio/Lumberjack.jl)
+[![Build Status](https://travis-ci.org/westleyargentum/Lumberjack.jl.png?branch=master)](https://travis-ci.org/westleyargentum/Lumberjack.jl)
 
 
 ## Quick Start
