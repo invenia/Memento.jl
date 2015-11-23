@@ -43,7 +43,7 @@ function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Di
             continue
         end
 
-        args = saw.saw_fn(args)
+        args = saw(args)
     end
 
     for (truck_name, truck) in lm.timber_trucks

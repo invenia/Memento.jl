@@ -117,20 +117,18 @@ function log(truck::LumberjackTruck, l::Dict)
     if isa(truck.out, Syslog)
         # Syslog needs to be explicitly told what the error level is.
         println(truck.out, mode, record)
-    else
-        if (truck.opts[:is_colorized])
-            # check if color has been defined for key
-            if (haskey(truck.opts[:colors], mode))
-                print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
-            # if not, don't apply colors
-            else
-                println(truck.out, record)
-            end
+    elseif (truck.opts[:is_colorized])
+        # check if color has been defined for key
+        if (haskey(truck.opts[:colors], mode))
+            print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
+        # if not, don't apply colors
         else
             println(truck.out, record)
         end
-        flush(truck.out)
+    else
+        println(truck.out, record)
     end
+    flush(truck.out)
 end
 
 # -------

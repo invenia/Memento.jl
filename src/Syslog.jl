@@ -16,10 +16,8 @@ type Syslog <: IO
     pid::Integer
 
     function Syslog(facility=:local0, tag="julia", tag_pid::Bool=false)
-        try
-            # Verify that logger is installed.
-            run(`logger -f /dev/null`)
-        catch
+        # Verify that logger is installed.
+        if !success(`which logger`)
             error("syslog output only available on systems with logger installed")
         end
 

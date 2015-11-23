@@ -1,9 +1,11 @@
-type Saw
+immutable Saw
     saw_fn::Function
     _mode
 
     Saw(saw_fn::Function, mode=nothing) = new(saw_fn, mode)
 end
+
+call(saw::Saw, args...; kwargs...) = saw.saw_fn(args...; kwargs...)
 
 
 # -------
