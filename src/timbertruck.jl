@@ -6,7 +6,7 @@ log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)),
 
 
 function configure(t::TimberTruck; mode = nothing)
-    !in(:_mode, @compat fieldnames(t)) && return
+    !in(:_mode, fieldnames(t)) && return
     t._mode = mode
 end
 
@@ -22,7 +22,7 @@ type CommonLogTruck <: TimberTruck
 
     CommonLogTruck(out::IO, mode = nothing) = new(out, mode)
 
-    function CommonLogTruck(filename::@compat(AbstractString), mode = nothing)
+    function CommonLogTruck(filename::AbstractString, mode = nothing)
         file = open(filename, "a")
         truck = new(file, mode)
         finalizer(truck, (t)->close(t.out))
@@ -47,9 +47,7 @@ type LumberjackTruck <: TimberTruck
         new(out, mode, opts)
     end
 
-    LumberjackTruck(out::IO, mode = nothing) = new(out, mode)
-
-    function LumberjackTruck(filename::@compat(AbstractString), mode = nothing, opts = Dict())
+    function LumberjackTruck(filename::AbstractString, mode = nothing, opts = Dict())
         file = open(filename, "a")
         setup_opts(opts)
         truck = new(file, mode, opts)
@@ -62,7 +60,7 @@ type LumberjackTruck <: TimberTruck
             opts[:is_colorized] = true
         elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
             # set default colors
-            opts[:colors] = @compat Dict{ASCIIString,Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
+            opts[:colors] = Dict{ASCIIString,Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
         else
             opts[:is_colorized] = false
         end
@@ -82,32 +80,44 @@ function log(truck::LumberjackTruck, l::Dict)
     record = date_stamp == nothing ? "" : "$date_stamp - "
 
     lookup = get(l, :lookup, nothing)
-    if !is(lookup,nothing)
-        # lookup is a tuple
-        func , fname, linenum = lookup
-        lookup_str = "$(string(func))@$(basename(string(fname))):$(linenum) - "
-        record = record*lookup_str
+    if !is(lookup, nothing)
+        # lookup is a StackFrame
+        name, file, line = l[:lookup].name, l[:lookup].file, l[:lookup].line
+        lookup_str = "$(name)@$(basename(string(file))):$(line) - "
+        record = record * lookup_str
     end
 
     mode = l[:mode]
-
     if (truck.opts[:uppercase])
         l[:mode] = uppercase(l[:mode])
     end
 
     record = string(record, "$(l[:mode]): $(l[:msg])")
 
+    stacktrace = get(l, :stacktrace, nothing)
+    if !is(stacktrace, nothing)
+        # stacktrace is a vector of StackFrames
+        record = record * string(" stack:[",
+            join(
+                map(f->"$(f.name)@$(basename(string(f.file))):$(f.line)", stacktrace), ", "
+            ), "]"
+        )
+    end
+
     delete!(l, :date)
     delete!(l, :lookup)
+    delete!(l, :stacktrace)
     delete!(l, :mode)
     delete!(l, :msg)
 
     for (k, v) in l
-        record = string(record, " $k:$(repr(v))")
+        record = string(record, " $k: $(repr(v))")
     end
 
-
-    if (truck.opts[:is_colorized])
+    if isa(truck.out, Syslog)
+        # Syslog needs to be explicitly told what the error level is.
+        println(truck.out, mode, record)
+    elseif (truck.opts[:is_colorized])
         # check if color has been defined for key
         if (haskey(truck.opts[:colors], mode))
             print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
@@ -125,12 +135,39 @@ end
 
 type JsonTruck <: TimberTruck
     out::IO
+    _mode
 end
 
+JsonTruck(out::IO) = JsonTruck(out, nothing)
+
 function log(truck::JsonTruck, l::Dict)
+    l = copy(l)
+
     if haskey(l, :date)
         l[:date] = string(l[:date])
     end
-    println(truck.out, json(l))
-    flush(truck.out)
+
+    if haskey(l, :lookup)
+        # lookup is a StackFrame
+        l[:lookup] = Dict(
+            :name => l[:lookup].name, :file => basename(string(l[:lookup].file)),
+            :line => l[:lookup].line
+        )
+    end
+
+    if haskey(l, :stacktrace)
+        # stacktrace is a vector of StackFrames
+        l[:stacktrace] = map(
+            f -> Dict(:name => f.name, :file => basename(string(f.file)), :line => f.line),
+            l[:stacktrace]
+        )
+    end
+
+    if isa(truck.out, Syslog)
+        # Syslog needs to be explicitly told what the error level is.
+        println(truck.out, l[:mode], json(l))
+    else
+        println(truck.out, json(l))
+        flush(truck.out)
+    end
 end

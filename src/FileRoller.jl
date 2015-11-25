@@ -3,9 +3,9 @@ import Base.println, Base.flush
 FILE_SIZE = 5000 * 1028
 
 type FileRoller <: IO
-    prefix::@compat AbstractString
-    folder::@compat AbstractString
-    filepath::@compat AbstractString
+    prefix::AbstractString
+    folder::AbstractString
+    filepath::AbstractString
     file::IO
     byteswritten::Int64
 end
@@ -18,7 +18,7 @@ function getsuffix(n::Integer)
     str
 end
 
-function getfile(folder::@compat(AbstractString), prefix::@compat(AbstractString))
+function getfile(folder::AbstractString, prefix::AbstractString)
     i = 1
     getpath(i) = joinpath(folder, "$(prefix).$(getsuffix(i))")
     p = getpath(i)
@@ -33,7 +33,7 @@ FileRoller(prefix) = FileRoller(prefix, pwd(), (getfile(pwd(), prefix))..., 0)
 
 FileRoller(prefix, dir) = FileRoller((getfile(dir, prefix))...)
 
-function println(f::FileRoller, s::@compat AbstractString)
+function println(f::FileRoller, s::AbstractString)
     if f.byteswritten > FILE_SIZE
         gf = getfile(f.folder, f.prefix)
         f.filepath = gf[1]

@@ -1,22 +1,37 @@
+immutable Saw
+    saw_fn::Function
+    _mode
+
+    Saw(saw_fn::Function, mode=nothing) = new(saw_fn, mode)
+end
+
+call(saw::Saw, args...; kwargs...) = saw.saw_fn(args...; kwargs...)
+
 
 # -------
 
 msec_date_saw(args::Dict) = setindex!(args, now(), :date)
 
 function fn_call_saw(args::Dict)
-    lookup = [ccall(:jl_lookup_code_address,
-                    Any,
-                    (Ptr{Void}, Int32), b, 0) for b in backtrace()]
+    # Filter out stack frames that are from Lumberjack itself.
+    stack = StackTraces.remove_frames!(
+        StackTraces.stacktrace(), [:fn_call_saw, :log, :info, :warn, :debug]
+    )
 
-    filter!(l->!isempty(l) &&
-            !any(symb->symb == l[1],
-                 [:fn_call_saw, :log, :info, :warn, :debug]),lookup)
-    if isempty(lookup)
+    if isempty(stack)
         args
     else
-        # lookup is a tuple
-        push!(args, :lookup, lookup[1])
+        setindex!(args, stack[1], :lookup)
     end
+end
+
+function stacktrace_saw(args::Dict)
+    # Filter out stack frames that are from Lumberjack itself.
+    stack = StackTraces.remove_frames!(
+        StackTraces.stacktrace(), [:stacktrace_saw, :log, :info, :warn, :debug]
+    )
+
+    setindex!(args, stack, :stacktrace)
 end
 
 # -------
