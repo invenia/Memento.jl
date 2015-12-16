@@ -82,7 +82,7 @@ function log(truck::LumberjackTruck, l::Dict)
     lookup = get(l, :lookup, nothing)
     if !is(lookup, nothing)
         # lookup is a StackFrame
-        name, file, line = l[:lookup].name, l[:lookup].file, l[:lookup].line
+        name, file, line = l[:lookup].func, l[:lookup].file, l[:lookup].line
         lookup_str = "$(name)@$(basename(string(file))):$(line) - "
         record = record * lookup_str
     end
@@ -99,7 +99,7 @@ function log(truck::LumberjackTruck, l::Dict)
         # stacktrace is a vector of StackFrames
         record = record * string(" stack:[",
             join(
-                map(f->"$(f.name)@$(basename(string(f.file))):$(f.line)", stacktrace), ", "
+                map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", stacktrace), ", "
             ), "]"
         )
     end
@@ -150,7 +150,7 @@ function log(truck::JsonTruck, l::Dict)
     if haskey(l, :lookup)
         # lookup is a StackFrame
         l[:lookup] = Dict(
-            :name => l[:lookup].name, :file => basename(string(l[:lookup].file)),
+            :name => l[:lookup].func, :file => basename(string(l[:lookup].file)),
             :line => l[:lookup].line
         )
     end
@@ -158,7 +158,7 @@ function log(truck::JsonTruck, l::Dict)
     if haskey(l, :stacktrace)
         # stacktrace is a vector of StackFrames
         l[:stacktrace] = map(
-            f -> Dict(:name => f.name, :file => basename(string(f.file)), :line => f.line),
+            f -> Dict(:name => f.func, :file => basename(string(f.file)), :line => f.line),
             l[:stacktrace]
         )
     end
