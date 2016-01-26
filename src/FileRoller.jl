@@ -29,9 +29,9 @@ function getfile(folder::AbstractString, prefix::AbstractString)
     p, open(p, "a")
 end
 
-FileRoller(prefix) = FileRoller(prefix, pwd(), (getfile(pwd(), prefix))..., 0)
+FileRoller(prefix) = FileRoller(prefix, pwd())
 
-FileRoller(prefix, dir) = FileRoller((getfile(dir, prefix))...)
+FileRoller(prefix, dir) = FileRoller(prefix, dir, (getfile(dir, prefix))..., 0)
 
 function println(f::FileRoller, s::AbstractString)
     if f.byteswritten > FILE_SIZE
