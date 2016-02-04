@@ -111,6 +111,8 @@ end
 
 error(msg::AbstractString, args::Dict) = error(_lumber_mill, msg, args)
 
+error(msg::AbstractString) = error(_lumber_mill, msg)
+
 error(msg...) = error(_lumber_mill, string(msg...))
 
 # -------

@@ -2,10 +2,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Lumberjack
 
-import Base.show, Base.log, StackTraces
-
-# To avoid warnings, intentionally do not import:
-# Base.error, Base.warn, Base.info
+import Base.show, Base.error, Base.warn, Base.info, Base.log, StackTraces
 
 export log,
        debug, info, warn, error,
@@ -23,6 +20,8 @@ export log,
 
 # -------
 
+global _lumber_mill
+
 include("saws.jl")
 include("timbertruck.jl")
 include("lumbermill.jl")
@@ -32,7 +31,7 @@ include("Syslog.jl")
 # -------
 
 function __init__()
-    global const _lumber_mill = LumberMill()
+    global _lumber_mill = LumberMill()
 end
 
 # -------
