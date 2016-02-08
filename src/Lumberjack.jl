@@ -2,7 +2,15 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Lumberjack
 
-import Base.show, Base.error, Base.warn, Base.info, Base.log, StackTraces
+import Base.show, Base.error, Base.warn, Base.info, Base.log
+import Mocking: @mendable
+
+if !isdefined(Base, :StackTraces)
+    import StackTraces
+end
+
+# To avoid warnings, intentionally do not import:
+# Base.error, Base.warn, Base.info
 
 export log,
        debug, info, warn, error,

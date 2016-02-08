@@ -32,7 +32,7 @@ end
 configure(; args...) = configure(_lumber_mill; args...)
 
 
-function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Dict = Dict())
+function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Dict)
     args[:mode] = mode
     args[:msg] = msg
 
@@ -58,26 +58,26 @@ function log(lm::LumberMill, mode::AbstractString, msg::AbstractString, args::Di
     end
 end
 
-log(mode::AbstractString, msg::AbstractString, args::Dict = Dict()) = log(_lumber_mill, mode, msg, args)
+log(mode::AbstractString, msg::AbstractString, args::Dict) = log(_lumber_mill, mode, msg, args)
 
-log(mode::AbstractString, args::Dict = Dict()) = log(_lumber_mill, mode, "", args)
+log(mode::AbstractString, args::Dict) = log(_lumber_mill, mode, "", args)
 
 
-debug(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "debug", msg, args)
+debug(lm::LumberMill, msg::AbstractString, args::Dict) = log(lm, "debug", msg, args)
 
 debug(msg::AbstractString, args::Dict) = debug(_lumber_mill, msg, args)
 
 debug(msg::AbstractString...) = debug(_lumber_mill, string(msg...))
 
 
-info(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "info", msg, args)
+info(lm::LumberMill, msg::AbstractString, args::Dict) = log(lm, "info", msg, args)
 
 info(msg::AbstractString, args::Dict) = info(_lumber_mill, msg, args)
 
 info(msg::AbstractString...; prefix = "info: ") = info(_lumber_mill, string(msg...))
 
 
-warn(lm::LumberMill, msg::AbstractString, args::Dict = Dict()) = log(lm, "warn", msg, args)
+warn(lm::LumberMill, msg::AbstractString, args::Dict) = log(lm, "warn", msg, args)
 
 warn(msg::AbstractString, args::Dict) = warn(_lumber_mill, msg, args)
 
@@ -100,7 +100,7 @@ warn(err::Exception; prefix = "error: ", kw...) =
     warn(sprint(io->showerror(io,err)), prefix = prefix; kw...)
 
 
-function error(lm::LumberMill, msg::AbstractString, args::Dict = Dict())
+function error(lm::LumberMill, msg::AbstractString, args::Dict)
     exception_msg = copy(msg)
     length(args) > 0 && (exception_msg *= " $args")
 
@@ -110,8 +110,6 @@ function error(lm::LumberMill, msg::AbstractString, args::Dict = Dict())
 end
 
 error(msg::AbstractString, args::Dict) = error(_lumber_mill, msg, args)
-
-error(msg::AbstractString) = error(_lumber_mill, msg)
 
 error(msg...) = error(_lumber_mill, string(msg...))
 
@@ -125,6 +123,10 @@ end
 
 function log(mode::AbstractString, msg::AbstractString; kwargs...)
     log(_lumber_mill, mode, msg; kwargs...)
+end
+
+function log(mode::AbstractString; kwargs...)
+    log(_lumber_mill, mode, ""; kwargs...)
 end
 
 for mode in (:debug, :info, :warn, :error)

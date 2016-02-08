@@ -8,6 +8,7 @@ Lumberjack.add_truck(LumberjackTruck(Syslog(:local0, "julia")))
 # Syslog uses an external call to logger to do its legwork. Because the syslog itself can be
 # essentially anywhere (we might not have permission to read it, and it might not even be on
 # the same machine), we'll just make sure that the external call to logger itself is right.
+# This requires that the call to run to be overwritten has the @mendable macro.
 history = []
 mend(run, command::Cmd -> push!(history, string(command))) do
     for mode in modes

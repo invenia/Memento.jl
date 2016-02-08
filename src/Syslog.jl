@@ -39,7 +39,9 @@ function println(log::Syslog, level::Symbol, msg::AbstractString)
     end
 
     tag = log.tag * (log.pid > -1 ? "[$(log.pid)]" : "")
-    run(`logger -t $(tag) -p $(log.facility).$level $msg`)
+
+    # @mendable is required to allow the test cases to modify the run command for testing.
+    @mendable run(`logger -t $(tag) -p $(log.facility).$level $msg`)
 end
 
 function println(log::Syslog, level::AbstractString, msg::AbstractString)
