@@ -26,28 +26,30 @@ remove_saws()
 # test with fn_call_saw
 add_saw(Lumberjack.fn_call_saw)
 
-@noinline caller(mode, msg) = log(mode, msg)
-caller("debug", "some-msg")
-caller("info", "some-msg")
+let
+    @noinline caller(mode, msg) = log(mode, msg)
+    caller("debug", "some-msg")
+    caller("info", "some-msg")
 
-remove_saws()
+    remove_saws()
 
-# test with stacktrace_saw
-add_saw(Lumberjack.stacktrace_saw)
+    # test with stacktrace_saw
+    add_saw(Lumberjack.stacktrace_saw)
 
-@noinline child_caller(mode, msg) = log(mode, msg)
-@noinline parent_caller(mode, msg) = child_caller(mode, msg)
-parent_caller("warn", "some-msg")
-parent_caller("error", "some-msg")
+    @noinline child_caller(mode, msg) = log(mode, msg)
+    @noinline parent_caller(mode, msg) = child_caller(mode, msg)
+    parent_caller("warn", "some-msg")
+    parent_caller("error", "some-msg")
 
-remove_saws()
+    remove_saws()
 
-# test with extra params
-log("debug", "some-msg", Dict{Any,Any}( :thing1 => "thing1" ))
-log("info", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
-log("warn", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
-log("error", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
-log("crazy", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
+    # test with extra params
+    log("debug", "some-msg", Dict{Any,Any}( :thing1 => "thing1" ))
+    log("info", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69 ))
+    log("warn", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3] ))
+    log("error", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" )))
+    log("crazy", "some-msg", Dict{Any,Any}( :thing1 => "thing1", :thing2 => 69, :thing3 => [1, 2, 3], :thing4 => Dict{Any,Any}( "a" => "apple" ), :thing5 => :some_symbol ))
+end
 
 js = JSON.parse("[$(join(readlines(open(JSON_FILE)), ','))]")
 
