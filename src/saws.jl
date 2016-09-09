@@ -5,7 +5,7 @@ immutable Saw
     Saw(saw_fn::Function, mode=nothing) = new(saw_fn, mode)
 end
 
-call(saw::Saw, args...; kwargs...) = saw.saw_fn(args...; kwargs...)
+@compat (saw::Saw)(args...; kwargs...) = saw.saw_fn(args...; kwargs...)
 
 
 # -------

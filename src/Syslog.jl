@@ -41,11 +41,13 @@ function println(log::Syslog, level::Symbol, msg::AbstractString)
     tag = log.tag * (log.pid > -1 ? "[$(log.pid)]" : "")
 
     # @mendable is required to allow the test cases to modify the run command for testing.
-    @mendable run(`logger -t $(tag) -p $(log.facility).$level $msg`)
+    # TODO: figure out how Mocking works with 0.5
+    #@mendable run(`logger -t $(tag) -p $(log.facility).$level $msg`)
+    run(`logger -t $(tag) -p $(log.facility).$level $msg`)
 end
 
 function println(log::Syslog, level::AbstractString, msg::AbstractString)
-    println(log, symbol(lowercase(level)), msg)
+    println(log, @compat(Symbol)(lowercase(level)), msg)
 end
 
 # Defined just in case somebody decides to call flush, which is totally unnecessary.
