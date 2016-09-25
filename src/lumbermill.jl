@@ -101,7 +101,7 @@ warn(err::Exception; prefix = "error: ", kw...) =
 
 
 function error(lm::LumberMill, msg::AbstractString, args::Dict)
-    exception_msg = copy(msg)
+    exception_msg = @compat identity(msg)
     length(args) > 0 && (exception_msg *= " $args")
 
     log(lm, "error", msg, args)
