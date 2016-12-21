@@ -4,8 +4,8 @@ const MODE_LOG_FILE = tempname()
 println("Path to MODE_LOG_FILE: $MODE_LOG_FILE")
 
 configure(; modes = ["debug", "info", "warn", "error", "crazy"])
-add_truck(Lumberjack.LumberjackTruck(MODE_LOG_FILE, "info"), "infotruck")
-add_saw(Lumberjack.Saw(Lumberjack.fn_call_saw, "error"))
+add_handler(Lumberjack.DefaultHandler(MODE_LOG_FILE, "info"), "infohandler")
+add_formatter(Lumberjack.Formatter(Lumberjack.fn_call_fmt, "error"))
 
 # Test limiting trucks and saws to certain log levels.
 @noinline caller(mode, msg) = log(mode, msg)
@@ -15,7 +15,7 @@ caller("warn", "Message")   # Logged.
 caller("error", "Message")  # Logged with function call.
 caller("crazy", "Message")  # Logged with function call.
 
-remove_truck("infotruck")
+remove_handler("infohandler")
 log_lines = readlines(open(MODE_LOG_FILE, "r"))
 
 fn_regex = "caller@\\Q$(basename(@__FILE__))\\E:\\d+"

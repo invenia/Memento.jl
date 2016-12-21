@@ -1,58 +1,85 @@
 using JSON
 
-abstract TimberTruck
+abstract Handler
 
-log(t::TimberTruck, a::Dict) = error("please implement `log(truck::$(typeof(t)), args::Dict)`")
+function get_formatters(handler::Handler)
+    if in(:_fmts, fieldnames(handler))
+        return handler._fmts
+    else
+        return Vector{Formatter}()
+    end
+end
 
+function add_formatter(handlers::Handler, fmt)
+    if in(:_fmts, fieldnames(handler))
+        append!(handler._fmts, ftm)
+        return hander._fmts
+    else
+        return nothing
+    end
+end
 
-function configure(t::TimberTruck; mode = nothing)
-    !in(:_mode, fieldnames(t)) && return
-    t._mode = mode
+function configure(handler::Handler; mode=nothing, fmt=Vector{Formatter})
+    set_mode!(handler, mode)
+    add_formatters(handler, fmt)
+end
+
+function log(handler::Handler, args::Dict)
+    error("please implement `log(handler::$(typeof(handler)), args::Dict)`")
 end
 
 
 # -------
 
-type CommonLogTruck <: TimberTruck
+type SimpleHandler <: Handler
     out::IO
 
     # for use by the framework, will be
     # ignored if absent or set to nothing
     _mode
 
-    CommonLogTruck(out::IO, mode = nothing) = new(out, mode)
+    _fmts::Vector{Formatter}
 
-    function CommonLogTruck(filename::AbstractString, mode = nothing)
+    function SimpleHandler(out::IO, mode=nothing, fmts=Vector{Formatter}())
+        new(out, mode, fmts)
+    end
+
+    function SimpleHandler(filename::AbstractString, mode=nothing, fmts=Vector{Formatter}())
         file = open(filename, "a")
-        truck = new(file, mode)
-        finalizer(truck, (t)->close(t.out))
-        truck
+        handler = new(file, mode, fmts)
+        finalizer(handler, (h)->close(h.out))
+        handler
     end
 end
 
-function log(truck::CommonLogTruck, l::Dict)
-    println(truck.out, "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])")
-    flush(truck.out)
+function format(handler::SimpleHandler, l::Dict)
+    return "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])"
+end
+
+function log(handler::SimpleHandler, l::Dict)
+    println(handler.out, format(handler, l))
+    flush(handler.out)
 end
 
 # -------
 
-type LumberjackTruck <: TimberTruck
+type DefaultHandler <: Handler
     out::IO
     _mode
+    _fmts::Vector{Formatter}
     opts::Dict
 
-    function LumberjackTruck(out::IO, mode = nothing, opts = Dict())
+    function DefaultHandler(out::IO, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
         setup_opts(opts)
-        new(out, mode, opts)
+        new(out, mode, fmts, opts)
     end
 
-    function LumberjackTruck(filename::AbstractString, mode = nothing, opts = Dict())
+    function DefaultHandler(filename::AbstractString, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
         file = open(filename, "a")
         setup_opts(opts)
-        truck = new(file, mode, opts)
-        finalizer(truck, (t)->close(t.out))
-        truck
+        handler = new(file, mode, fmts, opts)
+        finalizer(handler, (h)->close(h.out))
+        handler
     end
 
     function setup_opts(opts)
@@ -73,7 +100,7 @@ type LumberjackTruck <: TimberTruck
     end
 end
 
-function log(truck::LumberjackTruck, l::Dict)
+function format(handler::DefaultHandler, l::Dict)
     l = copy(l)
 
     date_stamp = get(l, :date, nothing)
@@ -88,7 +115,7 @@ function log(truck::LumberjackTruck, l::Dict)
     end
 
     mode = l[:mode]
-    if (truck.opts[:uppercase])
+    if (handler.opts[:uppercase])
         l[:mode] = uppercase(l[:mode])
     end
 
@@ -114,33 +141,41 @@ function log(truck::LumberjackTruck, l::Dict)
         record = string(record, " $k: $(repr(v))")
     end
 
-    if isa(truck.out, Syslog)
+    return record
+end
+
+function log(handler::DefaultHandler, l::Dict)
+    mode = l[:mode]
+    record = format(handler, l)
+
+    if isa(handler.out, Syslog)
         # Syslog needs to be explicitly told what the error level is.
-        println(truck.out, mode, record)
-    elseif (truck.opts[:is_colorized])
+        println(handler.out, mode, record)
+    elseif (handler.opts[:is_colorized])
         # check if color has been defined for key
-        if (haskey(truck.opts[:colors], mode))
-            print_with_color(truck.opts[:colors][mode], truck.out, string(record,"\n"))
+        if (haskey(handler.opts[:colors], mode))
+            print_with_color(handler.opts[:colors][mode], handler.out, string(record,"\n"))
         # if not, don't apply colors
         else
-            println(truck.out, record)
+            println(handler.out, record)
         end
     else
-        println(truck.out, record)
+        println(handler.out, record)
     end
-    flush(truck.out)
+    flush(handler.out)
 end
 
 # -------
 
-type JsonTruck <: TimberTruck
+type JsonHandler <: Handler
     out::IO
     _mode
+    _fmts::Vector{Formatter}
 end
 
-JsonTruck(out::IO) = JsonTruck(out, nothing)
+JsonHandler(out::IO) = JsonHandler(out, nothing, Vector{Formatter}())
 
-function log(truck::JsonTruck, l::Dict)
+function format(handler::JsonHandler, l::Dict)
     l = copy(l)
 
     if haskey(l, :date)
@@ -163,11 +198,17 @@ function log(truck::JsonTruck, l::Dict)
         )
     end
 
-    if isa(truck.out, Syslog)
+    return json(l)
+end
+
+function log(handler::JsonHandler, l::Dict)
+    record = format(handler, l)
+
+    if isa(handler.out, Syslog)
         # Syslog needs to be explicitly told what the error level is.
-        println(truck.out, l[:mode], json(l))
+        println(handler.out, l[:mode], record)
     else
-        println(truck.out, json(l))
-        flush(truck.out)
+        println(handler.out, record)
+        flush(handler.out)
     end
 end

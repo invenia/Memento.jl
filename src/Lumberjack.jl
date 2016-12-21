@@ -12,35 +12,39 @@ end
 # To avoid warnings, intentionally do not import:
 # Base.error, Base.warn, Base.info
 
-export log,
-       debug, info, warn, error,
-       add_saw, remove_saw, remove_saws,
-       add_truck, remove_truck, remove_trucks,
+export log, debug, info, warn, error,
+       add_formatter, remove_formatter, remove_formatters,
+       add_handler, remove_handler, remove_handlers,
        configure,
 
-       TimberTruck,
-       LumberjackTruck,
-       CommonLogTruck,
-       JsonTruck,
-       Saw,
+       Logger,
+       Handler,
+       DefaultHandler,
+       SimpleHandler,
+       JsonHandler,
+       Formatter,
        FileRoller,
        Syslog
 
 # -------
 
-global _lumber_mill
+global _loggers
 
-include("saws.jl")
-include("timbertruck.jl")
-include("lumbermill.jl")
-include("FileRoller.jl")
-include("Syslog.jl")
+include("formatters.jl")
+include("handlers.jl")
+include("loggers.jl")
+include("file_roller.jl")
+include("syslog.jl")
 
 # -------
 
 function __init__()
-    global _lumber_mill = LumberMill()
+    global _loggers = Dict{Any, Logger}(
+        "root" => Logger()
+    )
 end
+
+get_logger(name="root") = _loggers[name]
 
 # -------
 
