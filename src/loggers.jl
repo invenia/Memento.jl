@@ -55,6 +55,7 @@ end
 configure(; args...) = configure(get_logger(); args...)
 
 function format(logger::Logger, handler::Handler, args::Dict)
+
     for fmt in get_formatters(handler)
         if (get_mode(fmt) != nothing && get_mode(handler) != nothing
             && get_mode_index(logger, args[:mode]) < get_mode_index(logger, get_mode(handler)))
@@ -63,7 +64,7 @@ function format(logger::Logger, handler::Handler, args::Dict)
 
         args = fmt(args)
     end
-    
+
     return args
 end
 
@@ -71,29 +72,32 @@ function log(logger::Logger, mode::AbstractString, msg::AbstractString, args::Di
     args[:mode] = mode
     args[:msg] = msg
 
-    for fmt in logger.fmts
-        if (get_mode(fmt) != nothing &&
-            get_mode_index(logger, mode) < get_mode_index(logger, get_mode(fmt)))
-            continue
+    if mode in logger.modes
+        for fmt in logger.fmts
+            if (get_mode(fmt) != nothing &&
+                get_mode_index(logger, mode) < get_mode_index(logger, get_mode(fmt)))
+                continue
+            end
+
+            args = fmt(args)
         end
 
-        args = fmt(args)
-    end
+        # Iterate over the handlers
+        for (name, handler) in logger.handlers
+            if (get_mode(handler) != nothing
+                && get_mode_index(logger, mode) < get_mode_index(logger, get_mode(handler)))
+                continue
+            end
 
-    # Iterate over the handlers
-    for (name, handler) in logger.handlers
-        if (get_mode(handler) != nothing
-            && get_mode_index(logger, mode) < get_mode_index(logger, get_mode(handler)))
-            continue
+            log(handler, format(logger, handler, args))
         end
-
-        log(handler, format(logger, handler, args))
     end
 end
 
 log(mode::AbstractString, msg::AbstractString, args::Dict) = log(get_logger(), mode, msg, args)
 
 log(mode::AbstractString, args::Dict) = log(get_logger(), mode, "", args)
+
 
 
 debug(logger::Logger, msg::AbstractString, args::Dict) = log(logger, "debug", msg, args)
