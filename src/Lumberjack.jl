@@ -30,11 +30,10 @@ export log, debug, info, warn, error,
 
 global _loggers
 
+include("io.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
-include("file_roller.jl")
-include("syslog.jl")
 
 # -------
 

@@ -1,6 +1,6 @@
 using JSON
 
-abstract Handler
+abstract Handler{T<:IO}
 
 function get_formatters(handler::Handler)
     if in(:_fmts, fieldnames(handler))
@@ -24,81 +24,85 @@ function configure(handler::Handler; mode=nothing, fmt=Vector{Formatter})
     add_formatters(handler, fmt)
 end
 
+function format(handler::Handler, args::Dict)
+    error("please implement `format(handler::$(typeof(handler)), args::Dict)`")
+end
+
 function log(handler::Handler, args::Dict)
-    error("please implement `log(handler::$(typeof(handler)), args::Dict)`")
+    record = format(handler, args)
+    println(handler.io, record)
+    flush(handler.io)
+end
+
+function log(handler::Handler{Syslog}, args::Dict)
+    record = format(handler, l)
+    println(handler.io, l[:mode], record)
+    flush(handler.io)
 end
 
 
 # -------
 
-type SimpleHandler <: Handler
-    out::IO
-
-    # for use by the framework, will be
-    # ignored if absent or set to nothing
+type SimpleHandler{T<:IO} <: Handler{T}
+    io::T
     _mode
-
     _fmts::Vector{Formatter}
+end
 
-    function SimpleHandler(out::IO, mode=nothing, fmts=Vector{Formatter}())
-        new(out, mode, fmts)
-    end
+function SimpleHandler{T<:IO}(io::T, mode=nothing, fmts=Vector{Formatter}())
+    SimpleHandler(io, mode, fmts)
+end
 
-    function SimpleHandler(filename::AbstractString, mode=nothing, fmts=Vector{Formatter}())
-        file = open(filename, "a")
-        handler = new(file, mode, fmts)
-        finalizer(handler, (h)->close(h.out))
-        handler
-    end
+function SimpleHandler(filename::AbstractString, mode=nothing, fmts=Vector{Formatter}())
+    file = open(filename, "a")
+    handler = SimpleHandler(file, mode, fmts)
+    finalizer(handler, (h)->close(h.io))
+    handler
 end
 
 function format(handler::SimpleHandler, l::Dict)
     return "$(l[:remotehost]) $(l[:rfc931]) $(l[:authuser]) $(l[:date]) \"$(l[:request])\" $(l[:status]) $(l[:bytes])"
 end
 
-function log(handler::SimpleHandler, l::Dict)
-    println(handler.out, format(handler, l))
-    flush(handler.out)
-end
-
 # -------
 
-type DefaultHandler <: Handler
-    out::IO
+type DefaultHandler{T<:IO} <: Handler{T}
+    io::T
     _mode
     _fmts::Vector{Formatter}
     opts::Dict
-
-    function DefaultHandler(out::IO, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
-        setup_opts(opts)
-        new(out, mode, fmts, opts)
-    end
-
-    function DefaultHandler(filename::AbstractString, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
-        file = open(filename, "a")
-        setup_opts(opts)
-        handler = new(file, mode, fmts, opts)
-        finalizer(handler, (h)->close(h.out))
-        handler
-    end
-
-    function setup_opts(opts)
-        if haskey(opts, :colors)
-            opts[:is_colorized] = true
-        elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
-            # set default colors
-            opts[:colors] = Dict{@compat(String),Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
-        else
-            opts[:is_colorized] = false
-        end
-
-        if (!haskey(opts, :uppercase))
-            opts[:uppercase] = false
-        end
-
-        opts
-    end
 end
+
+function DefaultHandler{T<:IO}(io::T, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
+    setup_opts(opts)
+    DefaultHandler(io, mode, fmts, opts)
+end
+
+function DefaultHandler(filename::AbstractString, mode=nothing, opts=Dict(), fmts=Vector{Formatter}())
+    file = open(filename, "a")
+    setup_opts(opts)
+    handler = DefaultHandler(file, mode, fmts, opts)
+    finalizer(handler, (h)->close(h.io))
+    handler
+end
+
+function setup_opts(opts)
+    if haskey(opts, :colors)
+        opts[:is_colorized] = true
+    elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
+        # set default colors
+        opts[:colors] = Dict{@compat(String),Symbol}("debug" => :cyan, "info" => :blue, "warn" => :yellow, "error" => :red)
+    else
+        opts[:is_colorized] = false
+    end
+
+    if (!haskey(opts, :uppercase))
+        opts[:uppercase] = false
+    end
+
+    opts
+end
+
 
 function format(handler::DefaultHandler, l::Dict)
     l = copy(l)
@@ -148,32 +152,27 @@ function log(handler::DefaultHandler, l::Dict)
     mode = l[:mode]
     record = format(handler, l)
 
-    if isa(handler.out, Syslog)
-        # Syslog needs to be explicitly told what the error level is.
-        println(handler.out, mode, record)
-    elseif (handler.opts[:is_colorized])
-        # check if color has been defined for key
-        if (haskey(handler.opts[:colors], mode))
-            print_with_color(handler.opts[:colors][mode], handler.out, string(record,"\n"))
-        # if not, don't apply colors
-        else
-            println(handler.out, record)
-        end
+    if handler.opts[:is_colorized] && haskey(handler.opts[:colors], mode)
+        print_with_color(
+            handler.opts[:colors][mode],
+            handler.io, string(record,"\n")
+        )
     else
-        println(handler.out, record)
+        println(handler.io, record)
     end
-    flush(handler.out)
+
+    flush(handler.io)
 end
 
 # -------
 
-type JsonHandler <: Handler
-    out::IO
+type JsonHandler{T<:IO} <: Handler{T}
+    io::T
     _mode
     _fmts::Vector{Formatter}
 end
 
-JsonHandler(out::IO) = JsonHandler(out, nothing, Vector{Formatter}())
+JsonHandler{T<:IO}(io::T) = JsonHandler(io, nothing, Vector{Formatter}())
 
 function format(handler::JsonHandler, l::Dict)
     l = copy(l)
@@ -199,16 +198,4 @@ function format(handler::JsonHandler, l::Dict)
     end
 
     return json(l)
-end
-
-function log(handler::JsonHandler, l::Dict)
-    record = format(handler, l)
-
-    if isa(handler.out, Syslog)
-        # Syslog needs to be explicitly told what the error level is.
-        println(handler.out, l[:mode], record)
-    else
-        println(handler.out, record)
-        flush(handler.out)
-    end
 end
