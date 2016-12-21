@@ -1,38 +1,57 @@
-immutable Formatter
-    fmt_fn::Function
-    _mode
+using JSON
 
-    Formatter(fmt_fn::Function, mode=nothing) = new(fmt_fn, mode)
-end
+abstract Formatter
 
-@compat (fmt::Formatter)(args...; kwargs...) = fmt.fmt_fn(args...; kwargs...)
+const DEFAULT_FMT_STRING = "{date} - {level}: {msg}"
 
-# -------
+immutable DefaultFormatter <: Formatter
+    fmt_str::AbstractString
 
-msec_date_fmt(args::Dict) = setindex!(args, now(), :date)
-
-function fn_call_fmt(args::Dict)
-    # Filter out stack frames that are from Lumberjack itself.
-    stack = StackTraces.remove_frames!(
-        StackTraces.stacktrace(),
-        [:fn_call_fmt, :log, @compat(Symbol("#log#22")), :info, :warn, :debug]
-    )
-
-    if isempty(stack)
-        args
-    else
-        setindex!(args, stack[1], :lookup)
+    function DefaultFormatter(fmt_str::AbstractString=DEFAULT_FMT_STRING)
+        new(fmt_str)
     end
 end
 
-function stacktrace_fmt(args::Dict)
-    # Filter out stack frames that are from Lumberjack itself.
-    stack = StackTraces.remove_frames!(
-        StackTraces.stacktrace(),
-        [:stacktrace_fmt, :log, @compat(Symbol("#log#22")), :info, :warn, :debug]
-    )
+function format(fmt::DefaultFormatter, rec::Record)
+    rec_dict = copy(getdict(rec))
+    result = fmt.fmt_str
 
-    setindex!(args, stack, :stacktrace)
+    for field in keys(rec_dict)
+        if is(field, :lookup)
+            # lookup is a StackFrame
+            name, file, line = rec_dict[field].func, rec_dict[field].file, rec_dict[field].line
+            rec_dict[field] = "$(name)@$(basename(string(file))):$(line)"
+        elseif is(field, :stacktrace)
+            # stacktrace is a vector of StackFrames
+            rec_dict[field] = string(" stack:[",
+                join(
+                    map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", rec_dict[field]), ", "
+                ), "]"
+            )
+        end
+
+        result = replace(result, "{$field}", rec_dict[field])
+    end
+
+    return result
 end
 
-# -------
+
+type JsonFormatter <: Formatter end
+
+function format(fmt::JsonFormatter, rec::Record)
+    rec_dict = copy(getdict(rec))
+
+    rec_dict[:date] = string(l[:date])
+    rec_dict[:lookup] = Dict(
+        :name => rec_dict[:lookup].func,
+        :file => basename(string(rec_dict[:lookup].file)),
+        :line => rec_dict[:lookup].line
+    )
+    rec_dict[:stacktrace] = map(
+        f -> Dict(:name => f.func, :file => basename(string(f.file)), :line => f.line),
+        rec_dict[:stacktrace]
+    )
+
+    return json(rec_dict)
+end

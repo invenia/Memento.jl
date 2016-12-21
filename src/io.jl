@@ -1,6 +1,6 @@
 import Base.println, Base.flush
 
-FILE_SIZE = 5000 * 1028
+const DEFAULT_MAX_FILE_SIZE = 5000 * 1028
 
 type FileRoller <: IO
     prefix::AbstractString
@@ -8,6 +8,7 @@ type FileRoller <: IO
     filepath::AbstractString
     file::IO
     byteswritten::Int64
+    max_sz::Int
 end
 
 function getsuffix(n::Integer)
@@ -29,12 +30,14 @@ function getfile(folder::AbstractString, prefix::AbstractString)
     p, open(p, "a")
 end
 
-FileRoller(prefix) = FileRoller(prefix, pwd())
+FileRoller(prefix; max_sz=DEFAULT_MAX_FILE_SIZE) = FileRoller(prefix, pwd(); max_sz=max_sz)
 
-FileRoller(prefix, dir) = FileRoller(prefix, dir, (getfile(dir, prefix))..., 0)
+function FileRoller(prefix, dir; max_sz=DEFAULT_MAX_FILE_SIZE)
+    FileRoller(prefix, dir, (getfile(dir, prefix))..., 0, max_sz)
+end
 
 function println(f::FileRoller, s::AbstractString)
-    if f.byteswritten > FILE_SIZE
+    if f.byteswritten > f.max_sz
         gf = getfile(f.folder, f.prefix)
         f.filepath = gf[1]
         f.file = gf[2]

@@ -1,120 +1,117 @@
-typealias LoggingComponent Union{Formatter, Handler}
-
-function get_mode(component::LoggingComponent)
-    if in(:_mode, fieldnames(component))
-        return component._mode
-    else
-        return nothing
-    end
-end
-
-function set_mode!(component::LoggingComponent, mode)
-    if get_mode(component) != nothing
-        component._mode = mode
-    end
-end
-
 type Logger
+    name::AbstractString
     handlers::Dict{Any, Handler}
-    fmts::Vector{Formatter}
-    modes::Array
+    level::Symbol
+    levels::Dict{Symbol, Int}
+    record::Function
+end
 
-    function Logger(; handlers::Dict{Any, Handler}=Dict{Any, Handler}(),
-                    fmts=Vector{Formatter}(), modes = Any[])
+function Logger(name; level=DEFAULT_LOG_LEVEL, levels=DEFAULT_LOG_LEVELS, record::Function=default_record)
+    logger = Logger(
+        name,
+        Dict{Any, Handler}(),
+        level,
+        levels,
+        record
+    )
 
-        logger = new(handlers, fmts, modes)
+    add_handler(
+        logger,
+        DefaultHandler(
+            STDOUT, DefaultFormatter(),
+            Dict{Symbol,Any}(:is_colorized => true)
+        ),
+        "console"
+    )
 
-        # defaults
-        configure(logger)
-        add_formatter(logger, msec_date_fmt)
-        add_handler(
-            logger,
-            DefaultHandler(
-                STDOUT, nothing, Dict{Symbol,Any}(:is_colorized => true)
-            ),
-            "console"
-        )
+    logger
+end
 
-        logger
+get_logger(name="root") = _loggers[name]
+
+function configure(logger; kwargs...)
+    dict = Dict(kwargs)
+
+    if haskey(dict, :levels)
+        logger.levels = dict[:levels]
+    end
+
+    if haskey(dict, :level)
+        logger.level = dict[:level]
+    end
+
+    if haskey(dict, :record) && isa(args[:record], Type)
+        logger.record = args[:record]
     end
 end
 
-# -------
+configure(; kwargs...) = configure(get_logger(); kwargs...)
 
-function configure(logger::Logger;
-                   modes=["debug", "info", "warn", "error"],
-                   handlers=Dict{Any, Dict}())
+get_handlers(logger::Logger) = logger.handlers
+get_handlers() = get_handlers(get_logger())
 
-    logger.modes = modes
-
-    for (handler, settings) in handlers
-        configure(logger.handlers[handler]; settings...)
-    end
+function add_handler(logger::Logger, handler::Handler, name=string(Base.Random.uuid4()))
+    logger.handlers[name] = handler
 end
 
-configure(; args...) = configure(get_logger(); args...)
-
-function format(logger::Logger, handler::Handler, args::Dict)
-
-    for fmt in get_formatters(handler)
-        if (get_mode(fmt) != nothing && get_mode(handler) != nothing
-            && get_mode_index(logger, args[:mode]) < get_mode_index(logger, get_mode(handler)))
-            continue
-        end
-
-        args = fmt(args)
-    end
-
-    return args
+function add_handler(handler::Handler, name=string(Base.Random.uuid4()))
+    add_handler(get_logger(), handler, name)
 end
 
-function log(logger::Logger, mode::AbstractString, msg::AbstractString, args::Dict)
-    args[:mode] = mode
+remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
+
+remove_handler(name) = remove_handler(get_logger(), name)
+
+remove_handlers(logger::Logger=get_logger()) = empty!(logger.handlers)
+
+function set_level(logger::Logger, level::Symbol)
+    logger.levels[level]    # Throw a key error if the levels isn't in levels
+    logger.level = level
+end
+
+set_level(level::Symbol) = set_level(get_logger(), level)
+
+add_level(logger::Logger, level::Symbol, val::Int) = logger.levels[level] = val
+
+add_level(level::Symbol, val::Int) = add_level(get_logger(), level, val)
+
+set_record(logger::Logger, rec::Function) = logger.rec = rec
+
+set_record(rec::Function) = set_record(set_logger(), rec)
+
+function log(logger::Logger, level::Symbol, msg::AbstractString, args::Dict)
+    args[:name] = logger.name
+    args[:level] = level
+    args[:levelnum] = logger.levels[level]
     args[:msg] = msg
 
-    if mode in logger.modes
-        for fmt in logger.fmts
-            if (get_mode(fmt) != nothing &&
-                get_mode_index(logger, mode) < get_mode_index(logger, get_mode(fmt)))
-                continue
-            end
-
-            args = fmt(args)
-        end
-
-        # Iterate over the handlers
+    if logger.levels[level] >= logger.levels[logger.level]
         for (name, handler) in logger.handlers
-            if (get_mode(handler) != nothing
-                && get_mode_index(logger, mode) < get_mode_index(logger, get_mode(handler)))
-                continue
-            end
-
-            log(handler, format(logger, handler, args))
+            log(handler, logger.record(args))
         end
     end
 end
 
-log(mode::AbstractString, msg::AbstractString, args::Dict) = log(get_logger(), mode, msg, args)
+log(level::Symbol, msg::AbstractString, args::Dict) = log(get_logger(), level, msg, args)
 
-log(mode::AbstractString, args::Dict) = log(get_logger(), mode, "", args)
+log(level::Symbol, args::Dict) = log(get_logger(), level, "", args)
 
 
-
-debug(logger::Logger, msg::AbstractString, args::Dict) = log(logger, "debug", msg, args)
+debug(logger::Logger, msg::AbstractString, args::Dict) = log(logger, :debug, msg, args)
 
 debug(msg::AbstractString, args::Dict) = debug(get_logger(), msg, args)
 
 debug(msg::AbstractString...) = debug(get_logger(), string(msg...))
 
 
-info(logger::Logger, msg::AbstractString, args::Dict) = log(logger, "info", msg, args)
+info(logger::Logger, msg::AbstractString, args::Dict) = log(logger, :info, msg, args)
 
 info(msg::AbstractString, args::Dict) = info(get_logger(), msg, args)
 
 info(msg::AbstractString...; prefix = "info: ") = info(get_logger(), string(msg...))
 
 
-warn(logger::Logger, msg::AbstractString, args::Dict) = log(logger, "warn", msg, args)
+warn(logger::Logger, msg::AbstractString, args::Dict) = log(logger, :warn, msg, args)
 
 warn(msg::AbstractString, args::Dict) = warn(get_logger(), msg, args)
 
@@ -144,7 +141,7 @@ function error(logger::Logger, msg::AbstractString, args::Dict)
     exception_msg = @compat identity(msg)
     length(args) > 0 && (exception_msg *= " $args")
 
-    log(logger, "error", msg, args)
+    log(logger, :error, msg, args)
 
     throw(ErrorException(exception_msg))
 end
@@ -157,74 +154,24 @@ error(msg...) = error(get_logger(), string(msg...))
 
 # Allow the args dict to be passed in by kwargs instead.
 
-function log(logger::Logger, mode::AbstractString, msg::AbstractString; kwargs...)
-    log(logger, mode, msg, Dict{Symbol, Any}(kwargs))
+function log(logger::Logger, level::Symbol, msg::AbstractString; kwargs...)
+    log(logger, level, msg, Dict{Symbol, Any}(kwargs))
 end
 
-function log(mode::AbstractString, msg::AbstractString; kwargs...)
-    log(get_logger(), mode, msg; kwargs...)
+function log(level::Symbol, msg::AbstractString; kwargs...)
+    log(get_logger(), level, msg; kwargs...)
 end
 
-function log(mode::AbstractString; kwargs...)
-    log(get_logger(), mode, ""; kwargs...)
+function log(level::Symbol; kwargs...)
+    log(get_logger(), level, ""; kwargs...)
 end
 
-for mode in (:debug, :info, :warn, :error)
+for level in (:debug, :info, :warn, :error)
     @eval begin
-        function $mode(logger::Logger, msg::AbstractString; kwargs...)
-            $mode(logger, msg, Dict{Symbol, Any}(kwargs))
+        function $level(logger::Logger, msg::AbstractString; kwargs...)
+            $level(logger, msg, Dict{Symbol, Any}(kwargs))
         end
 
-        $mode(msg::AbstractString; kwargs...) = $mode(get_logger(), msg; kwargs...)
+        $level(msg::AbstractString; kwargs...) = $level(get_logger(), msg; kwargs...)
     end
-end
-
-# -------
-
-function add_formatter(logger::Logger, fmt_fn::Function, index::Integer=length(logger.fmts)+1)
-    insert!(logger.fmts, index, Formatter(fmt_fn))
-end
-
-function add_formatter(fmt_fn::Function, index::Integer=length(get_logger().fmts)+1)
-    add_formatter(get_logger(), fmt_fn, index)
-end
-
-# Like handlers, formatters that are only used only for certain logging modes can be added.
-
-function add_formatter(logger::Logger, fmt::Formatter, index::Integer=length(logger.fmts)+1)
-    insert!(logger.fmts, index, fmt)
-end
-
-function add_formatter(fmt::Formatter, index::Integer=length(get_logger().fmts)+1)
-    add_formatter(get_logger(), fmt, index)
-end
-
-
-function remove_formatter(logger::Logger, index=length(logger.fmts))
-    splice!(logger.fmts, index)
-end
-
-remove_formatter(index=length(get_logger().fmts)) = remove_formatter(get_logger(), index)
-
-remove_formatters(logger::Logger=get_logger()) = empty!(logger.fmts)
-
-function add_handler(logger::Logger, handler::Handler, name=string(Base.Random.uuid4()))
-    logger.handlers[name] = handler
-end
-
-function add_handler(handler::Handler, name=string(Base.Random.uuid4()))
-    add_handler(get_logger(), handler, name)
-end
-
-remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
-
-remove_handler(name) = remove_handler(get_logger(), name)
-
-remove_handlers(logger::Logger=get_logger()) = empty!(logger.handlers)
-
-# -------
-
-function get_mode_index(logger::Logger, mode)
-    index = findfirst(logger.modes, mode)
-    index > 0 ? index : length(logger.modes) + 1
 end
