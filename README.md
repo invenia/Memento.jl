@@ -1,7 +1,9 @@
 Lumberjack.jl
 =============
 
-[![Build Status](https://travis-ci.org/WestleyArgentum/Lumberjack.jl.svg?branch=master)](https://travis-ci.org/WestleyArgentum/Lumberjack.jl)
+[![Build Status](https://travis-ci.org/invenia/Lumberjack.jl.svg?branch=master)](https://travis-ci.org/invenia/Lumberjack.jl)
+[![codecov](https://codecov.io/gh/invenia/Lumberjack.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Lumberjack.jl)
+
 
 ## Quick Start
 ```julia

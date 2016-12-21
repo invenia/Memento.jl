@@ -3,8 +3,9 @@ os:
   - linux
   - osx
 julia:
-  - 0.4
   - 0.5
   - nightly
 notifications:
   email: false
+after_success:
+  - julia -e 'cd(Pkg.dir("Lumberjack")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
