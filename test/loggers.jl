@@ -41,10 +41,10 @@
 
             info("Starting IOBuffer tests")
             msg = "It works!"
-            Lumberjack.info(logger, msg)
+            Memento.info(logger, msg)
             @test takebuf_string(io) == "[info]:Logger.example - $msg\n"
 
-            Lumberjack.debug(logger, "This shouldn't get logged")
+            Memento.debug(logger, "This shouldn't get logged")
             @test takebuf_string(io) == ""
 
             msg = "Something went very wrong"

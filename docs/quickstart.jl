@@ -1,6 +1,6 @@
 # Copy and paste these line into a REPL and screen capture to produce the
 # sample usage image.
-using Lumberjack
+using Memento
 basic_config("debug"; fmt="[{date} | {level} | {name}]: {msg}")
 logger = get_logger(current_module())
 debug(logger, "Something that won't get logged.")

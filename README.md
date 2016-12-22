@@ -1,15 +1,15 @@
-Lumberjack.jl
+Memento.jl
 =============
 
-[![Build Status](https://travis-ci.org/invenia/Lumberjack.jl.svg?branch=master)](https://travis-ci.org/invenia/Lumberjack.jl)
-[![codecov](https://codecov.io/gh/invenia/Lumberjack.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Lumberjack.jl)
+[![Build Status](https://travis-ci.org/invenia/Memento.jl.svg?branch=master)](https://travis-ci.org/invenia/Memento.jl)
+[![codecov](https://codecov.io/gh/invenia/Memento.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Memento.jl)
 
-Lumberjack is flexible hierarchical logging library for julia.
+Memento is flexible hierarchical logging library for julia.
 
 ## Installation
 
 ```julia
-julia> Pkg.add("Lumberjack")
+julia> Pkg.add("Memento")
 ```
 
 ## Quick Start
@@ -19,11 +19,11 @@ julia> Pkg.add("Lumberjack")
 
 ## Architecture
 
-There are five main components of Lumberjack.jl that you can manipulate:
+There are five main components of Memento.jl that you can manipulate:
 
 ### Logger
 
-A `Logger` is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default "root" logger stored in global `_loggers` inside the `Lumberjack` module. Since Lumberjack implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code.
+A `Logger` is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default "root" logger stored in global `_loggers` inside the `Memento` module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code.
 To create a new logger for you code it is recommended to do `get_logger(current_module())`.
 
 ```julia
@@ -97,7 +97,7 @@ julia> DefaultFormatter("[{date} | {level} | {name}]: {msg}")
 
 ### Records
 
-`Record`s describe a set of key value pairs that should be available to a  `Formatter` on every log message. While the `DefaultRecord` in Lumberjack provides many of the keys and values need for most logging applications, you may need to implement your own `Record` type.
+`Record`s describe a set of key value pairs that should be available to a  `Formatter` on every log message. While the `DefaultRecord` in Memento provides many of the keys and values need for most logging applications, you may need to implement your own `Record` type.
 
 Internal `DefaultRecord` Dict:
 ```julia
@@ -115,7 +115,7 @@ Dict(
 
 ### IO
 
-Lumberjack writes all logs to any subtype of `IO` including `IOBuffer`s, `LibuvStream`s, `Pipe`s, `File`s, etc. Lumberjack also comes with 2 logging specific `IO` types.
+Memento writes all logs to any subtype of `IO` including `IOBuffer`s, `LibuvStream`s, `Pipe`s, `File`s, etc. Memento also comes with 2 logging specific `IO` types.
 
 1. `FileRoller` - Does automatic log file rotation.
 2. `Syslog` - Write to syslog using the `logger` command. Please note that syslog output is only available on systems that have `logger` utility installed. (This should include both Linux and OS X, but typically excludes Windows.) Note that BSD's `logger` (used on OS X) will append a second process ID, which is the PID of the `logger` tool itself.

@@ -1,6 +1,6 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
-module Lumberjack
+module Memento
 
 import Base.show, Base.info, Base.log, Compat.@compat
 #import Mocking: @mendable # TODO - figure out how to use Mocking on 0.5
@@ -69,7 +69,7 @@ end
 
 function reset!()
     empty!(_loggers)
-    Lumberjack.__init__()
+    Memento.__init__()
 end
 
 function get_parent(name)

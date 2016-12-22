@@ -1,6 +1,6 @@
 
 using Base.Test
-using Lumberjack
+using Memento
 using JSON
 
 cd(dirname(@__FILE__))
@@ -29,6 +29,6 @@ end
 # Run each file in the test directory that looks like "test-XXXX.jl"
 # Test files should assume the global lumber mill has been reset
 for file in files
-    Lumberjack.reset!()
+    Memento.reset!()
     include(abspath(file))
 end

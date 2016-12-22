@@ -35,7 +35,7 @@ using Base.Test
     end
 
     @testset "Syslog" begin
-        levels = copy(Lumberjack.DEFAULT_LOG_LEVELS)
+        levels = copy(Memento.DEFAULT_LOG_LEVELS)
         levels["invalid"] = 100
         handler = DefaultHandler(Syslog(:local0, "julia"))
 

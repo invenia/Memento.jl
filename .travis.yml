@@ -8,4 +8,4 @@ julia:
 notifications:
   email: false
 after_success:
-  - julia -e 'cd(Pkg.dir("Lumberjack")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

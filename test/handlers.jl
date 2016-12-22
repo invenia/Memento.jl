@@ -31,10 +31,10 @@
 
                 info("Starting IOBuffer tests")
                 msg = "It works!"
-                Lumberjack.info(logger, msg)
+                Memento.info(logger, msg)
                 @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"
 
-                Lumberjack.debug(logger, "This shouldn't get logged")
+                Memento.debug(logger, "This shouldn't get logged")
                 @test takebuf_string(io) == ""
 
                 msg = "Something went very wrong"
@@ -62,8 +62,8 @@
             @test logger.name == "DefaultHandler.sample_file"
             @test logger.level == "info"
 
-            Lumberjack.info(logger, "It works!")
-            Lumberjack.debug(logger, "This shouldn't get logged")
+            Memento.info(logger, "It works!")
+            Memento.debug(logger, "This shouldn't get logged")
 
             log(logger, "fubar", "Something went very wrong")
 
@@ -75,7 +75,7 @@
             try
                 handler1 = DefaultHandler(io)
 
-                @test handler1.fmt.fmt_str == Lumberjack.DEFAULT_FMT_STRING
+                @test handler1.fmt.fmt_str == Memento.DEFAULT_FMT_STRING
                 @test takebuf_string(handler1.io) == ""
                 @test !(handler1.opts[:is_colorized])
 
@@ -100,7 +100,7 @@
             info("Path to log file: $filename")
             handler1 = DefaultHandler(filename)
 
-            @test handler1.fmt.fmt_str == Lumberjack.DEFAULT_FMT_STRING
+            @test handler1.fmt.fmt_str == Memento.DEFAULT_FMT_STRING
             @test !(handler1.opts[:is_colorized])
 
             handler2 = DefaultHandler(
