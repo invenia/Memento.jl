@@ -2,11 +2,6 @@
 using Base.Test
 using Lumberjack
 
-function reset_lumberjack()
-    Lumberjack.remove_handlers()
-    Lumberjack.configure()
-end
-
 
 cd(dirname(@__FILE__))
 files = [
@@ -20,6 +15,6 @@ files = [
 # Run each file in the test directory that looks like "test-XXXX.jl"
 # Test files should assume the global lumber mill has been reset
 for file in files
-    reset_lumberjack()
+    Lumberjack.reset!()
     include(abspath(file))
 end

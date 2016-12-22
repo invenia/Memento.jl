@@ -2,11 +2,11 @@
     FMT_STR = "[{level}]:{name} - {msg}"
 
     LEVELS = Dict(
-        :debug => 10,
-        :info => 20,
-        :warn => 30,
-        :error => 40,
-        :fubar => 50
+        "debug" => 10,
+        "info" => 20,
+        "warn" => 30,
+        "error" => 40,
+        "fubar" => 50
     )
 
     @testset "DefaultHandler" begin
@@ -21,13 +21,13 @@
                 logger = Logger(
                     "DefaultHandler.sample_io",
                     Dict("Buffer" => handler),
-                    :info,
+                    "info",
                     LEVELS,
                     default_record
                 )
 
                 @test logger.name == "DefaultHandler.sample_io"
-                @test logger.level == :info
+                @test logger.level == "info"
 
                 info("Starting IOBuffer tests")
                 msg = "It works!"
@@ -38,7 +38,7 @@
                 @test takebuf_string(io) == ""
 
                 msg = "Something went very wrong"
-                log(logger, :fubar, msg)
+                log(logger, "fubar", msg)
                 @test takebuf_string(io) == "[fubar]:$(logger.name) - $msg\n"
             finally
                 close(io)
@@ -54,18 +54,18 @@
             logger = Logger(
                 "DefaultHandler.sample_file",
                 Dict("File" => handler),
-                :info,
+                "info",
                 LEVELS,
                 default_record
             )
 
             @test logger.name == "DefaultHandler.sample_file"
-            @test logger.level == :info
+            @test logger.level == "info"
 
             Lumberjack.info(logger, "It works!")
             Lumberjack.debug(logger, "This shouldn't get logged")
 
-            log(logger, :fubar, "Something went very wrong")
+            log(logger, "fubar", "Something went very wrong")
 
             @test success(`rm $filename`)
         end
@@ -88,8 +88,8 @@
                 @test handler2.fmt.fmt_str == FMT_STR
                 @test handler2.opts[:is_colorized]
                 @test haskey(handler2.opts, :colors)
-                @test haskey(handler2.opts[:colors], :debug)
-                @test handler2.opts[:colors][:debug] == :cyan
+                @test haskey(handler2.opts[:colors], "debug")
+                @test handler2.opts[:colors]["debug"] == :cyan
             finally
                 close(io)
             end
@@ -112,8 +112,8 @@
             @test handler2.fmt.fmt_str == FMT_STR
             @test handler2.opts[:is_colorized]
             @test haskey(handler2.opts, :colors)
-            @test haskey(handler2.opts[:colors], :debug)
-            @test handler2.opts[:colors][:debug] == :cyan
+            @test haskey(handler2.opts[:colors], "debug")
+            @test handler2.opts[:colors]["debug"] == :cyan
         end
     end
 end

@@ -4,11 +4,11 @@ using Base.Test
 @testset "IO" begin
     @testset "FileRoller" begin
         levels = Dict(
-            :debug => 10,
-            :info => 20,
-            :warn => 30,
-            :error => 40,
-            :fubar => 50
+            "debug" => 10,
+            "info" => 20,
+            "warn" => 30,
+            "error" => 40,
+            "fubar" => 50
         )
         roller_prefix = tempname()
         info("Path to roller_prefix: $roller_prefix")
@@ -17,17 +17,17 @@ using Base.Test
         logger = Logger(
             "IO.FileRoller",
             Dict("Roller" => handler),
-            :debug,
+            "debug",
             levels,
             default_record
         )
 
         for i = 1:300
-            log(logger, :debug, "some-msg")
-            log(logger, :info, "some-msg")
-            log(logger, :warn, "some-msg")
-            log(logger, :error, "some-msg")
-            log(logger, :fubar, "some-msg")
+            log(logger, "debug", "some-msg")
+            log(logger, "info", "some-msg")
+            log(logger, "warn", "some-msg")
+            log(logger, "error", "some-msg")
+            log(logger, "fubar", "some-msg")
         end
 
         @test success(`rm $roller_prefix.0001`)
@@ -36,13 +36,13 @@ using Base.Test
 
     @testset "Syslog" begin
         levels = copy(Lumberjack.DEFAULT_LOG_LEVELS)
-        levels[:invalid] = 100
+        levels["invalid"] = 100
         handler = DefaultHandler(Syslog(:local0, "julia"))
 
         logger = Logger(
             "IO.Syslog",
             Dict("Syslog" => handler),
-            :debug,
+            "debug",
             levels,
             default_record
         )

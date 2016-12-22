@@ -12,30 +12,30 @@ end
 # To avoid warnings, intentionally do not import:
 # Base.error, Base.warn, Base.info
 
-export log, debug, info, warn, error,
-       add_formatter, remove_formatter, remove_formatters,
+export log, debug, info, notice, warn, error, critical, alert, emergency,
+       set_level, add_level, set_record,
        add_handler, remove_handler, remove_handlers,
-       configure, get_logger,
+       configure, get_logger, get_handlers, default_record,
 
        Logger,
-       Record, DefaultRecord, default_record,
+       Record, DefaultRecord,
        Formatter, DefaultFormatter, JsonFormatter,
        Handler, DefaultHandler,
        FileRoller, Syslog
 
 
-const DEFAULT_LOG_LEVEL = :warn
+const DEFAULT_LOG_LEVEL = "warn"
 
-const DEFAULT_LOG_LEVELS = Dict{Symbol, Int}(
-    :not_set => 0,
-    :debug => 10,
-    :info => 20,
-    :notice => 30,
-    :warn => 40,
-    :error => 50,
-    :critical => 50,
-    :alert => 60,
-    :emergency => 70
+const DEFAULT_LOG_LEVELS = Dict{AbstractString, Int}(
+    "not_set" => 0,
+    "debug" => 10,
+    "info" => 20,
+    "notice" => 30,
+    "warn" => 40,
+    "error" => 50,
+    "critical" => 50,
+    "alert" => 60,
+    "emergency" => 70
 )
 
 global _loggers
@@ -51,5 +51,12 @@ function __init__()
         "root" => Logger("root")
     )
 end
+
+function reset!()
+    empty!(_loggers)
+    Lumberjack.__init__()
+end
+
+get_logger(name="root") = _loggers[name]
 
 end
