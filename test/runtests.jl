@@ -1,5 +1,8 @@
 
 using Base.Test
+using Mocking
+Mocking.enable()
+
 using Memento
 using JSON
 
@@ -21,6 +24,7 @@ files = [
         warn(logger1, "This might cause an error.")
         warn(logger1, ErrorException("A caught exception that we want to log as a warning."))
         @test_throws ErrorException error(logger1, "Something that should throw an error.")
+        @test_throws ErrorException error(logger1, ErrorException("A caught exception that we should log and rethrow"))
         logger2 = get_logger("Pkg.Foo.Bar")
     end
 end

@@ -38,7 +38,7 @@ using Base.Test
     @testset "Syslog" begin
         levels = copy(Memento._log_levels)
         levels["invalid"] = 100
-        handler = DefaultHandler(Syslog(:local0, "julia"))
+        handler = DefaultHandler(Syslog(:local0, "julia"), DefaultFormatter("{level}: {msg}"))
 
         logger = Logger(
             "IO.Syslog",
@@ -52,16 +52,27 @@ using Base.Test
         # Syslog uses an external call to logger to do its legwork. Because the syslog itself can be
         # essentially anywhere (we might not have permission to read it, and it might not even be on
         # the same machine), we'll just make sure that the external call to logger itself is right.
-        # This requires that the call to run to be overwritten has the @mendable macro.
+        # This requires that the call to run to be overwritten has the @mock macro.
         history = []
-        # mend(run, command::Cmd -> push!(history, string(command))) do
-        #     for mode in modes
-        #         log(mode, "Message")
-        #         @test history[end] == string(`logger -t julia -p local0.$(mode) "$(mode): Message"`)
-        #     end
-        #
-        #     # Syslog only accepts certain predefined loglevels.
-        #     @test_throws ErrorException log("invalid-syslog-level", "Message")
-        # end
+
+        # Generate a alternative method of `run` which call we wish to mock
+        patch = @patch run(cmd::Base.AbstractCmd, args...) = push!(history, string(cmd))
+
+        # Apply the patch which will modify the behaviour for our test
+        apply(patch) do
+            for level in keys(levels)
+                if level != "not_set"
+                    if level != "invalid"
+                        log(logger, level, "Message")
+                        sys_level = get(Memento.ALIAS_LEVELS, Symbol(level), level)
+                        @test history[end] == string(
+                            `logger -t julia -p local0.$(sys_level) "$(level): Message"`
+                        )
+                    else
+                        @test_throws ErrorException log(logger, "invalid", "Message")
+                    end
+                end
+            end
+        end
     end
 end

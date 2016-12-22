@@ -38,7 +38,12 @@
             set_level(logger, "info")
             @test logger.level == "info"
 
+            set_record(logger, DefaultRecord)
+
             add_level(logger, "fubar", 50)
+
+            show(io, logger)
+            @test takebuf_string(io) == "Logger(Logger.example)"
 
             info("Starting IOBuffer tests")
             msg = "It works!"

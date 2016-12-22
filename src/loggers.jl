@@ -72,7 +72,7 @@ function get_logger(name="root")
     return _loggers[logger_name]
 end
 
-set_record{R<:Record}(logger::Logger, rec::Type{R}) = logger.rec = rec
+set_record{R<:Record}(logger::Logger, rec::Type{R}) = logger.record = rec
 
 remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
 
@@ -89,14 +89,12 @@ function set_level(logger::Logger, level::AbstractString)
     logger.level = level
 end
 
-get_level(logger::Logger) = return logger.level
-
 function log(logger::Logger, args::Dict{Symbol, Any})
     level = args[:level]
     llevel = logger.level
     levels = logger.levels
 
-    if llevel != "not_set" && haskey(levels, level) && levels[level] >= levels[llevel]
+    if is_set(logger) && haskey(levels, level) && levels[level] >= levels[llevel]
         for (name, handler) in logger.handlers
             log(handler, logger.record(args))
         end
@@ -140,7 +138,7 @@ for key in keys(_log_levels)
                 end
 
                 function $level(logger::Logger, exc::ErrorException)
-                    $level(logger, sprint(io->showerror(io,err)), args)
+                    $level(logger, sprint(io->showerror(io,exc)))
                 end
             end
         end

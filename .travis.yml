@@ -7,5 +7,8 @@ julia:
   - nightly
 notifications:
   email: false
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia --compilecache=no -e 'Pkg.clone(pwd()); Pkg.build("Memento"); Pkg.test("Memento"; coverage=true)';
 after_success:
   - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

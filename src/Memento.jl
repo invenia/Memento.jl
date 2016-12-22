@@ -2,8 +2,9 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Memento
 
+using Mocking
+
 import Base: show, info, warn, error, log
-#import Mocking: @mendable # TODO - figure out how to use Mocking on 0.5
 
 if !isdefined(Base, :StackTraces)
     import StackTraces

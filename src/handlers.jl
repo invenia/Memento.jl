@@ -41,7 +41,7 @@ function setup_opts(opts)
     opts
 end
 
-function log(handler::DefaultHandler, rec::Record)
+function log{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
     level = rec[:level]
     str = format(handler.fmt, rec)
 
@@ -58,7 +58,7 @@ function log(handler::DefaultHandler, rec::Record)
     flush(handler.io)
 end
 
-function log(handler::DefaultHandler{Formatter, Syslog}, rec::Record)
+function log{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
     println(handler.io, rec[:level], str)
     flush(handler.io)
