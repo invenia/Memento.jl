@@ -50,9 +50,9 @@ julia> set_level(logger, "warn")
 ```
 Now we won't log any messages with this logger unless they are at least warning messages.
 ```julia
-julia> set_record(logger, my_record)
+julia> set_record(logger, MyRecord)
 ```
-Now our logger will call the `my_record` function to produce `Record`s.
+Now our logger will call create `MyRecord`s instead of `DefaultRecord`s
 
 ### Handlers
 

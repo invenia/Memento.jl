@@ -19,7 +19,8 @@ using Base.Test
             Dict("Roller" => handler),
             "debug",
             levels,
-            default_record
+            DefaultRecord,
+            true
         )
 
         for i = 1:300
@@ -35,7 +36,7 @@ using Base.Test
     end
 
     @testset "Syslog" begin
-        levels = copy(Memento.DEFAULT_LOG_LEVELS)
+        levels = copy(Memento._log_levels)
         levels["invalid"] = 100
         handler = DefaultHandler(Syslog(:local0, "julia"))
 
@@ -44,7 +45,8 @@ using Base.Test
             Dict("Syslog" => handler),
             "debug",
             levels,
-            default_record
+            DefaultRecord,
+            true
         )
 
         # Syslog uses an external call to logger to do its legwork. Because the syslog itself can be

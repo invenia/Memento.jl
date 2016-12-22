@@ -10,7 +10,7 @@ type DefaultRecord <: Record
     function DefaultRecord(args::Dict)
         trace = StackTraces.remove_frames!(
             StackTraces.stacktrace(),
-            [:DefaultRecord, :log, @compat(Symbol("#log#22")), :info, :warn, :debug]
+            [:DefaultRecord, :log, Symbol("#log#22"), :info, :warn, :debug]
         )
 
         new(Dict(
@@ -25,5 +25,3 @@ type DefaultRecord <: Record
         ))
     end
 end
-
-default_record(args::Dict) = DefaultRecord(args)

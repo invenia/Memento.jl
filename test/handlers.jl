@@ -23,7 +23,8 @@
                     Dict("Buffer" => handler),
                     "info",
                     LEVELS,
-                    default_record
+                    DefaultRecord,
+                    true
                 )
 
                 @test logger.name == "DefaultHandler.sample_io"
@@ -56,7 +57,8 @@
                 Dict("File" => handler),
                 "info",
                 LEVELS,
-                default_record
+                DefaultRecord,
+                true
             )
 
             @test logger.name == "DefaultHandler.sample_file"

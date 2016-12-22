@@ -26,8 +26,7 @@ files = [
 end
 
 
-# Run each file in the test directory that looks like "test-XXXX.jl"
-# Test files should assume the global lumber mill has been reset
+# Test files should assume the global _loggers has been reset
 for file in files
     Memento.reset!()
     include(abspath(file))

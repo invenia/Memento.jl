@@ -95,7 +95,7 @@ function println(log::Syslog, level::Symbol, msg::AbstractString)
 end
 
 function println(log::Syslog, level::AbstractString, msg::AbstractString)
-    println(log, @compat(Symbol)(lowercase(level)), msg)
+    println(log, Symbol(lowercase(level)), msg)
 end
 
 # Defined just in case somebody decides to call flush, which is totally unnecessary.

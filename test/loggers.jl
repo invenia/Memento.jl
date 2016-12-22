@@ -21,7 +21,8 @@
                 Dict("Buffer" => handler),
                 "error",
                 LEVELS,
-                default_record
+                DefaultRecord,
+                true
             )
 
             @test logger.name == "Logger.example"
