@@ -9,42 +9,29 @@ type Logger
 end
 
 function Logger(name; level=DEFAULT_LOG_LEVEL, levels=DEFAULT_LOG_LEVELS, record::Function=default_record)
-    logger = Logger(
+    return Logger(
         name,
         Dict{Any, Handler}(),
         level,
         levels,
         record
     )
-
-    add_handler(
-        logger,
-        DefaultHandler(
-            STDOUT, DefaultFormatter(),
-            Dict{Symbol,Any}(:is_colorized => true)
-        ),
-        "console"
-    )
-
-    logger
 end
 
-get_handlers(logger::Logger) = logger.handlers
+Base.show(io::IO, logger::Logger) = print(io, "Logger($(logger.name))")
 
+set_record(logger::Logger, rec::Function) = logger.rec = rec
+get_handlers(logger::Logger) = logger.handlers
+remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
 function add_handler(logger::Logger, handler::Handler, name=string(Base.Random.uuid4()))
     logger.handlers[name] = handler
 end
 
-remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
-
+add_level(logger::Logger, level::AbstractString, val::Int) = logger.levels[level] = val
 function set_level(logger::Logger, level::AbstractString)
     logger.levels[level]    # Throw a key error if the levels isn't in levels
     logger.level = level
 end
-
-add_level(logger::Logger, level::AbstractString, val::Int) = logger.levels[level] = val
-
-set_record(logger::Logger, rec::Function) = logger.rec = rec
 
 function log(logger::Logger, level::AbstractString, msg::AbstractString)
     dict = Dict{Symbol, Any}(
@@ -93,5 +80,5 @@ We special case `warn` as it is the only method that can take an exception,
 but won't throw it.
 """
 function warn(logger::Logger, exc::Exception)
-    log(logger, "warn", sprint(io -> showerror(io, exc)), args)
+    log(logger, "warn", sprint(io -> showerror(io, exc)))
 end

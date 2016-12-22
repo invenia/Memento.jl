@@ -25,10 +25,14 @@ function setup_opts(opts)
     elseif (!haskey(opts, :colors) && haskey(opts, :is_colorized) && opts[:is_colorized])
         # set default colors
         opts[:colors] = Dict{AbstractString, Symbol}(
-            "debug" => :cyan,
-            "info" => :blue,
-            "warn" => :yellow,
-            "error" => :red
+            "debug" => :blue,
+            "info" => :green,
+            "notice" => :cyan,
+            "warn" => :magenta,
+            "error" => :red,
+            "critical" => :yellow,
+            "alert" => :white,
+            "emergency" => :black,
         )
     else
         opts[:is_colorized] = false

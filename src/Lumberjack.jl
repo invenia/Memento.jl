@@ -15,7 +15,7 @@ end
 export log, debug, info, notice, warn, error, critical, alert, emergency,
        set_level, add_level, set_record,
        add_handler, remove_handler, remove_handlers,
-       configure, get_logger, get_handlers, default_record,
+       basic_config, get_logger, get_handlers, default_record, format,
 
        Logger,
        Record, DefaultRecord,
@@ -48,8 +48,23 @@ include("loggers.jl")
 
 function __init__()
     global _loggers = Dict{Any, Logger}(
-        "root" => Logger("root")
+        "root" => Logger("root"),
     )
+end
+
+function basic_config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, colorized=true)
+    _loggers["root"] = Logger("root"; level=level)
+    add_handler(
+        _loggers["root"],
+        DefaultHandler(
+            STDOUT,
+            DefaultFormatter(fmt),
+            Dict{Symbol, Any}(:is_colorized => colorized)
+        ),
+        "console"
+    )
+
+    return _loggers["root"]
 end
 
 function reset!()
@@ -57,6 +72,35 @@ function reset!()
     Lumberjack.__init__()
 end
 
-get_logger(name="root") = _loggers[name]
+function get_parent(name)
+    tokenized = split(name, '.')
+
+    if length(tokenized) == 1
+        return get_logger("root")
+    elseif length(tokenized) == 2
+        return get_logger(tokenized[1])
+    else
+        return get_logger(join(tokenized[1:end-1], '.'))
+    end
+end
+
+get_logger(name::Module) = get_logger("$name")
+
+function get_logger(name="root")
+    logger_name = name == "" ? "root" : name
+
+    if !(haskey(_loggers, logger_name))
+        parent = get_parent(logger_name)
+        _loggers[logger_name] = Logger(
+            logger_name,
+            parent.handlers,
+            parent.level,
+            parent.levels,
+            parent.record
+        )
+    end
+
+    return _loggers[logger_name]
+end
 
 end

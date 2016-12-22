@@ -14,7 +14,7 @@ type DefaultRecord <: Record
         )
 
         new(Dict(
-            :date => now(),
+            :date => round(now(), Base.Dates.Second),
             :level => args[:level],
             :levelnum => args[:levelnum],
             :msg => args[:msg],

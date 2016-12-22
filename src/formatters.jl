@@ -2,7 +2,7 @@ using JSON
 
 abstract Formatter
 
-const DEFAULT_FMT_STRING = "{date} - {level}: {msg}"
+const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
 
 immutable DefaultFormatter <: Formatter
     fmt_str::AbstractString
@@ -42,16 +42,28 @@ type JsonFormatter <: Formatter end
 function format(fmt::JsonFormatter, rec::Record)
     rec_dict = copy(getdict(rec))
 
-    rec_dict[:date] = string(l[:date])
-    rec_dict[:lookup] = Dict(
-        :name => rec_dict[:lookup].func,
-        :file => basename(string(rec_dict[:lookup].file)),
-        :line => rec_dict[:lookup].line
-    )
-    rec_dict[:stacktrace] = map(
-        f -> Dict(:name => f.func, :file => basename(string(f.file)), :line => f.line),
-        rec_dict[:stacktrace]
-    )
+    if haskey(rec_dict, :date)
+        rec_dict[:date] = string(rec_dict[:date])
+    end
+
+    if haskey(rec_dict, :lookup)
+        rec_dict[:lookup] = Dict(
+            :name => rec_dict[:lookup].func,
+            :file => basename(string(rec_dict[:lookup].file)),
+            :line => rec_dict[:lookup].line
+        )
+    end
+
+    if haskey(rec_dict, :stacktrace)
+        rec_dict[:stacktrace] = map(
+            f -> Dict(
+                :name => f.func,
+                :file => basename(string(f.file)),
+                :line => f.line
+            ),
+            rec_dict[:stacktrace]
+        )
+    end
 
     return json(rec_dict)
 end

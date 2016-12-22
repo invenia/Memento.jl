@@ -89,7 +89,7 @@
                 @test handler2.opts[:is_colorized]
                 @test haskey(handler2.opts, :colors)
                 @test haskey(handler2.opts[:colors], "debug")
-                @test handler2.opts[:colors]["debug"] == :cyan
+                @test handler2.opts[:colors]["debug"] == :blue
             finally
                 close(io)
             end
@@ -113,7 +113,7 @@
             @test handler2.opts[:is_colorized]
             @test haskey(handler2.opts, :colors)
             @test haskey(handler2.opts[:colors], "debug")
-            @test handler2.opts[:colors]["debug"] == :cyan
+            @test handler2.opts[:colors]["debug"] == :blue
         end
     end
 end
