@@ -6,6 +6,21 @@ Memento.jl
 
 Memento is flexible hierarchical logging library for julia.
 
+## Table of Contents
+1. [Installation](#installation)
+2. [Quick Start](#quick-start)
+3. [Architecture](#architecture)
+    - [Loggers](#loggers)
+    - [Handlers](#handlers)
+    - [Formatters](#formatters)
+    - [Records](#records)
+    - [IO](#io)
+4. [FAQ](#faq)
+    - [Why another logging library for julia?](why-another-logging-library-for-julia)
+    - [How do I set logging levels?](how-do-i-set-logging-levels)
+    - [How do I change the colors?](how-do-i-change-the-colors)
+5. [API](#api)
+
 ## Installation
 
 ```julia
@@ -21,7 +36,7 @@ julia> Pkg.add("Memento")
 
 There are five main components of Memento.jl that you can manipulate:
 
-### Logger
+### Loggers
 
 A `Logger` is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default "root" logger stored in global `_loggers` inside the `Memento` module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code.
 To create a new logger for you code it is recommended to do `get_logger(current_module())`.
@@ -125,6 +140,23 @@ To create your own `IO` types you need to subtype `IO` and implement the `printl
 
 ## FAQ
 
+### Why another logging library for Julia?
+_...or why did you fork [Lumberjack.jl](https://github.com/WestleyArgentum/Lumberjack.jl)?_
+
+The short answer is that none of the existing logging libraries quite fit our requirements.
+The summary table provided below shows that all of the existing libraries are missing more than 1 requirement.
+Our initial goal was to add more tests, hierarchical logging and some API changes to Lumberjack as it seemed to have the best balance of features and test coverage.
+In the end, our changes diverged enough from Lumberjack that it made more sense to fork the project.
+
+Library | Hierarchical | Custom Formatting | Custom IO Types | Syslog | Color | Coverage | Version
+--- | --- | --- | --- | --- | --- | --- | ---
+[Logging.jl](https://github.com/kmsquire/Logging.jl) | [Kinda](https://github.com/colinfang/MiniLogging.jl#why-another-logging-package) | No | Yes | Yes | Yes | 61% | 0.3.1
+[Lumberjack.jl](https://github.com/WestleyArgentum/Lumberjack.jl) | No | [Kinda](https://github.com/WestleyArgentum/Lumberjack.jl#timbertruck) | Yes | Yes | Yes | 76% | 2.1.0
+[MiniLogger.jl](https://github.com/colinfang/MiniLogging.jl) | Yes | No | Yes | No | No | 87% | 0.0.2
+[Memento.jl](https://github.com/invenia/Memento.jl) | Yes | Yes | Yes | Yes | Yes | 99% | N/A
+
+You can see from the table that Memento covers all of our logging requirements and has significantly higher test coverage.
+
 ### How do I set logging levels?
 
 You can globally set the minimum logging level with `basic_config`.
@@ -192,4 +224,4 @@ julia> basic_config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=
 
 ## API
 
-TODO: autogenerate and a place in a docs folder
+TODO: autogenerate and a place in the docs folder
