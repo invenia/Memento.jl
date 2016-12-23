@@ -36,44 +36,59 @@ using Base.Test
     end
 
     @testset "Syslog" begin
-        @test_throws ErrorException Syslog(:foobar, "julia")
+        @testset "Sample Usage" begin
+            if !is_windows()
+                levels = copy(Memento._log_levels)
+                levels["invalid"] = 100
+                handler = DefaultHandler(Syslog(:local0, "julia"), DefaultFormatter("{level}: {msg}"))
 
-        levels = copy(Memento._log_levels)
-        levels["invalid"] = 100
-        handler = DefaultHandler(Syslog(:local0, "julia"), DefaultFormatter("{level}: {msg}"))
+                logger = Logger(
+                    "IO.Syslog",
+                    Dict("Syslog" => handler),
+                    "debug",
+                    levels,
+                    DefaultRecord,
+                    true
+                )
 
-        logger = Logger(
-            "IO.Syslog",
-            Dict("Syslog" => handler),
-            "debug",
-            levels,
-            DefaultRecord,
-            true
-        )
+                # Syslog uses an external call to logger to do its legwork. Because the syslog itself can be
+                # essentially anywhere (we might not have permission to read it, and it might not even be on
+                # the same machine), we'll just make sure that the external call to logger itself is right.
+                # This requires that the call to run to be overwritten has the @mock macro.
+                history = []
 
-        # Syslog uses an external call to logger to do its legwork. Because the syslog itself can be
-        # essentially anywhere (we might not have permission to read it, and it might not even be on
-        # the same machine), we'll just make sure that the external call to logger itself is right.
-        # This requires that the call to run to be overwritten has the @mock macro.
-        history = []
+                # Generate a alternative method of `run` which call we wish to mock
+                patch = @patch run(cmd::Base.AbstractCmd, args...) = push!(history, string(cmd))
 
-        # Generate a alternative method of `run` which call we wish to mock
-        patch = @patch run(cmd::Base.AbstractCmd, args...) = push!(history, string(cmd))
-
-        # Apply the patch which will modify the behaviour for our test
-        apply(patch) do
-            for level in keys(levels)
-                if level != "not_set"
-                    if level != "invalid"
-                        log(logger, level, "Message")
-                        sys_level = get(Memento.ALIAS_LEVELS, Symbol(level), level)
-                        @test history[end] == string(
-                            `logger -t julia -p local0.$(sys_level) "$(level): Message"`
-                        )
-                    else
-                        @test_throws ErrorException log(logger, "invalid", "Message")
+                # Apply the patch which will modify the behaviour for our test
+                apply(patch) do
+                    for level in keys(levels)
+                        if level != "not_set"
+                            if level != "invalid"
+                                log(logger, level, "Message")
+                                sys_level = get(Memento.ALIAS_LEVELS, Symbol(level), level)
+                                @test history[end] == string(
+                                    `logger -t julia -p local0.$(sys_level) "$(level): Message"`
+                                )
+                            else
+                                @test_throws ErrorException log(logger, "invalid", "Message")
+                            end
+                        end
                     end
                 end
+            end
+        end
+
+        @testset "Construction" begin
+            @test_throws ErrorException Syslog(:foobar, "julia")
+            patch = @patch success(cmd::Base.AbstractCmd) = false
+
+            apply(patch) do
+                @test_throws ErrorException Syslog(:local0, "julia")
+            end
+
+            if is_windows()
+                @test_throws ErrorException Syslog(:local0, "julia")
             end
         end
     end

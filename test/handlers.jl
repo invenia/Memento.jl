@@ -30,7 +30,6 @@
                 @test logger.name == "DefaultHandler.sample_io"
                 @test logger.level == "info"
 
-                info("Starting IOBuffer tests")
                 msg = "It works!"
                 Memento.info(logger, msg)
                 @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"
@@ -151,7 +150,6 @@
                 @test logger.name == "DefaultHandler.sample_io"
                 @test logger.level == "info"
 
-                info("Starting IOBuffer tests")
                 msg = "It works!"
                 Memento.info(logger, msg)
                 @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"

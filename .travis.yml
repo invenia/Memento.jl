@@ -4,11 +4,14 @@ os:
   - osx
 julia:
   - 0.5
-  - nightly
+  # - nightly # Mocking is currently broken due to PR #17057 in Base (fix is on the way)
 notifications:
   email: false
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --compilecache=no -e 'Pkg.clone(pwd()); Pkg.build("Memento"); Pkg.test("Memento"; coverage=true)';
+  # Run parallel tests
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("Memento"); Pkg.test("Memento")';
+  # Run io tests (with mocking) and coverage
+  - julia --compilecache=no -e 'Pkg.test("Memento"; coverage=true)';
 after_success:
   - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

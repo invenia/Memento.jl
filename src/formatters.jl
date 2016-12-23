@@ -17,11 +17,11 @@ function format(fmt::DefaultFormatter, rec::Record)
     result = fmt.fmt_str
 
     for field in keys(rec)
-        if is(field, :lookup)
+        if field === :lookup
             # lookup is a StackFrame
             name, file, line = rec_dict[field].func, rec_dict[field].file, rec_dict[field].line
             rec_dict[field] = "$(name)@$(basename(string(file))):$(line)"
-        elseif is(field, :stacktrace)
+        elseif field === :stacktrace
             # stacktrace is a vector of StackFrames
             rec_dict[field] = string(" stack:[",
                 join(
