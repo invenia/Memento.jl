@@ -1,4 +1,4 @@
-# Currently, can't run io.jl and concurrency.jl at the same time as 
+# Currently, can't run io.jl and concurrency.jl at the same time as
 # multiprocessing doesn't work with --compilecache=no
 # needed for the mocking tests to working.
 
@@ -16,10 +16,12 @@
             )
 
             asyncmap(x -> warn(get_logger(), "message"), 1:10)
-            all_msgs = split(takebuf_string(io), "\n")
+            if !is_windows()
+                all_msgs = split(takebuf_string(io), "\n")
 
-            @test !isempty(all_msgs)
-            @test all(m -> m == all_msgs[1], all_msgs[2:end-1])
+                @test !isempty(all_msgs)
+                @test all(m -> m == all_msgs[1], all_msgs[2:end-1])
+            end
         finally
             close(io)
         end
@@ -48,7 +50,9 @@
                 @test all(m -> m == all_msgs[1], all_msgs[2:end])
             end
 
-            @test success(`rm $parallel_test_filename`)
+            if !is_windows()
+                @test success(`rm $parallel_test_filename`)
+            end
         finally
             rmprocs(numprocs)
         end

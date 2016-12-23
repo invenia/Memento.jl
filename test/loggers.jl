@@ -43,19 +43,18 @@
             add_level(logger, "fubar", 50)
 
             show(io, logger)
-            @test takebuf_string(io) == "Logger(Logger.example)"
+            @test contains(takebuf_string(io), "Logger(Logger.example)")
 
-            info("Starting IOBuffer tests")
             msg = "It works!"
             Memento.info(logger, msg)
-            @test takebuf_string(io) == "[info]:Logger.example - $msg\n"
+            @test contains(takebuf_string(io), "[info]:Logger.example - $msg")
 
             Memento.debug(logger, "This shouldn't get logged")
-            @test takebuf_string(io) == ""
+            @test isempty(takebuf_string(io))
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
-            @test takebuf_string(io) == "[fubar]:Logger.example - $msg\n"
+            @test contains(takebuf_string(io), "[fubar]:Logger.example - $msg")
 
             new_logger = Logger("new_logger")
         finally

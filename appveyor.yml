@@ -8,6 +8,7 @@ environment:
 branches:
   only:
     - master
+    - windows
     - /release-.*/
 
 notifications:

@@ -65,7 +65,7 @@ cd(dirname(@__FILE__))
 
             msg = "This should propagate to the root logger."
             warn(baz, msg)
-            @test takebuf_string(io) == "Foo.Bar.Baz - warn: $msg\n"
+            @test contains(takebuf_string(io), "Foo.Bar.Baz - warn: $msg")
 
             set_level(baz, "debug")
             add_handler(
@@ -79,16 +79,16 @@ cd(dirname(@__FILE__))
             str = takebuf_string(io)
 
             # The message should be written twice for "root" and "Foo.Bar.Baz"
-            @test length(str) == length("Foo.Bar.Baz - warn: $msg\n") * 2
+            @test length(str) > length("Foo.Bar.Baz - warn: $msg") * 2
 
             debug(baz, msg)
             # Test that the "root" logger won't print anything bug the baz logger will
             # because of their respective logging levels
-            @test takebuf_string(io) == "Foo.Bar.Baz - debug: $msg\n"
+            @test contains(takebuf_string(io), "Foo.Bar.Baz - debug: $msg")
 
             info(car, msg)
             # the Foo.Car logger should still be unaffected.
-            @test takebuf_string(io) == "Foo.Car - info: $msg\n"
+            @test contains(takebuf_string(io), "Foo.Car - info: $msg")
         finally
             close(io)
         end
