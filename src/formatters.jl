@@ -16,7 +16,7 @@ function format(fmt::DefaultFormatter, rec::Record)
     rec_dict = copy(getdict(rec))
     result = fmt.fmt_str
 
-    for field in keys(rec_dict)
+    for field in keys(rec)
         if is(field, :lookup)
             # lookup is a StackFrame
             name, file, line = rec_dict[field].func, rec_dict[field].file, rec_dict[field].line

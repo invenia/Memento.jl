@@ -11,9 +11,9 @@ if !isdefined(Base, :StackTraces)
 end
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
-       set_level, add_level, set_record,
+       is_set, is_root, set_level, add_level, set_record,
        add_handler, remove_handler, remove_handlers,
-       basic_config, get_logger, get_handlers, default_record, format,
+       basic_config, get_logger, get_handlers, format,
 
        Logger,
        Record, DefaultRecord,

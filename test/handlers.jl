@@ -117,5 +117,54 @@
             @test haskey(handler2.opts[:colors], "debug")
             @test handler2.opts[:colors]["debug"] == :blue
         end
+
+        @testset "Colors" begin
+            io = IOBuffer()
+
+            try
+                handler = DefaultHandler(
+                    io, DefaultFormatter(FMT_STR),
+                    Dict{Symbol, Any}(
+                        :is_colorized => true,
+                        :colors => Dict{AbstractString, Symbol}(
+                            "debug" => :black,
+                            "info" => :blue,
+                            "notice" => :green,
+                            "warn" => :cyan,
+                            "error" => :magenta,
+                            "critical" => :red,
+                            "alert" => :yellow,
+                            "emergency" => :white,
+                        )
+                    )
+                )
+
+                logger = Logger(
+                    "DefaultHandler.sample_io",
+                    Dict("Buffer" => handler),
+                    "info",
+                    LEVELS,
+                    DefaultRecord,
+                    true
+                )
+
+                @test logger.name == "DefaultHandler.sample_io"
+                @test logger.level == "info"
+
+                info("Starting IOBuffer tests")
+                msg = "It works!"
+                Memento.info(logger, msg)
+                @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"
+
+                Memento.debug(logger, "This shouldn't get logged")
+                @test takebuf_string(io) == ""
+
+                msg = "Something went very wrong"
+                log(logger, "fubar", msg)
+                @test takebuf_string(io) == "[fubar]:$(logger.name) - $msg\n"
+            finally
+                close(io)
+            end
+        end
     end
 end

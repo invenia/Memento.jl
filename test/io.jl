@@ -36,6 +36,8 @@ using Base.Test
     end
 
     @testset "Syslog" begin
+        @test_throws ErrorException Syslog(:foobar, "julia")
+
         levels = copy(Memento._log_levels)
         levels["invalid"] = 100
         handler = DefaultHandler(Syslog(:local0, "julia"), DefaultFormatter("{level}: {msg}"))
