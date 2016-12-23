@@ -32,14 +32,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"
+                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
 
                 Memento.debug(logger, "This shouldn't get logged")
-                @test takebuf_string(io) == ""
+                @test isempty(takebuf_string(io))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test takebuf_string(io) == "[fubar]:$(logger.name) - $msg\n"
+                @test contains(takebuf_string(io), "[fubar]:$(logger.name) - $msg")
             finally
                 close(io)
             end
@@ -68,7 +68,9 @@
 
             log(logger, "fubar", "Something went very wrong")
 
-            @test success(`rm $filename`)
+            if !is_windows()
+                @test success(`rm $filename`)
+            end
         end
 
         @testset "IO Construction" begin
@@ -77,7 +79,7 @@
                 handler1 = DefaultHandler(io)
 
                 @test handler1.fmt.fmt_str == Memento.DEFAULT_FMT_STRING
-                @test takebuf_string(handler1.io) == ""
+                @test isempty(takebuf_string(handler1.io))
                 @test !(handler1.opts[:is_colorized])
 
                 handler2 = DefaultHandler(
@@ -152,14 +154,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test takebuf_string(io) == "[info]:$(logger.name) - $msg\n"
+                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
 
                 Memento.debug(logger, "This shouldn't get logged")
-                @test takebuf_string(io) == ""
+                @test isempty(takebuf_string(io))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test takebuf_string(io) == "[fubar]:$(logger.name) - $msg\n"
+                @test contains(takebuf_string(io), "[fubar]:$(logger.name) - $msg")
             finally
                 close(io)
             end
