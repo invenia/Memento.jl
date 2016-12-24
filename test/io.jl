@@ -31,10 +31,8 @@ using Base.Test
             log(logger, "fubar", "some-msg")
         end
 
-        if !is_windows()
-            @test success(`rm $roller_prefix.0001`)
-            @test success(`rm $roller_prefix.0002`)
-        end
+        @test is_windows() ? true : success(`rm $roller_prefix.001`)
+        @test is_windows() ? true : success(`rm $roller_prefix.002`)
     end
 
     @testset "Syslog" begin
