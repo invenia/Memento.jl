@@ -154,7 +154,7 @@ Library | Hierarchical | Custom Formatting | Custom IO Types | Syslog | Color | 
 [Logging.jl](https://github.com/kmsquire/Logging.jl) | [Kinda](https://github.com/colinfang/MiniLogging.jl#why-another-logging-package) | No | Yes | Yes | Yes | 61% | 0.3.1
 [Lumberjack.jl](https://github.com/WestleyArgentum/Lumberjack.jl) | No | [Kinda](https://github.com/WestleyArgentum/Lumberjack.jl#timbertruck) | Yes | Yes | Yes | 76% | 2.1.0
 [MiniLogger.jl](https://github.com/colinfang/MiniLogging.jl) | Yes | No | Yes | No | No | 87% | 0.0.2
-[Memento.jl](https://github.com/invenia/Memento.jl) | Yes | Yes | Yes | Yes | Yes | 99% | N/A
+[Memento.jl](https://github.com/invenia/Memento.jl) | Yes | Yes | Yes | Yes | Yes | 100% | N/A
 
 You can see from the table that Memento covers all of our logging requirements and has significantly higher test coverage.
 
