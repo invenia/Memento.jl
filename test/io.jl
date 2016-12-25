@@ -12,7 +12,7 @@ using Base.Test
         )
         roller_prefix = tempname()
         info("Path to roller_prefix: $roller_prefix")
-        handler = DefaultHandler(FileRoller(roller_prefix; max_sz=1028))
+        handler = DefaultHandler(FileRoller(roller_prefix; max_sz=1024))
 
         logger = Logger(
             "IO.FileRoller",
@@ -23,7 +23,7 @@ using Base.Test
             true
         )
 
-        for i = 1:300
+        for i = 1:100
             log(logger, "debug", "some-msg")
             log(logger, "info", "some-msg")
             log(logger, "warn", "some-msg")
@@ -31,8 +31,12 @@ using Base.Test
             log(logger, "fubar", "some-msg")
         end
 
-        @test is_windows() ? true : success(`rm $roller_prefix.001`)
-        @test is_windows() ? true : success(`rm $roller_prefix.002`)
+        @test ispath(isdir(roller_prefix))
+        @test isfile(handler.io.filepath)
+        @test isdir(roller_prefix) == isdir(handler.io.filepath)
+        @test contains(handler.io.filepath, roller_prefix)
+        @test handler.io.filepath != roller_prefix
+        @test handler.io.filepath != "$(roller_prefix).001"
     end
 
     @testset "Syslog" begin
