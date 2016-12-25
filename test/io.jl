@@ -31,9 +31,9 @@ using Base.Test
             log(logger, "fubar", "some-msg")
         end
 
-        @test ispath(isdir(roller_prefix))
+        @test ispath(dirname(roller_prefix))
         @test isfile(handler.io.filepath)
-        @test isdir(roller_prefix) == isdir(handler.io.filepath)
+        @test dirname(roller_prefix) == dirname(handler.io.filepath)
         @test contains(handler.io.filepath, roller_prefix)
         @test handler.io.filepath != roller_prefix
         @test handler.io.filepath != "$(roller_prefix).001"
