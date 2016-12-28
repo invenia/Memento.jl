@@ -17,9 +17,9 @@ Memento is flexible hierarchical logging library for julia.
     - [Records](#records)
     - [IO](#io)
 4. [FAQ](#faq)
-    - [Why another logging library for julia?](why-another-logging-library-for-julia)
-    - [How do I set logging levels?](how-do-i-set-logging-levels)
-    - [How do I change the colors?](how-do-i-change-the-colors)
+    - [Why another logging library for julia?](#why-another-logging-library-for-julia)
+    - [How do I set logging levels?](#how-do-i-set-logging-levels)
+    - [How do I change the colors?](#how-do-i-change-the-colors)
 5. [API](#api)
 
 ## Installation
