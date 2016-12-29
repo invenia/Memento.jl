@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Quick Start",
     "category": "section",
-    "text": "(Image: quickstart)"
+    "text": "Start by using Mementojulia> using MementoNow setup basic logging on the root logger with basic_config.julia> logger = basic_config(\"debug\"; fmt=\"[{level} | {name}]: {msg}\")\nLogger(root)Now start logging with the root logger.julia> debug(logger, \"Something to help you track down a bug.\")\n[debug | root]: Something to help you track down a bug.\n\njulia> info(logger, \"Something you might want to know.\")\n[info | root]: Something you might want to know.\n\njulia> notice(logger, \"This is probably pretty important.\")\n[notice | root]: This is probably pretty important.\n\njulia> warn(logger, \"This might cause an error.\")\n[warn | root]: This might cause an error.\n\njulia> warn(logger, ErrorException(\"A caught exception that we want to log as a warning.\"))\n[warn | root]: A caught exception that we want to log as a warning.\n\njulia> error(logger, \"Something that should throw an error.\")\n[error | root]: Something that should throw an error.\nERROR: Something that should throw an error.\n in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250Now maybe you want to have a different logger for each module/submodule. This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.julia> child_logger = get_logger(\"Foo.bar\")\nLogger(Foo.bar)\n\njulia> set_level(child_logger, \"warn\")\n\"warn\"\n\njulia> add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\")))\n\nMemento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))\n\njulia> debug(child_logger, \"Something that should only be printed to STDOUT on the root_logger.\")\n[debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.\n\njulia> warn(child_logger, \"Warning to STDOUT and the log file.\")\n[warn | Foo.bar]: Warning to STDOUT and the log file.NOTE: We used get_logger(\"Foo.bar\"), but you can also do get_logger(current_module()) which allows us to avoid hard coding in logger names."
 },
 
 {
@@ -397,6 +397,14 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Memento.DefaultHandler",
     "category": "Type",
+    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
+},
+
+{
+    "location": "api.html#Memento.DefaultHandler",
+    "page": "API",
+    "title": "Memento.DefaultHandler",
+    "category": "Type",
     "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
@@ -406,14 +414,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Memento.DefaultHandler",
     "category": "Type",
     "text": "The DefaultHandler manages any Formatter, IO and Record.\n\nFields:\n\nfmt: a Formatter for converting Records to Strings\nio: an IO type for printing String to.\nopts: a dictionary of optional arguments such as :is_colorized and :colors   Ex) Dict{Symbol, Any}(           :is_colorized => true,           :opts[:colors] => Dict{AbstractString, Symbol}(               \"debug\" => :blue,               \"info\" => :green,               ...           )       )\n\n\n\n"
-},
-
-{
-    "location": "api.html#Memento.DefaultHandler",
-    "page": "API",
-    "title": "Memento.DefaultHandler",
-    "category": "Type",
-    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
