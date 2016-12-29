@@ -15,3 +15,4 @@ script:
   - julia --compilecache=no -e 'Pkg.test("Memento"; coverage=true)';
 after_success:
   - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
