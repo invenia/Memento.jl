@@ -3,7 +3,7 @@ repo_url:         https://github.com/invenia/Memento.jl
 site_description: A flexible logging library for julia
 site_author:      rory.finnegan@invenia.ca
 
-theme: yeti
+theme: readthedocs
 
 extra_css:
   - assets/Documenter.css
