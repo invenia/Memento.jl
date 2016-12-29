@@ -14,5 +14,56 @@ julia> Pkg.add("Memento")
 ```
 
 ## Quick Start
+Start by `using` Memento
+```julia
+julia> using Memento
+```
 
-![quickstart](assets/quickstart.png)
+Now setup basic logging on the root logger with `basic_config`.
+```julia
+julia> logger = basic_config("debug"; fmt="[{level} | {name}]: {msg}")
+Logger(root)
+```
+Now start logging with the root logger.
+```julia
+julia> debug(logger, "Something to help you track down a bug.")
+[debug | root]: Something to help you track down a bug.
+
+julia> info(logger, "Something you might want to know.")
+[info | root]: Something you might want to know.
+
+julia> notice(logger, "This is probably pretty important.")
+[notice | root]: This is probably pretty important.
+
+julia> warn(logger, "This might cause an error.")
+[warn | root]: This might cause an error.
+
+julia> warn(logger, ErrorException("A caught exception that we want to log as a warning."))
+[warn | root]: A caught exception that we want to log as a warning.
+
+julia> error(logger, "Something that should throw an error.")
+[error | root]: Something that should throw an error.
+ERROR: Something that should throw an error.
+ in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250
+```
+
+Now maybe you want to have a different logger for each module/submodule.
+This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.
+```julia
+julia> child_logger = get_logger("Foo.bar")
+Logger(Foo.bar)
+
+julia> set_level(child_logger, "warn")
+"warn"
+
+julia> add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")))
+
+Memento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter("[{date} | {level} | {name}]: {msg}"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))
+
+julia> debug(child_logger, "Something that should only be printed to STDOUT on the root_logger.")
+[debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.
+
+julia> warn(child_logger, "Warning to STDOUT and the log file.")
+[warn | Foo.bar]: Warning to STDOUT and the log file.
+```
+NOTE: We used `get_logger("Foo.bar")`, but you can also do `get_logger(current_module())` which allows us to avoid hard coding in logger names.
