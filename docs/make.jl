@@ -17,8 +17,15 @@ makedocs(
             "man/records.md",
             "man/io.md",
         ],
-        "FAQ" => "faq.md",
-        "API" => "api.md",
+        "FAQ" => Any[
+            "faq/another-logging-lib.md",
+            "faq/change-colors.md",
+        ],
+        "API" => Any[
+            "api/public.md",
+            "api/private.md",
+        ],
+        "Contributing" => "contributing.md",
     ]
 )
 
