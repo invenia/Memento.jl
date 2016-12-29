@@ -5,6 +5,8 @@ Memento.jl
 [![Build status](https://ci.appveyor.com/api/projects/status/1agvguwqkae06qr9/branch/master?svg=true)](https://ci.appveyor.com/project/Rory-Finnegan/memento-jl/branch/master)
 [![codecov](https://codecov.io/gh/invenia/Memento.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Memento.jl)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.github.io/Memento.jl/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 Memento is flexible hierarchical logging library for julia.
 
