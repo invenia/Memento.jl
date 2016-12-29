@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
+    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
@@ -405,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
+    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
