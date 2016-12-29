@@ -16,12 +16,10 @@
             )
 
             asyncmap(x -> warn(get_logger(), "message"), 1:10)
-            if !is_windows()
-                all_msgs = split(takebuf_string(io), "\n")
+            all_msgs = split(takebuf_string(io), '\n')
 
-                @test !isempty(all_msgs)
-                @test all(m -> m == all_msgs[1], all_msgs[2:end-1])
-            end
+            @test !isempty(all_msgs)
+            @test all(m -> m == all_msgs[1], all_msgs[2:end-1])
         finally
             close(io)
         end
@@ -50,9 +48,8 @@
                 @test all(m -> m == all_msgs[1], all_msgs[2:end])
             end
 
-            if !is_windows()
-                @test success(`rm $parallel_test_filename`)
-            end
+            @test isfile(parallel_test_filename)
+            @test is_windows() ? true : success(`rm $parallel_test_filename`)   # Get UNLINK Error on windows
         finally
             rmprocs(numprocs)
         end

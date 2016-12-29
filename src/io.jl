@@ -109,8 +109,8 @@ type Syslog <: IO
 
     function Syslog(facility=:local0, tag="julia", tag_pid::Bool=false)
         # Verify that logger is installed.
-        has_logger = @mock success(`which logger`)
-        if !has_logger
+        has_logger = try @mock success(`which logger`) end
+        if has_logger == nothing || !has_logger
             error("syslog output only available on systems with logger installed")
         end
 

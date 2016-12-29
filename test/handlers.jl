@@ -68,9 +68,8 @@
 
             log(logger, "fubar", "Something went very wrong")
 
-            if !is_windows()
-                @test success(`rm $filename`)
-            end
+            @test isfile(filename)
+            @test is_windows() ? true : success(`rm $filename`)
         end
 
         @testset "IO Construction" begin
