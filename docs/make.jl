@@ -16,6 +16,7 @@ makedocs(
             "man/formatters.md",
             "man/records.md",
             "man/io.md",
+            "man/conclusion.md",
         ],
         "FAQ" => Any[
             "faq/another-logging-lib.md",

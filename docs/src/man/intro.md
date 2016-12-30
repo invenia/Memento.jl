@@ -34,17 +34,17 @@ emergency | 80 | System is unusable. Applications shouldn't need to call this so
 
 ## Formatting logs
 
-The by default Memento will use a `DefaultFormatter` for handlers.
+Unless explicitly changed Memento will use a `DefaultFormatter` for handlers.
 This `Formatter` takes a format string for mapping log record fields into each log message.
 Desired fields are wrapped in curly brackets (ie: `"{msg}"`)
 
-The default format string is `"[{level} | {name}]: {msg}"` would produce message that look like
+The default format string is `"[{level} | {name}]: {msg}"`, which produces messages that look like
 ```julia
 [info | root]: my info message.
 [warn | root]: my warning message.
 ...
 ```
-However, you could change this string to just `"{level}: {msg}"` which would produce message that look like
+However, you could change this string to just `"{level}: {msg}"`, which would produce messages that look like
 ```julia
 info: my info message.
 warn: my warning message.
