@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Conclusion · Memento.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/default.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Ubuntu+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../../versions.js"></script></head><body><nav class="toc"><h1>Memento.jl</h1><form class="search" action="../search.html"><select id="version-selector" onChange="window.location.href=this.value"><option value="#" selected="selected" disabled="disabled">Version</option></select><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../index.html">Home</a></li><li><span class="toctext">Manual</span><ul><li><a class="toctext" href="intro.html">Introduction</a></li><li><a class="toctext" href="loggers.html">Loggers</a></li><li><a class="toctext" href="handlers.html">Handlers</a></li><li><a class="toctext" href="formatters.html">Formatters</a></li><li><a class="toctext" href="records.html">Records</a></li><li><a class="toctext" href="io.html">IO</a></li><li class="current"><a class="toctext" href="conclusion.html">Conclusion</a><ul class="internal"></ul></li></ul></li><li><span class="toctext">FAQ</span><ul><li><a class="toctext" href="../faq/another-logging-lib.html">Another logging library?</a></li><li><a class="toctext" href="../faq/change-colors.html">Changing colors?</a></li></ul></li><li><span class="toctext">API</span><ul><li><a class="toctext" href="../api/public.html">Public</a></li><li><a class="toctext" href="../api/private.html">Private</a></li></ul></li><li><a class="toctext" href="../contributing.html">Contributing</a></li></ul></nav><article id="docs"><header><nav><ul><li>Manual</li><li><a href="conclusion.html">Conclusion</a></li></ul><a class="edit-page" href="https://github.com/invenia/Memento.jl/tree/0e4f77140cf421413b29de0ec74e810ce8997bbe/docs/src/man/conclusion.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/></header><h1><a class="nav-anchor" id="Conclusion-1" href="#Conclusion-1">Conclusion</a></h1><p>We&#39;ve reviewed all the different components you can use to configure logging in you application, but how do they all fit together? Let&#39;s work through a sample use case that uses all of the components we&#39;ve discussed.</p><p>NOTE: The example provided is a bit contrived for simplicity.</p><p>First, let&#39;s start with a julia Pkg called <code>Wrapper</code> that runs a function wrapped in some Memento logging.</p><pre><code class="language-julia"># Wrapper.jl
+module Wrapper
+
+using Memento
+
+function run(f::Function, args...; kwargs...)
+    ret = nothing
+    logger = get_logger(current_module())
+    info(logger, &quot;Got logger $logger&quot;)
+
+    notice(logger, &quot;Running function...&quot;)
+
+    try
+        ret = f(args...; kwargs...)
+    catch exc
+        warn(logger, exc)
+    end
+
+    return ret
+end
+
+end</code></pre><p>Now we want to start writing our application code that uses this package, but our logging requirements are very specific and Memento doesn&#39;t support our particular use case yet.</p><p>Requirements:</p><ol><li><p>This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.</p></li><li><p>We want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form <code>https://&lt;account_uri&gt;/&lt;app_name&gt;/&lt;level&gt;?AccessKey=&lt;access_key&gt;</code>.</p></li><li><p>We want our logs to be written in a CSV format... for some reason.</p></li></ol><p>Okay, so how do we address all of those requirements using Memento&#39;s API?</p><p>Steps:</p><ol><li><p>Create a custom <code>Record</code> type called <code>EC2Record</code> that stores the Amazon EC2 information to address the first requirement.</p></li><li><p>Create a custom <code>IO</code> type called <code>REST</code> that writes log strings to the REST endpoint to partly address the second requirement.</p></li><li><p>Create a custom <code>Formatter</code> type called <code>CSVFormatter</code> that converts <code>Record</code>s to (comma, tab, etc) delimited strings.</p></li></ol><p>NOTE: The code below is not intended to be a working example because it assumes a fake REST service.</p><pre><code class="language-julia"># myapp.jl
+using Wrapper
+using Memento
+using Requests  # For send logs to our fake logging REST service
+
+# Start by setting up our basic console logging for the root logger.
+logger = basic_config(&quot;info&quot;; fmt=&quot;[{level} | {name}]: {msg}&quot;)
+
+# We create our custom EC2Record type
+type EC2Record &lt;: Record
+    dict::Dict{Symbol, Any}
+
+    function EC2Record(args::Dict)
+        trace = StackTraces.remove_frames!(
+            StackTraces.stacktrace(),
+            [:DefaultRecord, :log, Symbol(&quot;#log#22&quot;), :info, :warn, :debug]
+        )
+
+        new(Dict(
+            :date =&gt; round(now(), Base.Dates.Second),
+            :level =&gt; args[:level],
+            :levelnum =&gt; args[:levelnum],
+            :msg =&gt; args[:msg],
+            :name =&gt; args[:name],
+            :pid =&gt; myid(),
+            :lookup =&gt; isempty(trace) ? nothing : first(trace),
+            :stacktrace =&gt; trace,
+            :instance_id =&gt; ENV[&quot;INSTANCE_ID&quot;],
+            :public_ip =&gt; ENV[&quot;PUBLIC_IP&quot;],
+            :iam_user =&gt; ENV[&quot;IAM_USER&quot;],
+            # Other things?
+        ))
+    end
+end
+
+# A really simple CSVFormatter
+type CSVFormatter &lt;: Formatter
+    delim::Char
+    vals::Array{Symbol}
+
+    CSVFormatter(delim=&#39;,&#39;, vals=Array{Symbol}()) = new(delim, vals)
+end
+
+function format(fmt::CSVFormatter, rec::Record)
+    fields = isempty(fmt.vals) ? keys(rec) : fmt.vals
+
+    # For a real world use case we might want to do some
+    # string formatting of fields like :stacktrace here.
+
+    val = map(k -&gt; rec[k], fields)
+
+    return join(val, fmt.delim)
+end
+
+# Create our custom REST IO type
+type REST &lt;: IO
+    account_uri::AbstractString
+    app_name::AbstractString
+    access_key::AbstractString
+end
+
+# Our print method builds the correct uri using the log level
+# and sends the put request.
+function println(io::REST, level::AbstractString, msg::AbstractString)
+    uri = &quot;https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)&quot;
+    @async put(uri; data=msg)
+end
+
+# Not relevant, but good to have.
+flush(io::REST) = io
+
+# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`
+function log{F&lt;:Formatter, O&lt;:REST}(handler::DefaultHandler{F, O}, rec::Record)
+    msg = format(handler.fmt, rec)
+    println(handler.io, rec[:level], msg)
+    flush(handler.io)
+end
+
+# Now we can tie this all together, but adding a new DefaultHandler
+# with the CSVFormatter and REST IO type.
+add_handler(logger, DefaultHandler(
+    REST(
+        &quot;memento.mylogrestservice.com&quot;, &quot;myapp&quot;,
+        &quot;qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A&quot;
+    ),
+    CSVFormatter(
+        &#39;,&#39;,
+        [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]
+    )
+))
+
+# Don&#39;t forget to update the root logger `Record` type.
+set_record(logger, EC2Record)
+
+Wrapper.run(exp, 10)
+# Should log some things.
+
+Wrapper.run(exp, &quot;foo&quot;)
+# Should log a warning about a method error.</code></pre><footer><hr/><a class="previous" href="io.html"><span class="direction">Previous</span><span class="title">IO</span></a><a class="next" href="../faq/another-logging-lib.html"><span class="direction">Next</span><span class="title">Another logging library?</span></a></footer></article></body></html>
