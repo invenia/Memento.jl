@@ -397,14 +397,6 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Memento.DefaultHandler",
-    "page": "Public",
-    "title": "Memento.DefaultHandler",
-    "category": "Type",
     "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
@@ -414,6 +406,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Memento.DefaultHandler",
     "category": "Type",
     "text": "The DefaultHandler manages any Formatter, IO and Record.\n\nFields:\n\nfmt: a Formatter for converting Records to Strings\nio: an IO type for printing String to.\nopts: a dictionary of optional arguments such as :is_colorized and :colors   Ex) Dict{Symbol, Any}(           :is_colorized => true,           :opts[:colors] => Dict{AbstractString, Symbol}(               \"debug\" => :blue,               \"info\" => :green,               ...           )       )\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.DefaultHandler",
+    "page": "Public",
+    "title": "Memento.DefaultHandler",
+    "category": "Type",
+    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
