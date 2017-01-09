@@ -19,3 +19,7 @@ julia> Pkg.add("Memento")
 ## Quick Start
 
 ![quickstart](docs/src/assets/quickstart.png)
+
+## Documentation
+
+Please checkout the hosted [docs](https://invenia.github.io/Memento.jl/latest/) for more details.
