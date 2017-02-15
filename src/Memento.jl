@@ -4,7 +4,7 @@ module Memento
 
 using Mocking
 
-import Base: show, info, warn, error, log, Filter
+import Base: show, info, warn, error, log, write, Filter
 
 if !isdefined(Base, :StackTraces)
     import StackTraces
@@ -12,7 +12,7 @@ end
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
        is_set, is_root, set_level, add_level, set_record, add_filter,
-       add_handler, remove_handler, remove_handlers,
+       add_handler, remove_handler, remove_handlers, write,
        basic_config, get_logger, get_handlers, format,
 
        Logger,
