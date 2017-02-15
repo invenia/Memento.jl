@@ -4,19 +4,20 @@ module Memento
 
 using Mocking
 
-import Base: show, info, warn, error, log
+import Base: show, info, warn, error, log, Filter
 
 if !isdefined(Base, :StackTraces)
     import StackTraces
 end
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
-       is_set, is_root, set_level, add_level, set_record,
+       is_set, is_root, set_level, add_level, set_record, add_filter,
        add_handler, remove_handler, remove_handlers,
        basic_config, get_logger, get_handlers, format,
 
        Logger,
        Record, DefaultRecord,
+       Filter,
        Formatter, DefaultFormatter, JsonFormatter,
        Handler, DefaultHandler,
        FileRoller, Syslog
@@ -40,6 +41,7 @@ global _loggers
 
 include("io.jl")
 include("records.jl")
+include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")

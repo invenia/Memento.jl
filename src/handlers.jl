@@ -9,6 +9,18 @@ based on the `Formatter`, `IO` and/or `Record` types.
 """
 abstract Handler{F<:Formatter, O<:IO}
 
+filters(handler::Handler) = Memento.LogFilter[]
+
+function add_filter(handler::Handler, filter::Memento.LogFilter)
+    push!(filters(handler), filter)
+end
+
+function log(handler::Handler, rec::Record)
+    if all(f -> f(rec), filters(handler))
+        write(handler, rec)
+    end
+end
+
 """
 The DefaultHandler manages any `Formatter`, `IO` and `Record`.
 
@@ -29,6 +41,7 @@ type DefaultHandler{F<:Formatter, O<:IO} <: Handler{F, O}
     fmt::F
     io::O
     opts::Dict{Symbol, Any}
+    filters::Array{LogFilter}
 end
 
 """
@@ -40,9 +53,10 @@ Args:
 - fmt: the Formatter to use (default to `DefaultFormatter()`)
 - opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
+function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(),
+        opts=Dict{Symbol, Any}(); filters::Array{LogFilter}=Memento.LogFilter[])
     setup_opts(opts)
-    DefaultHandler(fmt, io, opts)
+    DefaultHandler(fmt, io, opts, filters)
 end
 
 """
@@ -54,10 +68,11 @@ Args:
 - fmt: the Formatter to use (default to `DefaultFormatter()`)
 - opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
+function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(),
+        opts=Dict{Symbol, Any}(); filters::Array{LogFilter}=Memento.LogFilter[])
     file = open(filename, "a")
     setup_opts(opts)
-    handler = DefaultHandler(fmt, file, opts)
+    handler = DefaultHandler(fmt, file, opts, filters)
     finalizer(handler, (h)->close(h.io))
     handler
 end
@@ -87,11 +102,13 @@ function setup_opts(opts)
     opts
 end
 
+filters(handler::DefaultHandler) = handler.filters
+
 """
 `log{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)`
 logs all records with any `Formatter` and `IO` types.
 """
-function log{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
+function write{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
     level = rec[:level]
     str = format(handler.fmt, rec)
 
@@ -112,7 +129,7 @@ end
 `logs{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)`
 logs all records with any `Formatter` and a `Syslog` `IO` type.
 """
-function log{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
+function write{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
     println(handler.io, rec[:level], str)
     flush(handler.io)

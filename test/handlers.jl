@@ -165,5 +165,42 @@
                 close(io)
             end
         end
+
+        @testset "Level Filter" begin
+            io = IOBuffer()
+
+            try
+                handler = DefaultHandler(
+                    io, DefaultFormatter(FMT_STR)
+                )
+
+                logger = Logger(
+                    "DefaultHandler.sample_io",
+                    Dict("Buffer" => handler),
+                    "info",
+                    LEVELS,
+                    DefaultRecord,
+                    true
+                )
+
+                @test logger.name == "DefaultHandler.sample_io"
+                @test logger.level == "info"
+
+                msg = "It works!"
+                Memento.info(logger, msg)
+                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
+
+                # Filter out log messages < LEVELS["warn"]
+                add_filter(
+                    handler,
+                    Filter((rec) -> rec[:levelnum] >= LEVELS["warn"])
+                )
+
+                Memento.info(logger, "This shouldn't get logged")
+                @test isempty(takebuf_string(io))
+            finally
+                close(io)
+            end
+        end
     end
 end
