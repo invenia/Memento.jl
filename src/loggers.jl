@@ -11,6 +11,7 @@ Fields:
 - `levels`: a mapping of available logging levels to their relative priority (represented as integer values) (defaults to using `Memento._log_levels`)
 - `record`: the `Record` type that should be produced by this logger (defaults to `DefaultRecord`).
 - `propagate`: whether or not this logger should propagate its message to its parent (defaults to `true`).
+- `overwritehandlerlevels`: is a collection of specific priority per handler (defaults to empty `Dict`).
 """
 type Logger
     name::AbstractString
@@ -19,6 +20,7 @@ type Logger
     levels::Dict{AbstractString, Int}
     record::Type
     propagate::Bool
+    overwritehandlerlevels::Dict{Any, Int}
 end
 
 function Logger{R<:Record}(name; level="not_set", levels=_log_levels,
@@ -29,9 +31,12 @@ function Logger{R<:Record}(name; level="not_set", levels=_log_levels,
         level,
         levels,
         record,
-        propagate
+        propagate,
+        Dict{Any, Int}()
     )
 end
+
+Logger(name, handlers, level, levels, record, propagate) = Logger(name, handlers, level, levels, record, propagate, Dict{Any, Int}() )
 
 " `Base.show(::IO, ::Logger)` just prints `Logger(logger.name)` "
 Base.show(io::IO, logger::Logger) = print(io, "Logger($(logger.name))")
@@ -148,7 +153,10 @@ set_record{R<:Record}(logger::Logger, rec::Type{R}) = logger.record = rec
 
 " `remove_handler(::Logger, name)` removes the `Handler` with the
 provided name from the logger.handlers. "
-remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
+function remove_handler(logger::Logger, name) 
+    delete!(logger.handlers, name)
+    delete!(logger.overwritehandlerlevels, name)   #  Can just call delete! even if it doesn't exist, otherwise check haskey(..,..) first
+end
 
 " `get_handlers(::Logger)` returns logger.handlers"
 get_handlers(logger::Logger) = logger.handlers
@@ -181,6 +189,16 @@ function set_level(logger::Logger, level::AbstractString)
 end
 
 """
+`set_level(::Logger, handlername, ::AbstractString)` changes what level this handler in a logger should log at.
+"""
+function set_level(logger::Logger, name, level::AbstractString)
+    logger.levels[level]    # Throw a key error if the levels isn't in levels
+    logger.handlers[name]   # Throw a key error if the name isn't in handlers
+    logger.overwritehandlerlevels[name] = logger.levels[level]
+end
+
+
+"""
 `log(::Logger, ::Dict{Symbol, Any})` logs
 `logger.record(args)` to its handlers if it has the appropriate `args[:level]`
 and `args[:level]` is above the priority of `logger.level`.
@@ -196,9 +214,11 @@ function log(logger::Logger, args::Dict{Symbol, Any})
     llevel = logger.level
     levels = logger.levels
 
-    if is_set(logger) && haskey(levels, level) && levels[level] >= levels[llevel]
+    if is_set(logger) && haskey(levels, level) && levels[level] >= levels[llevel] 
         for (name, handler) in logger.handlers
-            log(handler, logger.record(args))
+            if (!haskey(logger.overwritehandlerlevels, name) || levels[level] >= logger.overwritehandlerlevels[name] ) 
+                log(handler, logger.record(args))
+            end
         end
     end
 
