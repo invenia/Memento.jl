@@ -4,6 +4,7 @@ using Base.Test
 @testset "IO" begin
     @testset "FileRoller" begin
         levels = Dict(
+            "not_set" => 0,
             "debug" => 10,
             "info" => 20,
             "warn" => 30,

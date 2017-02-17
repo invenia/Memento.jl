@@ -17,13 +17,38 @@ type Logger
     handlers::Dict{Any, Handler}
     level::AbstractString
     levels::Dict{AbstractString, Int}
+    filters::Array{Memento.Filter}
     record::Type
     propagate::Bool
+
+    function Logger(name::AbstractString, handlers::Dict, level::AbstractString,
+                    levels::Dict, record::Type, propagate::Bool)
+        @assert haskey(levels, "not_set")
+
+        logger = new(
+            name,
+            handlers,
+            level,
+            levels,
+            Memento.Filter[],
+            record,
+            propagate
+        )
+
+        for (name, handler) in logger.handlers
+            handler.levels = Ref(logger.levels)
+        end
+
+        push!(logger.filters, Memento.Filter(rec -> is_set(logger)))
+        push!(logger.filters, Memento.Filter(logger))
+
+        return logger
+    end
 end
 
 function Logger{R<:Record}(name; level="not_set", levels=_log_levels,
                 record::Type{R}=DefaultRecord, propagate=true)
-    Logger(
+    logger = Logger(
         name,
         Dict{Any, Handler}(),
         level,
@@ -31,6 +56,21 @@ function Logger{R<:Record}(name; level="not_set", levels=_log_levels,
         record,
         propagate
     )
+end
+
+function Memento.Filter(l::Logger)
+    function level_filter(rec::Record)
+        level = rec[:level]
+
+        if haskey(l.levels, level)
+            return l.levels[level] >= l.levels[l.level]
+        else
+            warn("$level not in $(l.levels)")
+            return false
+        end
+    end
+
+    Memento.Filter(level_filter)
 end
 
 " `Base.show(::IO, ::Logger)` just prints `Logger(logger.name)` "
@@ -164,6 +204,7 @@ Args:
 - name: a name to identify the handler.
 """
 function add_handler(logger::Logger, handler::Handler, name=string(Base.Random.uuid4()))
+    handler.levels.x = logger.levels
     logger.handlers[name] = handler
 end
 
@@ -196,7 +237,10 @@ function log(logger::Logger, args::Dict{Symbol, Any})
     llevel = logger.level
     levels = logger.levels
 
-    if is_set(logger) && haskey(levels, level) && levels[level] >= levels[llevel]
+    rec = logger.record(args)
+
+    # If none of the `Filter`s return false we're good to log our record.
+    if all(f -> f(rec), logger.filters)
         for (name, handler) in logger.handlers
             log(handler, logger.record(args))
         end

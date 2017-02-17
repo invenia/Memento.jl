@@ -9,15 +9,30 @@ based on the `Formatter`, `IO` and/or `Record` types.
 """
 abstract Handler{F<:Formatter, O<:IO}
 
-filters(handler::Handler) = Memento.LogFilter[]
+function Memento.Filter(h::Handler)
+    function level_filter(rec::Record)
+        level = rec[:level]
 
-function add_filter(handler::Handler, filter::Memento.LogFilter)
+        if haskey(h.levels.x, level)
+            return h.levels.x[level] >= h.levels.x[h.level]
+        else
+            warn("$level not in $(h.levels.x)")
+            return false
+        end
+    end
+
+    Memento.Filter(level_filter)
+end
+
+filters(handler::Handler) = Memento.Filter[]
+
+function add_filter(handler::Handler, filter::Memento.Filter)
     push!(filters(handler), filter)
 end
 
 function log(handler::Handler, rec::Record)
     if all(f -> f(rec), filters(handler))
-        write(handler, rec)
+        emit(handler, rec)
     end
 end
 
@@ -41,7 +56,9 @@ type DefaultHandler{F<:Formatter, O<:IO} <: Handler{F, O}
     fmt::F
     io::O
     opts::Dict{Symbol, Any}
-    filters::Array{LogFilter}
+    filters::Array{Memento.Filter}
+    levels::Ref{Dict{AbstractString, Int}}
+    level::AbstractString
 end
 
 """
@@ -53,10 +70,11 @@ Args:
 - fmt: the Formatter to use (default to `DefaultFormatter()`)
 - opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(),
-        opts=Dict{Symbol, Any}(); filters::Array{LogFilter}=Memento.LogFilter[])
+function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
     setup_opts(opts)
-    DefaultHandler(fmt, io, opts, filters)
+    handler = DefaultHandler(fmt, io, opts, Memento.Filter[], Ref(_log_levels), "not_set")
+    push!(handler.filters, Memento.Filter(handler))
+    return handler
 end
 
 """
@@ -68,11 +86,11 @@ Args:
 - fmt: the Formatter to use (default to `DefaultFormatter()`)
 - opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(),
-        opts=Dict{Symbol, Any}(); filters::Array{LogFilter}=Memento.LogFilter[])
+function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
     file = open(filename, "a")
     setup_opts(opts)
-    handler = DefaultHandler(fmt, file, opts, filters)
+    handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
+    push!(handler.filters, Memento.Filter(handler))
     finalizer(handler, (h)->close(h.io))
     handler
 end
@@ -104,11 +122,16 @@ end
 
 filters(handler::DefaultHandler) = handler.filters
 
+function set_level(handler::DefaultHandler, level::AbstractString)
+    handler.levels.x[level]     # Throw a key error if the levels isn't in levels
+    handler.level = level
+end
+
 """
 `log{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)`
 logs all records with any `Formatter` and `IO` types.
 """
-function write{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
+function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
     level = rec[:level]
     str = format(handler.fmt, rec)
 
@@ -129,7 +152,7 @@ end
 `logs{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)`
 logs all records with any `Formatter` and a `Syslog` `IO` type.
 """
-function write{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
+function emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
     println(handler.io, rec[:level], str)
     flush(handler.io)

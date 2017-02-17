@@ -1,9 +1,7 @@
-immutable LogFilter
+immutable Filter
     f::Function
 end
 
-Filter(f::Function) = LogFilter(f)
-
-function (filter::LogFilter)(rec::Record)::Bool
+function (filter::Filter)(rec::Record)::Bool
     return filter.f(rec)
 end

@@ -2,6 +2,7 @@
     FMT_STR = "[{level}]:{name} - {msg}"
 
     LEVELS = Dict(
+        "not_set" => 0,
         "debug" => 10,
         "info" => 20,
         "warn" => 30,
@@ -191,10 +192,11 @@
                 @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
 
                 # Filter out log messages < LEVELS["warn"]
-                add_filter(
-                    handler,
-                    Filter((rec) -> rec[:levelnum] >= LEVELS["warn"])
-                )
+                set_level(handler, "warn")
+                # add_filter(
+                #     handler,
+                #     Filter((rec) -> rec[:levelnum] >= LEVELS["warn"])
+                # )
 
                 Memento.info(logger, "This shouldn't get logged")
                 @test isempty(takebuf_string(io))

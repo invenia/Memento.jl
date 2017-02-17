@@ -2,6 +2,7 @@
     FMT_STR = "[{level}]:{name} - {msg}"
 
     LEVELS = Dict(
+        "not_set" => 0,
         "debug" => 10,
         "info" => 20,
         "warn" => 30,
