@@ -12,6 +12,7 @@ Fields:
 - `record`: the `Record` type that should be produced by this logger (defaults to `DefaultRecord`).
 - `propagate`: whether or not this logger should propagate its message to its parent (defaults to `true`).
 """
+
 type Logger
     name::AbstractString
     handlers::Dict{Any, Handler}
@@ -273,6 +274,17 @@ function log(logger::Logger, level::AbstractString, msg::AbstractString)
     log(logger, dict)
 end
 
+function log(msg::Function, logger::Logger, level::AbstractString)
+    dict = Dict{Symbol, Any}(
+        :name => logger.name,
+        :level => level,
+        :levelnum => logger.levels[level],
+        :msg => msg
+    )
+
+    log(logger, dict)
+end
+
 #=
 For our DEFAULT_LOG_LEVELS we generate the appropriate `:level(logger, msg)`
 methods.
@@ -286,12 +298,21 @@ for key in keys(_log_levels)
                 function $level(logger::Logger, msg::AbstractString)
                     log(logger, $key, msg)
                 end
+
+                function $level(msg::Function, logger::Logger)
+                    log(msg, logger, $key)
+                end
             end
         else
             @eval begin
                 function $level(logger::Logger, msg::AbstractString)
                     log(logger, $key, msg)
                     throw(ErrorException(msg))
+                end
+
+                function $level(msg::Function, logger::Logger)
+                    log(msg, logger, $key)
+                    throw(ErrorException(msg()))
                 end
 
                 function $level(logger::Logger, exc::Exception)
@@ -306,7 +327,10 @@ end
 #=
 Add our doc strings.
 =#
-msg = (level) -> "`$level(::Logger, ::AbstractString)` logs the message at the $level level."
+msg = (level) -> """
+`$level(::Logger, ::AbstractString)` logs the message at the $level level.
+`$level(::Function, ::Logger)` logs the message produced by the provided function at the $level level.
+"""
 @doc msg("debug") debug
 @doc msg("info") info
 @doc msg("notice") notice
@@ -314,6 +338,7 @@ msg = (level) -> "`$level(::Logger, ::AbstractString)` logs the message at the $
 
 msg = (level) -> """
 `$level(::Logger, ::AbstractString)` logs the message at the $level level and throws an `ErrorException` with that message
+`$level(::Function, ::Logger)` logs the message produced by the provided function at the $level level and throws an `ErrorException` with that message.
 `$level(::Logger, ::Exception)` calls `$level(logger, msg)` with the contents of the `Exception`.
 """
 

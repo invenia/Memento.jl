@@ -5,14 +5,23 @@ message strings.
 """
 abstract Record
 
+"`keys(::Record)` returns all keys in the inner dict"
+Base.keys(rec::Record) = keys(rec.dict)
+
 "`getdict(::Record)` returns the inner dict of the record "
 getdict(rec::Record) = rec.dict
 
-"`getindex(::Record, key)` returns the item from the inner dict"
-Base.getindex(rec::Record, key) = rec.dict[key]
-
-"`keys(::Record)` returns all keys in the inner dict"
-Base.keys(rec::Record) = keys(rec.dict)
+"""
+`getindex(::Record, key)` returns the item from the inner dict.
+If the value is a zero argument function it will be executed.
+"""
+function Base.getindex(rec::Record, key)
+    if isa(rec.dict[key], Function)
+        return rec.dict[key]()
+    else
+        return rec.dict[key]
+    end
+end
 
 """
 `DefaultRecord` wraps a `Dict{Symbol, Any}` which stores basic logging event
