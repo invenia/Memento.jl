@@ -1,5 +1,7 @@
+import Memento: Attribute
+
 type TestRecord <: Record
-    dict::Dict{Symbol, Any}
+    dict::Dict{Symbol, Attribute}
 end
 
 @testset "Formatters" begin
@@ -9,18 +11,18 @@ end
 
     @testset "JsonFormatter" begin
         rec = TestRecord(
-            Dict{Symbol, Any}(
-                :date => now(),
-                :level => "info",
-                :levelnum => 20,
-                :name => "root",
-                :msg => "blah"
+            Dict{Symbol, Attribute}(
+                :date => Attribute(now()),
+                :level => Attribute("info"),
+                :levelnum => Attribute(20),
+                :name => Attribute("root"),
+                :msg => Attribute("blah"),
             )
         )
 
         fmt = JsonFormatter()
-        @test format(fmt, rec) == json(rec.dict)
-        ret = format(fmt, DefaultRecord(rec.dict))
+        @test format(fmt, rec) == json(Dict(rec))
+        ret = format(fmt, DefaultRecord(Dict(rec)))
 
         @test contains(ret, "lookup")
         @test contains(ret, "stacktrace")

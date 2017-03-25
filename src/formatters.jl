@@ -32,24 +32,24 @@ end
 format string with the appropriate fields in the `Record`
 """
 function format(fmt::DefaultFormatter, rec::Record)
-    rec_dict = copy(getdict(rec))
+    dict = Dict(rec)
     result = fmt.fmt_str
 
-    for field in keys(rec)
+    for field in keys(dict)
         if field === :lookup
             # lookup is a StackFrame
-            name, file, line = rec_dict[field].func, rec_dict[field].file, rec_dict[field].line
-            rec_dict[field] = "$(name)@$(basename(string(file))):$(line)"
+            name, file, line = dict[field].func, dict[field].file, dict[field].line
+            dict[field] = "$(name)@$(basename(string(file))):$(line)"
         elseif field === :stacktrace
             # stacktrace is a vector of StackFrames
-            rec_dict[field] = string(" stack:[",
-                join(
-                    map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", rec_dict[field]), ", "
-                ), "]"
+            dict[field] = string(
+                " stack:[",
+                join(map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", dict[field]), ", "),
+                "]"
             )
         end
 
-        result = replace(result, "{$field}", rec_dict[field])
+        result = replace(result, "{$field}", dict[field])
     end
 
     return result
@@ -63,33 +63,33 @@ type JsonFormatter <: Formatter end
 
 """
 `format(::JsonFormatter, ::Record)` converts :date, :lookup and :stacktrace to strings
-and dicts respectively and call `JSON.json()` on the resulting dictionary. 
+and dicts respectively and call `JSON.json()` on the resulting dictionary.
 """
 function format(fmt::JsonFormatter, rec::Record)
-    rec_dict = copy(getdict(rec))
+    dict = Dict(rec)
 
-    if haskey(rec_dict, :date)
-        rec_dict[:date] = string(rec_dict[:date])
+    if haskey(dict, :date)
+        dict[:date] = string(dict[:date])
     end
 
-    if haskey(rec_dict, :lookup)
-        rec_dict[:lookup] = Dict(
-            :name => rec_dict[:lookup].func,
-            :file => basename(string(rec_dict[:lookup].file)),
-            :line => rec_dict[:lookup].line
+    if haskey(dict, :lookup)
+        dict[:lookup] = Dict(
+            :name => dict[:lookup].func,
+            :file => basename(string(dict[:lookup].file)),
+            :line => dict[:lookup].line
         )
     end
 
-    if haskey(rec_dict, :stacktrace)
-        rec_dict[:stacktrace] = map(
+    if haskey(dict, :stacktrace)
+        dict[:stacktrace] = map(
             f -> Dict(
                 :name => f.func,
                 :file => basename(string(f.file)),
                 :line => f.line
             ),
-            rec_dict[:stacktrace]
+            dict[:stacktrace]
         )
     end
 
-    return json(rec_dict)
+    return json(dict)
 end
