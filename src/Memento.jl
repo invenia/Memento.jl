@@ -24,7 +24,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
 
 const DEFAULT_LOG_LEVEL = "warn"
 
-global _log_levels = Dict{AbstractString, Int}(
+const global _log_levels = Dict{AbstractString, Int}(
     "not_set" => 0,
     "debug" => 10,
     "info" => 20,
@@ -46,7 +46,7 @@ include("handlers.jl")
 include("loggers.jl")
 
 function __init__()
-    global _loggers = Dict{Any, Logger}(
+    global _loggers = Dict{AbstractString, Logger}(
         "root" => Logger("root"),
     )
 end

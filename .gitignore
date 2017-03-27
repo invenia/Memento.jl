@@ -2,3 +2,5 @@
 docs/build/
 docs/site/
 *.jl.*.cov
+benchmark/.results/*.jld
+benchmark/.tune.jld
