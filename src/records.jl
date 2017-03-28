@@ -83,13 +83,8 @@ function get_trace()
 end
 
 function get_lookup(trace::Attribute{StackTrace})
-    function inner_lookup()
-        if isempty(get(trace))
-            return nothing
-        else
-            return first(get(trace))
-        end
-    end
+    inner() = isempty(get(trace)) ? nothing : first(get(trace))
+    return inner
 end
 
 function get_msg(msg)

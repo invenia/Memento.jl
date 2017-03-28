@@ -18,12 +18,6 @@ function Memento.Filter(h::Handler)
     Memento.Filter(level_filter)
 end
 
-filters(handler::Handler) = Memento.Filter[]
-
-function add_filter(handler::Handler, filter::Memento.Filter)
-    push!(filters(handler), filter)
-end
-
 function log(handler::Handler, rec::Record)
     if all(f -> f(rec), filters(handler))
         emit(handler, rec)

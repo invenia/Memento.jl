@@ -1,22 +1,13 @@
 import Memento: Attribute
 
-type TestRecord <: Record
-    date::Attribute
-    level::Attribute
-    levelnum::Attribute
-    name::Attribute
-    msg::Attribute
-end
-
 @testset "Formatters" begin
+    rec = DefaultRecord(Dict{Symbol, Any}(
+        :name => "Logger.example",
+        :level => :info,
+        :levelnum => 20,
+        :msg => "blah",
+    ))
     @testset "DefaultFormatter" begin
-        rec = DefaultRecord(Dict{Symbol, Any}(
-            :name => "Logger.example",
-            :level => :info,
-            :levelnum => 20,
-            :msg => "blah",
-        ))
-
         fmt = DefaultFormatter("{lookup}|{msg}|{stacktrace}")
         result = format(fmt, rec)
         parts = split(result, "|")
@@ -31,15 +22,31 @@ end
     end
 
     @testset "JsonFormatter" begin
-        rec = TestRecord(
-            Attribute(now()),
-            Attribute("info"),
-            Attribute(20),
-            Attribute("root"),
-            Attribute("blah"),
+        fmt = JsonFormatter()
+        result = format(fmt, rec)
+        for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
+            @test contains(result, string(key))
+        end
+
+        @test contains(result, "blah")
+
+        aliases = Dict(
+            :logger => :name,
+            :level => :level,
+            :timestamp => :date,
+            :location => :lookup,
+            :message => :msg,
+            :process_id => :pid,
         )
 
-        fmt = JsonFormatter()
-        @test format(fmt, rec) == json(Dict(rec))
+        fmt2 = JsonFormatter(aliases)
+        result = format(fmt2, rec)
+
+        for key in [:location, :message, :timestamp, :process_id]
+            @test contains(result, string(key))
+            @test !contains(result, string(aliases[key]))
+        end
+
+        @test contains(result, "blah")
     end
 end
