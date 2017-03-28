@@ -40,17 +40,18 @@ function format(fmt::DefaultFormatter, rec::Record)
 
         value = if field === :lookup
             # lookup is a StackFrame
-            name, file, line = dict[field].func, dict[field].file, dict[field].line
+            frame = get(rec, field)
+            name, file, line = frame.func, frame.file, frame.line
             "$(name)@$(basename(string(file))):$(line)"
         elseif field === :stacktrace
             # stacktrace is a vector of StackFrames
-            string(
-                " stack:[",
-                join(map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", dict[field]), ", "),
-                "]"
-            )
+            str_frames = map(get(rec, field)) do frame
+                string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
+            end
+
+            string(" stack:[", join(str_frames, ", "), "]")
         else
-            rec[field]
+            get(rec, field)
         end
 
         result = replace(result, "{$token}", value)
@@ -76,7 +77,8 @@ and dicts respectively and call `JSON.json()` on the resulting dictionary.
 """
 function format(fmt::JsonFormatter, rec::Record)
     aliases = if isnull(fmt.aliases)
-        Dict(zip(keys(rec), keys(rec)))
+        names = fieldnames(rec)
+        Dict(zip(names, names))
     else
         get(fmt.aliases)
     end
@@ -84,25 +86,27 @@ function format(fmt::JsonFormatter, rec::Record)
     dict = Dict{Symbol, Any}()
 
     for (alias, key) in aliases
+        tmp_val = get(rec, key)
+
         value = if key === :date
-            string(rec[:date])
+            string(tmp_val)
         elseif key === :lookup
             Dict(
-                :name => rec[:lookup].func,
-                :file => basename(string(rec[:lookup].file)),
-                :line => rec[:lookup].line
+                :name => tmp_val.func,
+                :file => basename(string(tmp_val.file)),
+                :line => tmp_val.line
             )
         elseif key === :stacktrace
             map(
-                f -> Dict(
-                    :name => f.func,
-                    :file => basename(string(f.file)),
-                    :line => f.line
+                frame -> Dict(
+                    :name => frame.func,
+                    :file => basename(string(frame.file)),
+                    :line => frame.line
                 ),
-                rec[:stacktrace]
+                tmp_val
             )
         else
-            rec[key]
+            tmp_val
         end
 
         dict[alias] = value

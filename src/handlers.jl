@@ -11,7 +11,7 @@ abstract Handler{F<:Formatter, O<:IO}
 
 function Memento.Filter(h::Handler)
     function level_filter(rec::Record)
-        level = rec[:level]
+        level = get(rec, :level)
 
         if haskey(h.levels.x, level)
             return h.levels.x[level] >= h.levels.x[h.level]
@@ -132,7 +132,7 @@ end
 logs all records with any `Formatter` and `IO` types.
 """
 function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
-    level = rec[:level]
+    level = get(rec, :level)
     str = format(handler.fmt, rec)
 
     if handler.opts[:is_colorized] && haskey(handler.opts[:colors], level)
@@ -154,6 +154,6 @@ logs all records with any `Formatter` and a `Syslog` `IO` type.
 """
 function emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
-    println(handler.io, rec[:level], str)
+    println(handler.io, get(rec, :level), str)
     flush(handler.io)
 end
