@@ -62,13 +62,7 @@ end
 function Memento.Filter(l::Logger)
     function level_filter(rec::Record)
         level = get(rec, :level)
-
-        if haskey(l.levels, level)
-            return l.levels[level] >= l.levels[l.level]
-        else
-            warn("$level not in $(l.levels)")
-            return false
-        end
+        return l.levels[level] >= l.levels[l.level]
     end
 
     Memento.Filter(level_filter)

@@ -76,19 +76,10 @@ function DefaultRecord(args::Dict{Symbol, Any})
 end
 
 function get_trace()
-    return StackTraces.remove_frames!(
-        StackTraces.stacktrace(),
-        [
-            :DefaultRecord,
-            :log,
-            Symbol("#log#22"),
-            :info,
-            :warn,
-            :debug,
-            :get_trace,
-            :emit,
-        ]
-    )
+    trace = StackTraces.stacktrace()
+    return filter!(trace) do frame
+        !in(frame, Memento)
+    end
 end
 
 function get_lookup(trace::Attribute{StackTrace})
@@ -107,4 +98,16 @@ function get_msg(msg)
     else
         return msg
     end
+end
+
+function Base.in(frame::StackFrame, filter_mod::Module)
+    finfo = frame.linfo
+    result = false
+
+    if !isnull(finfo)
+        frame_mod = get(finfo).def.module
+        result = module_name(frame_mod) === module_name(filter_mod)
+    end
+
+    return result
 end

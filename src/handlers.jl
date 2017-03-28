@@ -12,13 +12,7 @@ abstract Handler{F<:Formatter, O<:IO}
 function Memento.Filter(h::Handler)
     function level_filter(rec::Record)
         level = get(rec, :level)
-
-        if haskey(h.levels.x, level)
-            return h.levels.x[level] >= h.levels.x[h.level]
-        else
-            warn("$level not in $(h.levels.x)")
-            return false
-        end
+        return h.levels.x[level] >= h.levels.x[h.level]
     end
 
     Memento.Filter(level_filter)
