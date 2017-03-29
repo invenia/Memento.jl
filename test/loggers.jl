@@ -115,8 +115,8 @@
             @test isempty(takebuf_string(io))
 
             msg = "Something went very wrong"
-            log(msg_func(msg), logger, "fubar")
-            @test contains(takebuf_string(io), "[fubar]:Logger.example - $msg")
+            @test_throws ErrorException error(msg_func(msg), logger)
+            @test contains(takebuf_string(io), "[error]:Logger.example - $msg")
 
             new_logger = Logger("new_logger")
         finally
