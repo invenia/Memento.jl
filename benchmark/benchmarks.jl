@@ -1,9 +1,9 @@
 using PkgBenchmark
 using Memento
 
-const FMT_STR = "[{level}]:{name} - {msg}"
+const FMT_STR = "[{level}|{name}] - {msg}"
 
-function test_logger()
+function memento_setup()
     return Logger(
         "Benchmarks",
         Dict(
@@ -47,13 +47,13 @@ function memento_msg(msg; sleep_time=0.0)
     end
 end
 
-@benchgroup "Simple `info`" begin
+@benchgroup "Common Logging" begin
     @bench "Base.info" info(io, base_msg("info", "Base", "Msg")()) setup=(io = IOBuffer())
-    @bench "Memento.info" info(memento_msg("Msg"), logger) setup=(logger = test_logger())
-    @bench "Memento.debug" debug(memento_msg("Msg"), logger) setup=(logger = test_logger())
+    @bench "Memento.info" info(memento_msg("Msg"), logger) setup=(logger = memento_setup())
+    @bench "Memento.debug" debug(memento_msg("Msg"), logger) setup=(logger = memento_setup())
 end
 
-@benchgroup "Expensive `info`" begin
+@benchgroup "Expensive Logging" begin
     @bench(
         "Basic.info",
         info(io, base_msg("info", "Base", "Msg"; sleep_time=0.1)()),
@@ -62,11 +62,11 @@ end
     @bench(
         "Memento.info",
         info(memento_msg("Msg"; sleep_time=0.1), logger),
-        setup=(logger = test_logger())
+        setup=(logger = memento_setup())
     )
     @bench(
         "Memento.debug",
         debug(memento_msg("Msg"; sleep_time=0.1), logger),
-        setup=(logger = test_logger())
+        setup=(logger = memento_setup())
     )
 end

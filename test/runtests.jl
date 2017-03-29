@@ -65,7 +65,9 @@ cd(dirname(@__FILE__))
 
             msg = "This should propagate to the root logger."
             warn(baz, msg)
-            @test contains(takebuf_string(io), "Foo.Bar.Baz - warn: $msg")
+            result = takebuf_string(io)
+            expected = "Foo.Bar.Baz - warn: $msg"
+            @test contains(result, expected)
 
             set_level(baz, "debug")
             add_handler(

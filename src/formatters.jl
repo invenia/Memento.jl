@@ -21,10 +21,20 @@ Ex) "[{level} | {name}]: {msg}" will print message of the form
 """
 immutable DefaultFormatter <: Formatter
     fmt_str::AbstractString
-    tokens::Vector{SubString{String}}
+    tokens::Vector{Pair{Symbol, Bool}}
 
     function DefaultFormatter(fmt_str::AbstractString=DEFAULT_FMT_STRING)
-        new(fmt_str, matchall(r"(?<={).+?(?=})", fmt_str))
+        #r"(?<={).+?(?=})
+        tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
+            #println(dump(m))
+            if m.captures[1] != nothing
+                return Symbol(strip(m.match, ('{', '}'))) => true
+            else
+                return Symbol(m.match) => false
+            end
+        end
+
+        new(fmt_str, tokens)
     end
 end
 
@@ -35,29 +45,33 @@ format string with the appropriate fields in the `Record`
 function format(fmt::DefaultFormatter, rec::Record)
     result = fmt.fmt_str
 
-    for token in fmt.tokens
-        field = Symbol(token)
-        tmp_val = rec[field]
+    parts = map(fmt.tokens) do token
+        content = token.first
+        value = content
 
-        value = if field === :lookup
-            # lookup is a StackFrame
-            name, file, line = tmp_val.func, tmp_val.file, tmp_val.line
-            "$(name)@$(basename(string(file))):$(line)"
-        elseif field === :stacktrace
-            # stacktrace is a vector of StackFrames
-            str_frames = map(tmp_val) do frame
-                string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
+        if token.second
+            tmp_val = rec[content]
+
+            value = if content === :lookup
+                # lookup is a StackFrame
+                name, file, line = tmp_val.func, tmp_val.file, tmp_val.line
+                "$(name)@$(basename(string(file))):$(line)"
+            elseif content === :stacktrace
+                # stacktrace is a vector of StackFrames
+                str_frames = map(tmp_val) do frame
+                    string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
+                end
+
+                string(" stack:[", join(str_frames, ", "), "]")
+            else
+                tmp_val
             end
-
-            string(" stack:[", join(str_frames, ", "), "]")
-        else
-            tmp_val
         end
 
-        result = replace(result, "{$token}", value)
+        return value
     end
 
-    return result
+    return string(parts...)
 end
 
 """
