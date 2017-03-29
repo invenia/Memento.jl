@@ -24,12 +24,11 @@ TODO: Finish implementing `Record`s as specific associative types.
 """
 abstract Record
 
-Base.get(rec::Record, attr::Symbol) = get(getfield(rec, attr))
-Base.getindex(rec::Record, attr::Symbol) = get(rec, attr)
+Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
 
 function Base.Dict(rec::Record)
     return map(fieldnames(rec)) do key
-        key => get(rec, key)
+        key => rec[key]
     end |> Dict
 end
 

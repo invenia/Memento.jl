@@ -7,7 +7,6 @@
             :msg => "blah",
         ))
 
-        @test rec[:date] == get(rec, :date)
         @test rec[:date] == get(rec.date)
         @test get(rec.date) == get(rec.date.x)
 

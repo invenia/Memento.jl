@@ -37,21 +37,21 @@ function format(fmt::DefaultFormatter, rec::Record)
 
     for token in fmt.tokens
         field = Symbol(token)
+        tmp_val = rec[field]
 
         value = if field === :lookup
             # lookup is a StackFrame
-            frame = get(rec, field)
-            name, file, line = frame.func, frame.file, frame.line
+            name, file, line = tmp_val.func, tmp_val.file, tmp_val.line
             "$(name)@$(basename(string(file))):$(line)"
         elseif field === :stacktrace
             # stacktrace is a vector of StackFrames
-            str_frames = map(get(rec, field)) do frame
+            str_frames = map(tmp_val) do frame
                 string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
             end
 
             string(" stack:[", join(str_frames, ", "), "]")
         else
-            get(rec, field)
+            tmp_val
         end
 
         result = replace(result, "{$token}", value)
@@ -86,7 +86,7 @@ function format(fmt::JsonFormatter, rec::Record)
     dict = Dict{Symbol, Any}()
 
     for (alias, key) in aliases
-        tmp_val = get(rec, key)
+        tmp_val = rec[key]
 
         value = if key === :date
             string(tmp_val)

@@ -61,7 +61,7 @@ end
 
 function Memento.Filter(l::Logger)
     function level_filter(rec::Record)
-        level = get(rec, :level)
+        level = rec[:level]
         return l.levels[level] >= l.levels[l.level]
     end
 
