@@ -1,12 +1,38 @@
+"""
+    Attribute
 
+An `Attribute` represents a lazily evaluated field in a log `Record`.
+
+# Fields
+* `f::Function`: A function to evaluate in order to get a value if one is not set.
+* `x::Nullable`: A value that may or may not exist yet.
+"""
 type Attribute{T}
     f::Function
     x::Nullable{T}
 end
 
+"""
+    Attribute(T::Type, f::Function)
+
+Creates an `Attribute` with the function and a `Nullable` of type `T`.
+"""
 Attribute(T::Type, f::Function) = Attribute(f, Nullable{T}())
+
+"""
+    Attribute(x)
+
+Simply wraps the value `x` in a `Nullable` and sticks that in an `Attribute` with an
+empty `Function`.
+"""
 Attribute(x) = Attribute(typeof(x), () -> x)
 
+"""
+    get(attr::Attribute{T}) -> T
+
+Run set `attr.x` to the output of `attr.f` if `attr.x` is not already set.
+We then return the value stored in `attr.x`
+"""
 function Base.get(attr::Attribute)
     if isnull(attr.x)
         attr.x = Nullable(attr.f())
@@ -16,16 +42,26 @@ function Base.get(attr::Attribute)
 end
 
 """
-`Record`s are used to store information about a log event including the
+    Record
+
+Are an `Attribute` container used to store information about a log events including the
 msg, date, level, stacktrace, etc. `Formatter`s use `Records` to format log
 message strings.
 
-TODO: Finish implementing `Record`s as specific associative types.
+NOTE: you should access `Attribute`s in a `Record` by using `getindex` (ie: record[:msg])
+as this will correctly extract the value from the `Attribute` container.
 """
 abstract Record
 
 Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
 
+"""
+    Dict(rec::Record)
+
+Extracts the `Record` and its `Attribute`s into a `Dict`
+NOTE: This may be an expensive operations, so you probably don't want to do this for every
+log record unless you're planning on using every `Attribute`.
+"""
 function Base.Dict(rec::Record)
     return map(fieldnames(rec)) do key
         key => rec[key]
@@ -34,19 +70,23 @@ end
 
 
 """
-`DefaultRecord` wraps a `Dict{Symbol, Any}` which stores basic logging event
-information.
+    DefaultRecord
 
-Info:
+Stores the most common logging event information.
+NOTE: if you'd like more logging attributes you can:
 
-date: timestamp of log event
-level: log level
-levelnum: integer value for log level
-msg: the log message itself
-name: the name of the source logger
-pid: the pid of where the log event occured
-lookup: the top StackFrame
-stacktrace: a stacktrace
+1. You can add them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.
+2. You can make a custom `Record` type.
+
+# Fields
+* `date::Attribute{DateTime}`: timestamp of log event
+* `level::Attribute{Symbol}`: log level
+* `levelnum::Attribute{Int}`: integer value for log level
+* `msg::Attribute{AbstractString}`: the log message itself
+* `name::Attribute{AbstractString}`: the name of the source logger
+* `pid::Attribute{Int}`: the pid of where the log event occured
+* `lookup::Attribute{StackFrame}`: the top StackFrame
+* `stacktrace::Attribute{StackTrace}`: a stacktrace
 """
 immutable DefaultRecord <: Record
     date::Attribute
@@ -59,6 +99,14 @@ immutable DefaultRecord <: Record
     stacktrace::Attribute
 end
 
+"""
+    DefaultRecord(args::Dict{Symbol, Any})
+
+Takes a dict of initial log record arguments and creates the `DefaultRecord`.
+
+# Arguments
+* `args::Dict{Symbol, Any}`: takes a dict containing the log :level, :levelnum, :name and :msg
+"""
 function DefaultRecord(args::Dict{Symbol, Any})
     time = now()
     trace = Attribute(StackTrace, get_trace)
@@ -75,6 +123,11 @@ function DefaultRecord(args::Dict{Symbol, Any})
     )
 end
 
+"""
+    get_trace()
+
+Returns the `StackTrace` with `StackFrame`s from the `Memento` module filtered out.
+"""
 function get_trace()
     trace = StackTraces.stacktrace()
     return filter!(trace) do frame
@@ -82,11 +135,21 @@ function get_trace()
     end
 end
 
+"""
+    get_lookup(trace::Attribute{StackTrace})
+
+Returns the top `StackFrame` for `trace` if it isn't empty.
+"""
 function get_lookup(trace::Attribute{StackTrace})
     inner() = isempty(get(trace)) ? nothing : first(get(trace))
     return inner
 end
 
+"""
+    get_msg(msg) -> Function
+
+Wraps `msg` in a function if it is a String.
+"""
 function get_msg(msg)
     if isa(msg, AbstractString)
         return () -> msg
@@ -95,6 +158,11 @@ function get_msg(msg)
     end
 end
 
+"""
+    Base.in(frame::StackFrame, filter_mod::Module) -> Bool
+
+Returns whether the `frame` is from the provided `Module`
+"""
 function Base.in(frame::StackFrame, filter_mod::Module)
     finfo = frame.linfo
     result = false

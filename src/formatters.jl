@@ -1,6 +1,8 @@
 using JSON
 
 """
+    Formatter
+
 A `Formatter` must implement a `format(::Formatter, ::Record)` method
 which takes a `Record` and returns a `String` representation of the
 log `Record`.
@@ -10,6 +12,8 @@ abstract Formatter
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
 
 """
+    DefaultFormatter
+
 The `DefaultFormatter` uses a simple format string to build
 the log message. Fields from the `Record` to be used should be
 wrapped curly brackets.
@@ -39,7 +43,9 @@ immutable DefaultFormatter <: Formatter
 end
 
 """
-`format(::DefaultFormatter, ::Record)` iteratively replaces entries in the
+    format(::DefaultFormatter, ::Record) -> String
+
+Iteratively replaces entries in the
 format string with the appropriate fields in the `Record`
 """
 function format(fmt::DefaultFormatter, rec::Record)
@@ -75,7 +81,9 @@ function format(fmt::DefaultFormatter, rec::Record)
 end
 
 """
-`JsonFormatter` uses the JSON pkg to format the `Record` into a valid
+    JsonFormatter
+
+Uses the JSON pkg to format the `Record` into a valid
 JSON string.
 """
 type JsonFormatter <: Formatter
@@ -86,7 +94,9 @@ type JsonFormatter <: Formatter
 end
 
 """
-`format(::JsonFormatter, ::Record)` converts :date, :lookup and :stacktrace to strings
+    format(::JsonFormatter, ::Record) -> String
+
+Converts :date, :lookup and :stacktrace to strings
 and dicts respectively and call `JSON.json()` on the resulting dictionary.
 """
 function format(fmt::JsonFormatter, rec::Record)

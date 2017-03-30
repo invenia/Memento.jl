@@ -9,7 +9,7 @@ type MyHandler{F<:Formatter, O<:IO} <: Handler{F, O}
     io::O
 end
 
-function log{F<:Formatter, O<:IO}(handler::MyHandler{F, O}, rec::Record)
+function emit{F<:Formatter, O<:IO}(handler::MyHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
     println(handler.io, str)
     flush(handler.io)
@@ -21,7 +21,7 @@ behaviour based on the `Formatter`, `IO` or `Record` types being used.
 For example, the `Syslog` `IO` type needs an extra `level` argument to
 its `println` so we special case this like so:
 ```julia
-function log{F<:Formatter, O<:Syslog}(handler::MyHandler{F, O}, rec::Record)
+function emit{F<:Formatter, O<:Syslog}(handler::MyHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)
     println(handler.io, rec[:level], str)
     flush(handler.io)

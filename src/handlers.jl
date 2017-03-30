@@ -1,5 +1,7 @@
 """
-`Handlers` manage formatting `Record`s and printing
+    Handler
+
+Manage formatting `Record`s and printing
 the resulting `String` to an `IO` type. All `Handler`
 subtypes must implement at least 1 `log(::Handler, ::Record)`
 method.
@@ -18,6 +20,12 @@ function Memento.Filter(h::Handler)
     Memento.Filter(level_filter)
 end
 
+"""
+    log(handler::Handler, rec::Record)
+
+Checks the `Handler` filters and if they all pass then
+`emit` the record.
+"""
 function log(handler::Handler, rec::Record)
     if all(f -> f(rec), filters(handler))
         emit(handler, rec)
@@ -25,6 +33,8 @@ function log(handler::Handler, rec::Record)
 end
 
 """
+    DefaultHanlder
+
 The DefaultHandler manages any `Formatter`, `IO` and `Record`.
 
 Fields:
@@ -50,13 +60,14 @@ type DefaultHandler{F<:Formatter, O<:IO} <: Handler{F, O}
 end
 
 """
-`DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any})`
-creates a DefaultHandler with the specified IO type.
+    DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any})
 
-Args:
-- io: the IO type
-- fmt: the Formatter to use (default to `DefaultFormatter()`)
-- opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
+Creates a DefaultHandler with the specified IO type.
+
+# Arguments
+* `io::IO`: the IO type
+* `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
+* `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
 function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
     setup_opts(opts)
@@ -66,13 +77,14 @@ function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), o
 end
 
 """
-`DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any})`
-creates a DefaultHandler with a IO handle to the specified filename.
+    DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any})`
 
-Args:
-- filename: the filename of a log file to write to
-- fmt: the Formatter to use (default to `DefaultFormatter()`)
-- opts: the optional arguments (defaults to `Dict{Symbol, Any}()`)
+Creates a DefaultHandler with a IO handle to the specified filename.
+
+# Arguments
+* `filename::AbstractString`: the filename of a log file to write to
+* `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
+* `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
 function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
     file = open(filename, "a")
@@ -84,7 +96,9 @@ function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFo
 end
 
 """
-`setup_opts(opts)` sets the default :colors if `opts[:is_colorized] == true`
+    setup_opts(opts) -> Dict
+
+Sets the default :colors if `opts[:is_colorized] == true`.
 """
 function setup_opts(opts)
     if haskey(opts, :colors)
@@ -108,16 +122,27 @@ function setup_opts(opts)
     opts
 end
 
+"""
+    filters(handler::DefaultHandler) -> Array{Filter}
+
+Returns the filters for the handler.
+"""
 filters(handler::DefaultHandler) = handler.filters
 
+"""
+    set_level(handler::DefaultHandler, level::AbstractString)
+
+Sets the minimum level required to `emit` the record from the handler.
+"""
 function set_level(handler::DefaultHandler, level::AbstractString)
     handler.levels.x[level]     # Throw a key error if the levels isn't in levels
     handler.level = level
 end
 
 """
-`log{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)`
-logs all records with any `Formatter` and `IO` types.
+    emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)
+
+Handles printing any `Record` with any `Formatter` and `IO` types.
 """
 function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
     level = rec[:level]
@@ -137,8 +162,9 @@ function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
 end
 
 """
-`logs{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)`
-logs all records with any `Formatter` and a `Syslog` `IO` type.
+    emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
+
+Handles printing any records with any `Formatter` and a `Syslog` `IO` type.
 """
 function emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
     str = format(handler.fmt, rec)

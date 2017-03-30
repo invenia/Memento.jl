@@ -1,3 +1,12 @@
+"""
+    Filter
+
+I wrapper around a function that takes a log `Record` and returns
+a bool whether to skip logging it.
+
+# Fields
+`f::Function`: a function that should return a bool given a `Record`
+"""
 immutable Filter
     f::Function
 end

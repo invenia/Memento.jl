@@ -1,48 +1,44 @@
 # Records
 
-`Record`s describe a set of key value pairs that should be available to a  `Formatter` on every log message.
+`Record`s describe a set of log `Attributes` that should be available to a `Formatter` on every log message.
 
-Internal `DefaultRecord` Dict:
-```julia
-Dict(
-    :date => round(now(), Base.Dates.Second),
-    :level => args[:level],
-    :levelnum => args[:levelnum],
-    :msg => args[:msg],
-    :name => args[:name],
-    :pid => myid(),
-    :lookup => isempty(trace) ? nothing : first(trace),
-    :stacktrace => trace,
-)
-```
+NOTE: The `Attribute` type is used as a way to provide lazy evaluation of log record elements.
 
 While the `DefaultRecord` in Memento provides many of the keys and values needed for most logging applications, you may need to implement your own `Record` type.
 For example, if you're running a julia application on a cloud service provider like Amazon's EC2 you might want to include some general information about the resource your code is running on, which might result in a custom `Record` type that looks like:
 
 ```julia
+# TODO: Fix this example.
 type EC2Record <: Record
-    dict::Dict{Symbol, Any}
+    date::Attribute
+    level::Attribute
+    levelnum::Attribute
+    msg::Attribute
+    name::Attribute
+    pid::Attribute
+    lookup::Attribute
+    stacktrace::Attribute
+    instance_id::Attribute
+    public_ip::Attribute
+    iam_user::Attribute
 
     function EC2Record(args::Dict)
-        trace = StackTraces.remove_frames!(
-            StackTraces.stacktrace(),
-            [:DefaultRecord, :log, Symbol("#log#22"), :info, :warn, :debug]
-        )
+        time = now()
+        trace = Attribute(StackTrace, get_trace)
 
-        new(Dict(
-            :date => round(now(), Base.Dates.Second),
-            :level => args[:level],
-            :levelnum => args[:levelnum],
-            :msg => args[:msg],
-            :name => args[:name],
-            :pid => myid(),
-            :lookup => isempty(trace) ? nothing : first(trace),
-            :stacktrace => trace,
-            :instance_id => ENV["INSTANCE_ID"],
-            :public_ip => ENV["PUBLIC_IP"],
-            :iam_user => ENV["IAM_USER"],
-            ...
-        ))
+        EC2Record(
+            Attribute(DateTime, () -> round(time, Base.Dates.Second)),
+            Attribute(args[:level]),
+            Attribute(args[:levelnum]),
+            Attribute(AbstractString, get_msg(args[:msg])),
+            Attribute(args[:name]),
+            Attribute(myid()),
+            Attribute(StackFrame, get_lookup(trace)),
+            trace,
+            Attribute(ENV["INSTANCE_ID"]),
+            Attribute(ENV["PUBLIC_IP"]),
+            Attribute(ENV["IAM_USER"]),
+        )
     end
 end
 ```
