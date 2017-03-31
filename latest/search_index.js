@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Handlers",
     "title": "Handlers",
     "category": "section",
-    "text": "As we've already seen, Handlers can be used to write log messages to different IO types. More specifically, handlers are parameterized types that describe the relationship of how Formatter and IO types are used to take a Record (a kind of specified Dict) -> convert it to a String with the Formatter and write that to an IO type.In the simplest case a Handler definition would like:type MyHandler{F<:Formatter, O<:IO} <: Handler{F, O}\n    fmt::F\n    io::O\nend\n\nfunction log{F<:Formatter, O<:IO}(handler::MyHandler{F, O}, rec::Record)\n    str = format(handler.fmt, rec)\n    println(handler.io, str)\n    flush(handler.io)\nendHowever, under some circumstances it may be necessary to customize this behaviour based on the Formatter, IO or Record types being used. For example, the Syslog IO type needs an extra level argument to its println so we special case this like so:function log{F<:Formatter, O<:Syslog}(handler::MyHandler{F, O}, rec::Record)\n    str = format(handler.fmt, rec)\n    println(handler.io, rec[:level], str)\n    flush(handler.io)\nend"
+    "text": "As we've already seen, Handlers can be used to write log messages to different IO types. More specifically, handlers are parameterized types that describe the relationship of how Formatter and IO types are used to take a Record (a kind of specified Dict) -> convert it to a String with the Formatter and write that to an IO type.In the simplest case a Handler definition would like:type MyHandler{F<:Formatter, O<:IO} <: Handler{F, O}\n    fmt::F\n    io::O\nend\n\nfunction emit{F<:Formatter, O<:IO}(handler::MyHandler{F, O}, rec::Record)\n    str = format(handler.fmt, rec)\n    println(handler.io, str)\n    flush(handler.io)\nendHowever, under some circumstances it may be necessary to customize this behaviour based on the Formatter, IO or Record types being used. For example, the Syslog IO type needs an extra level argument to its println so we special case this like so:function emit{F<:Formatter, O<:Syslog}(handler::MyHandler{F, O}, rec::Record)\n    str = format(handler.fmt, rec)\n    println(handler.io, rec[:level], str)\n    flush(handler.io)\nend"
 },
 
 {
@@ -133,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Records",
     "title": "Records",
     "category": "section",
-    "text": "Records describe a set of key value pairs that should be available to a  Formatter on every log message.Internal DefaultRecord Dict:Dict(\n    :date => round(now(), Base.Dates.Second),\n    :level => args[:level],\n    :levelnum => args[:levelnum],\n    :msg => args[:msg],\n    :name => args[:name],\n    :pid => myid(),\n    :lookup => isempty(trace) ? nothing : first(trace),\n    :stacktrace => trace,\n)While the DefaultRecord in Memento provides many of the keys and values needed for most logging applications, you may need to implement your own Record type. For example, if you're running a julia application on a cloud service provider like Amazon's EC2 you might want to include some general information about the resource your code is running on, which might result in a custom Record type that looks like:type EC2Record <: Record\n    dict::Dict{Symbol, Any}\n\n    function EC2Record(args::Dict)\n        trace = StackTraces.remove_frames!(\n            StackTraces.stacktrace(),\n            [:DefaultRecord, :log, Symbol(\"#log#22\"), :info, :warn, :debug]\n        )\n\n        new(Dict(\n            :date => round(now(), Base.Dates.Second),\n            :level => args[:level],\n            :levelnum => args[:levelnum],\n            :msg => args[:msg],\n            :name => args[:name],\n            :pid => myid(),\n            :lookup => isempty(trace) ? nothing : first(trace),\n            :stacktrace => trace,\n            :instance_id => ENV[\"INSTANCE_ID\"],\n            :public_ip => ENV[\"PUBLIC_IP\"],\n            :iam_user => ENV[\"IAM_USER\"],\n            ...\n        ))\n    end\nendNOTE: The above example simply assumes that you have some relevant environment variables set on the machine, but you could also query Amazon for that information."
+    "text": "Records describe a set of log Attributes that should be available to a Formatter on every log message.NOTE: The Attribute type is used as a way to provide lazy evaluation of log record elements.While the DefaultRecord in Memento provides many of the keys and values needed for most logging applications, you may need to implement your own Record type. For example, if you're running a julia application on a cloud service provider like Amazon's EC2 you might want to include some general information about the resource your code is running on, which might result in a custom Record type that looks like:# TODO: Fix this example.\ntype EC2Record <: Record\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(args::Dict)\n        time = now()\n        trace = Attribute(StackTrace, get_trace)\n\n        EC2Record(\n            Attribute(DateTime, () -> round(time, Base.Dates.Second)),\n            Attribute(args[:level]),\n            Attribute(args[:levelnum]),\n            Attribute(AbstractString, get_msg(args[:msg])),\n            Attribute(args[:name]),\n            Attribute(myid()),\n            Attribute(StackFrame, get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nendNOTE: The above example simply assumes that you have some relevant environment variables set on the machine, but you could also query Amazon for that information."
 },
 
 {
@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Conclusion",
     "title": "Conclusion",
     "category": "section",
-    "text": "We've reviewed all the different components you can use to configure logging in you application, but how do they all fit together? Let's work through a sample use case that uses all of the components we've discussed.NOTE: The example provided is a bit contrived for simplicity.First, let's start with a julia Pkg called Wrapper that runs a function wrapped in some Memento logging.# Wrapper.jl\nmodule Wrapper\n\nusing Memento\n\nfunction run(f::Function, args...; kwargs...)\n    ret = nothing\n    logger = get_logger(current_module())\n    info(logger, \"Got logger $logger\")\n\n    notice(logger, \"Running function...\")\n\n    try\n        ret = f(args...; kwargs...)\n    catch exc\n        warn(logger, exc)\n    end\n\n    return ret\nend\n\nendNow we want to start writing our application code that uses this package, but our logging requirements are very specific and Memento doesn't support our particular use case yet.Requirements:This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.\nWe want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>.\nWe want our logs to be written in a CSV format... for some reason.Okay, so how do we address all of those requirements using Memento's API?Steps:Create a custom Record type called EC2Record that stores the Amazon EC2 information to address the first requirement.\nCreate a custom IO type called REST that writes log strings to the REST endpoint to partly address the second requirement.\nCreate a custom Formatter type called CSVFormatter that converts Records to (comma, tab, etc) delimited strings.NOTE: The code below is not intended to be a working example because it assumes a fake REST service.# myapp.jl\nusing Wrapper\nusing Memento\nusing Requests  # For send logs to our fake logging REST service\n\n# Start by setting up our basic console logging for the root logger.\nlogger = basic_config(\"info\"; fmt=\"[{level} | {name}]: {msg}\")\n\n# We create our custom EC2Record type\ntype EC2Record <: Record\n    dict::Dict{Symbol, Any}\n\n    function EC2Record(args::Dict)\n        trace = StackTraces.remove_frames!(\n            StackTraces.stacktrace(),\n            [:DefaultRecord, :log, Symbol(\"#log#22\"), :info, :warn, :debug]\n        )\n\n        new(Dict(\n            :date => round(now(), Base.Dates.Second),\n            :level => args[:level],\n            :levelnum => args[:levelnum],\n            :msg => args[:msg],\n            :name => args[:name],\n            :pid => myid(),\n            :lookup => isempty(trace) ? nothing : first(trace),\n            :stacktrace => trace,\n            :instance_id => ENV[\"INSTANCE_ID\"],\n            :public_ip => ENV[\"PUBLIC_IP\"],\n            :iam_user => ENV[\"IAM_USER\"],\n            # Other things?\n        ))\n    end\nend\n\n# A really simple CSVFormatter\ntype CSVFormatter <: Formatter\n    delim::Char\n    vals::Array{Symbol}\n\n    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)\nend\n\nfunction format(fmt::CSVFormatter, rec::Record)\n    fields = isempty(fmt.vals) ? keys(rec) : fmt.vals\n\n    # For a real world use case we might want to do some\n    # string formatting of fields like :stacktrace here.\n\n    val = map(k -> rec[k], fields)\n\n    return join(val, fmt.delim)\nend\n\n# Create our custom REST IO type\ntype REST <: IO\n    account_uri::AbstractString\n    app_name::AbstractString\n    access_key::AbstractString\nend\n\n# Our print method builds the correct uri using the log level\n# and sends the put request.\nfunction println(io::REST, level::AbstractString, msg::AbstractString)\n    uri = \"https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)\"\n    @async put(uri; data=msg)\nend\n\n# Not relevant, but good to have.\nflush(io::REST) = io\n\n# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`\nfunction log{F<:Formatter, O<:REST}(handler::DefaultHandler{F, O}, rec::Record)\n    msg = format(handler.fmt, rec)\n    println(handler.io, rec[:level], msg)\n    flush(handler.io)\nend\n\n# Now we can tie this all together, but adding a new DefaultHandler\n# with the CSVFormatter and REST IO type.\nadd_handler(logger, DefaultHandler(\n    REST(\n        \"memento.mylogrestservice.com\", \"myapp\",\n        \"qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A\"\n    ),\n    CSVFormatter(\n        ',',\n        [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]\n    )\n))\n\n# Don't forget to update the root logger `Record` type.\nset_record(logger, EC2Record)\n\nWrapper.run(exp, 10)\n# Should log some things.\n\nWrapper.run(exp, \"foo\")\n# Should log a warning about a method error."
+    "text": "We've reviewed all the different components you can use to configure logging in you application, but how do they all fit together? Let's work through a sample use case that uses all of the components we've discussed.NOTE: The example provided is a bit contrived for simplicity.First, let's start with a julia Pkg called Wrapper that runs a function wrapped in some Memento logging.# Wrapper.jl\nmodule Wrapper\n\nusing Memento\n\nfunction run(f::Function, args...; kwargs...)\n    ret = nothing\n    logger = get_logger(current_module())\n    info(logger, \"Got logger $logger\")\n\n    notice(logger, \"Running function...\")\n\n    try\n        ret = f(args...; kwargs...)\n    catch exc\n        warn(logger, exc)\n    end\n\n    return ret\nend\n\nendNow we want to start writing our application code that uses this package, but our logging requirements are very specific and Memento doesn't support our particular use case yet.Requirements:This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.\nWe want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>.\nWe want our logs to be written in a CSV format... for some reason.Okay, so how do we address all of those requirements using Memento's API?Steps:Create a custom Record type called EC2Record that stores the Amazon EC2 information to address the first requirement.\nCreate a custom IO type called REST that writes log strings to the REST endpoint to partly address the second requirement.\nCreate a custom Formatter type called CSVFormatter that converts Records to (comma, tab, etc) delimited strings.NOTE: The code below is not intended to be a working example because it assumes a fake REST service.# myapp.jl\nusing Wrapper\nusing Memento\nusing Requests  # For send logs to our fake logging REST service\n\n# Start by setting up our basic console logging for the root logger.\nlogger = basic_config(\"info\"; fmt=\"[{level} | {name}]: {msg}\")\n\n# We create our custom EC2Record type\ntype EC2Record <: Record\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(args::Dict)\n        time = now()\n        trace = Attribute(StackTrace, get_trace)\n\n        EC2Record(\n            Attribute(DateTime, () -> round(time, Base.Dates.Second)),\n            Attribute(args[:level]),\n            Attribute(args[:levelnum]),\n            Attribute(AbstractString, get_msg(args[:msg])),\n            Attribute(args[:name]),\n            Attribute(myid()),\n            Attribute(StackFrame, get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nend\n\n# A really simple CSVFormatter\ntype CSVFormatter <: Formatter\n    delim::Char\n    vals::Array{Symbol}\n\n    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)\nend\n\nfunction format(fmt::CSVFormatter, rec::Record)\n    fields = isempty(fmt.vals) ? keys(rec) : fmt.vals\n\n    # For a real world use case we might want to do some\n    # string formatting of fields like :stacktrace here.\n\n    val = map(k -> rec[k], fields)\n\n    return join(val, fmt.delim)\nend\n\n# Create our custom REST IO type\ntype REST <: IO\n    account_uri::AbstractString\n    app_name::AbstractString\n    access_key::AbstractString\nend\n\n# Our print method builds the correct uri using the log level\n# and sends the put request.\nfunction println(io::REST, level::AbstractString, msg::AbstractString)\n    uri = \"https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)\"\n    @async put(uri; data=msg)\nend\n\n# Not relevant, but good to have.\nflush(io::REST) = io\n\n# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`\nfunction log{F<:Formatter, O<:REST}(handler::DefaultHandler{F, O}, rec::Record)\n    msg = format(handler.fmt, rec)\n    println(handler.io, rec[:level], msg)\n    flush(handler.io)\nend\n\n# Now we can tie this all together, but adding a new DefaultHandler\n# with the CSVFormatter and REST IO type.\nadd_handler(logger, DefaultHandler(\n    REST(\n        \"memento.mylogrestservice.com\", \"myapp\",\n        \"qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A\"\n    ),\n    CSVFormatter(\n        ',',\n        [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]\n    )\n))\n\n# Don't forget to update the root logger `Record` type.\nset_record(logger, EC2Record)\n\nWrapper.run(exp, 10)\n# Should log some things.\n\nWrapper.run(exp, \"foo\")\n# Should log a warning about a method error."
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Logger",
     "category": "Type",
-    "text": "A Logger is responsible for converting msg strings into Records which are then passed to each handler. By default loggers propagate their message to their parent loggers.\n\nFields:\n\nname: is the name of the logger (required).\nhandlers: is a collection of Handlers (defaults to empty Dict).\nlevel: the current minimum logging level for the logger to log message to handlers (defaults to \"not_set\").\nlevels: a mapping of available logging levels to their relative priority (represented as integer values) (defaults to using Memento._log_levels)\nrecord: the Record type that should be produced by this logger (defaults to DefaultRecord).\npropagate: whether or not this logger should propagate its message to its parent (defaults to true).\n\n\n\n"
+    "text": "Logger\n\nA Logger is responsible for converting msg strings into Records which are then passed to each handler. By default loggers propagate their message to their parent loggers.\n\nFields\n\nname::AbstractString: is the name of the logger (required).\nhandlers::Dict{Any, Handler}: is a collection of Handlers (defaults to empty Dict).\nlevel::AbstractString: the current minimum logging level for the logger to  log message to handlers (defaults to \"not_set\").\nlevels::Dict{AbstractString, Int}: a mapping of available logging levels to their   relative priority (represented as integer values) (defaults to using Memento._log_levels)\nrecord::Type: the Record type that should be produced by this logger   (defaults to DefaultRecord).\npropagate::Bool: whether or not this logger should propagate its message to its parent   (defaults to true).\n\n\n\n"
 },
 
 {
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.error",
     "category": "Function",
-    "text": "error(::Logger, ::AbstractString) logs the message at the error level and throws an ErrorException with that message error(::Logger, ::Exception) calls error(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "error(logger::Logger, msg::AbstractString)\n\nLogs the message at the error level and throws an ErrorException with that message\n\nerror(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the error level and throws an ErrorException with that message.\n\nerror(logger::Logger, exc::Exception)\n\nCalls error(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
 {
@@ -237,7 +237,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.info",
     "category": "Function",
-    "text": "info(::Logger, ::AbstractString) logs the message at the info level.\n\n\n\n"
+    "text": "info(logger::Logger, msg::AbstractString)\n\nLogs the message at the info level.\n\ninfo(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the info level.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Base.log-Tuple{Function,Memento.Logger,AbstractString}",
+    "page": "Public",
+    "title": "Base.log",
+    "category": "Method",
+    "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\n\n\n\n"
 },
 
 {
@@ -245,7 +253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.log",
     "category": "Method",
-    "text": "log(::Logger, ::AbstractString, ::AbstractString) creates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArgs:\n\nlogger: the logger to log to.\nlevel: the log level as a String\nmsg: the msg to log as a String\n\n\n\n"
+    "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\n\n\n"
 },
 
 {
@@ -253,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.log",
     "category": "Method",
-    "text": "log(::Logger, ::Dict{Symbol, Any}) logs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nArgs:\n\nlogger: the logger to log args to.\nargs: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n"
+    "text": "log(logger::Logger, args::Dict{Symbol, Any})\n\nLogs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nargs::Dict: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n"
 },
 
 {
@@ -261,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.warn",
     "category": "Function",
-    "text": "warn(::Logger, ::AbstractString) logs the message at the warn level.\n\n\n\n"
+    "text": "warn(logger::Logger, msg::AbstractString)\n\nLogs the message at the warn level.\n\nwarn(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the warn level.\n\n\n\n"
 },
 
 {
@@ -269,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.warn",
     "category": "Method",
-    "text": "warn(::Logger, ::Exception) takes an exception and logs it. \n\n\n\n"
+    "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it.\n\n\n\n"
 },
 
 {
@@ -277,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.add_handler",
     "category": "Function",
-    "text": "add_handler(::Logger, ::Handler, name) adds a new handler to logger.handlers. If a name is not provided a random one will be generated.\n\nArgs:\n\nlogger: the logger to use.\nhandler: the handler to add.\nname: a name to identify the handler.\n\n\n\n"
+    "text": "add_handler(logger::Logger, handler::Handler, name)\n\nAdds a new handler to logger.handlers. If a name is not provided a random one will be generated.\n\nArguments\n\nlogger::Logger: the logger to use.\nhandler::Handler: the handler to add.\nname::AbstractString: a name to identify the handler.\n\n\n\n"
 },
 
 {
@@ -285,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.add_level",
     "category": "Method",
-    "text": "add_level(::Logger, ::AbstractString, ::Int) adds a new level::String and priority::Int to the logger.levels\n\n\n\n"
+    "text": "add_level(logger::Logger, level::AbstractString, val::Int)\n\nAdds a new level::String and priority::Int to the logger.levels\n\n\n\n"
 },
 
 {
@@ -293,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.alert",
     "category": "Function",
-    "text": "alert(::Logger, ::AbstractString) logs the message at the alert level and throws an ErrorException with that message alert(::Logger, ::Exception) calls alert(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "alert(logger::Logger, msg::AbstractString)\n\nLogs the message at the alert level and throws an ErrorException with that message\n\nalert(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the alert level and throws an ErrorException with that message.\n\nalert(logger::Logger, exc::Exception)\n\nCalls alert(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
 {
@@ -301,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.basic_config",
     "category": "Method",
-    "text": "basic_config(::AbstractString; ::AbstractString, ::Dict{AbstractString, Int}, colorized::Bool) sets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to STDOUT.\n\nArgs:\n\nlevel: the minimum logging level to log message to the root logger (required).\nfmt: a format string to pass to the DefaultFormatter which describes how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to STDOUT should be colorized.\n\nReturns the root logger.\n\n\n\n"
+    "text": "basic_config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to STDOUT.\n\nArguments\n\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to STDOUT should be colorized.\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
 },
 
 {
@@ -309,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.critical",
     "category": "Function",
-    "text": "critical(::Logger, ::AbstractString) logs the message at the critical level and throws an ErrorException with that message critical(::Logger, ::Exception) calls critical(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "critical(logger::Logger, msg::AbstractString)\n\nLogs the message at the critical level and throws an ErrorException with that message\n\ncritical(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the critical level and throws an ErrorException with that message.\n\ncritical(logger::Logger, exc::Exception)\n\nCalls critical(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
 {
@@ -317,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.debug",
     "category": "Function",
-    "text": "debug(::Logger, ::AbstractString) logs the message at the debug level.\n\n\n\n"
+    "text": "debug(logger::Logger, msg::AbstractString)\n\nLogs the message at the debug level.\n\ndebug(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the debug level.\n\n\n\n"
 },
 
 {
@@ -325,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.emergency",
     "category": "Function",
-    "text": "emergency(::Logger, ::AbstractString) logs the message at the emergency level and throws an ErrorException with that message emergency(::Logger, ::Exception) calls emergency(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "emergency(logger::Logger, msg::AbstractString)\n\nLogs the message at the emergency level and throws an ErrorException with that message\n\nemergency(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the emergency level and throws an ErrorException with that message.\n\nemergency(logger::Logger, exc::Exception)\n\nCalls emergency(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
 {
@@ -333,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.get_handlers",
     "category": "Method",
-    "text": "get_handlers(::Logger) returns logger.handlers\n\n\n\n"
+    "text": "get_handlers(logger::Logger)\n\nReturns logger.handlers\n\n\n\n"
 },
 
 {
@@ -341,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.get_logger",
     "category": "Function",
-    "text": "get_logger(::AbstractString) returns the appropriate logger. If the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArgs: the name of the logger (defaults to \"root\")\n\nReturns the logger.\n\n\n\n"
+    "text": "get_logger(name::AbstractString) -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname::AbstractString: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n"
 },
 
 {
@@ -349,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.get_logger",
     "category": "Method",
-    "text": "get_logger(name::Module) converts the Module to a String and calls get_logger(name::String).\n\nArgs: name of the logger\n\nReturns the logger.\n\n\n\n"
+    "text": "get_logger(name::Module) -> Logger\n\nConverts the Module to a String and calls get_logger(name::String).\n\nArguments\n\nname::Module: the Module a logger should be associated\n\nReturns\n\nLogger: the logger associated with the provided Module.\n\nReturns the logger.\n\n\n\n"
 },
 
 {
@@ -357,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.is_root",
     "category": "Method",
-    "text": "is_root(::Logger) returns true if logger.nameis \"root\" or \"\" \n\n\n\n"
+    "text": "is_root(::Logger)\n\nReturns true if logger.nameis \"root\" or \"\"\n\n\n\n"
 },
 
 {
@@ -365,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.is_set",
     "category": "Method",
-    "text": "is_set(:Logger) returns true or false as to whether the logger is set. (ie: logger.level != \"not_set\") \n\n\n\n"
+    "text": "is_set(:Logger)\n\nReturns true or false as to whether the logger is set. (ie: logger.level != \"not_set\")\n\n\n\n"
 },
 
 {
@@ -373,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.notice",
     "category": "Function",
-    "text": "notice(::Logger, ::AbstractString) logs the message at the notice level.\n\n\n\n"
+    "text": "notice(logger::Logger, msg::AbstractString)\n\nLogs the message at the notice level.\n\nnotice(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the notice level.\n\n\n\n"
 },
 
 {
@@ -381,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.remove_handler",
     "category": "Method",
-    "text": "remove_handler(::Logger, name) removes the Handler with the provided name from the logger.handlers. \n\n\n\n"
+    "text": "remove_handler(logger::Logger, name)\n\nRemoves the Handler with the provided name from the logger.handlers.\n\n\n\n"
 },
 
 {
@@ -389,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.set_level",
     "category": "Method",
-    "text": "set_level(::Logger, ::AbstractString) changes what level this logger should log at.\n\n\n\n"
+    "text": "set_level(logger::Logger, level::AbstractString)\n\nChanges what level this logger should log at.\n\n\n\n"
 },
 
 {
@@ -397,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.set_record",
     "category": "Method",
-    "text": "set_record{R<:Record}(::Logger, ::Type{R}) sets the record type for the logger.\n\nArgs:\n\nlogger: the logger to set.\nrec: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n"
+    "text": "set_record{R<:Record}(logger::Logger, rec::Type{R})\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n"
 },
 
 {
@@ -413,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with a IO handle to the specified filename.\n\nArgs:\n\nfilename: the filename of a log file to write to\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
+    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any})\n\nCreates a DefaultHandler with the specified IO type.\n\nArguments\n\nio::IO: the IO type\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
@@ -421,7 +429,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any}) creates a DefaultHandler with the specified IO type.\n\nArgs:\n\nio: the IO type\nfmt: the Formatter to use (default to DefaultFormatter())\nopts: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
+    "text": "DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any})`\n\nCreates a DefaultHandler with a IO handle to the specified filename.\n\nArguments\n\nfilename::AbstractString: the filename of a log file to write to\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
 {
@@ -429,7 +437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "Type",
-    "text": "The DefaultHandler manages any Formatter, IO and Record.\n\nFields:\n\nfmt: a Formatter for converting Records to Strings\nio: an IO type for printing String to.\nopts: a dictionary of optional arguments such as :is_colorized and :colors   Ex) Dict{Symbol, Any}(           :is_colorized => true,           :opts[:colors] => Dict{AbstractString, Symbol}(               \"debug\" => :blue,               \"info\" => :green,               ...           )       )\n\n\n\n"
+    "text": "DefaultHanlder\n\nThe DefaultHandler manages any Formatter, IO and Record.\n\nFields:\n\nfmt: a Formatter for converting Records to Strings\nio: an IO type for printing String to.\nopts: a dictionary of optional arguments such as :is_colorized and :colors   Ex) Dict{Symbol, Any}(           :is_colorized => true,           :opts[:colors] => Dict{AbstractString, Symbol}(               \"debug\" => :blue,               \"info\" => :green,               ...           )       )\n\n\n\n"
 },
 
 {
@@ -437,23 +445,39 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Handler",
     "category": "Type",
-    "text": "Handlers manage formatting Records and printing the resulting String to an IO type. All Handler subtypes must implement at least 1 log(::Handler, ::Record) method.\n\nNOTE: Handlers can useful if you need to special case logging behaviour based on the Formatter, IO and/or Record types.\n\n\n\n"
+    "text": "Handler\n\nManage formatting Records and printing the resulting String to an IO type. All Handler subtypes must implement at least 1 log(::Handler, ::Record) method.\n\nNOTE: Handlers can useful if you need to special case logging behaviour based on the Formatter, IO and/or Record types.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Base.log-Tuple{Memento.DefaultHandler{F<:Memento.Formatter,O<:IO},Memento.Record}",
+    "location": "api/public.html#Base.log-Tuple{Memento.Handler,Memento.Record}",
     "page": "Public",
     "title": "Base.log",
     "category": "Method",
-    "text": "log{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record) logs all records with any Formatter and IO types.\n\n\n\n"
+    "text": "log(handler::Handler, rec::Record)\n\nChecks the Handler filters and if they all pass then emit the record.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Base.log-Tuple{Memento.DefaultHandler{F<:Memento.Formatter,O<:Memento.Syslog},Memento.Record}",
+    "location": "api/public.html#Memento.emit-Tuple{Memento.DefaultHandler{F<:Memento.Formatter,O<:IO},Memento.Record}",
     "page": "Public",
-    "title": "Base.log",
+    "title": "Memento.emit",
     "category": "Method",
-    "text": "logs{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record) logs all records with any Formatter and a Syslog IO type.\n\n\n\n"
+    "text": "emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)\n\nHandles printing any Record with any Formatter and IO types.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.emit-Tuple{Memento.DefaultHandler{F<:Memento.Formatter,O<:Memento.Syslog},Memento.Record}",
+    "page": "Public",
+    "title": "Memento.emit",
+    "category": "Method",
+    "text": "emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)\n\nHandles printing any records with any Formatter and a Syslog IO type.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.set_level-Tuple{Memento.DefaultHandler,AbstractString}",
+    "page": "Public",
+    "title": "Memento.set_level",
+    "category": "Method",
+    "text": "set_level(handler::DefaultHandler, level::AbstractString)\n\nSets the minimum level required to emit the record from the handler.\n\n\n\n"
 },
 
 {
@@ -469,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultFormatter",
     "category": "Type",
-    "text": "The DefaultFormatter uses a simple format string to build the log message. Fields from the Record to be used should be wrapped curly brackets.\n\nEx) \"[{level} | {name}]: {msg}\" will print message of the form [info | root]: my info message. [warn | root]: my warning message. ...\n\n\n\n"
+    "text": "DefaultFormatter\n\nThe DefaultFormatter uses a simple format string to build the log message. Fields from the Record to be used should be wrapped curly brackets.\n\nEx) \"[{level} | {name}]: {msg}\" will print message of the form [info | root]: my info message. [warn | root]: my warning message. ...\n\n\n\n"
 },
 
 {
@@ -477,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Formatter",
     "category": "Type",
-    "text": "A Formatter must implement a format(::Formatter, ::Record) method which takes a Record and returns a String representation of the log Record.\n\n\n\n"
+    "text": "Formatter\n\nA Formatter must implement a format(::Formatter, ::Record) method which takes a Record and returns a String representation of the log Record.\n\n\n\n"
 },
 
 {
@@ -485,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.JsonFormatter",
     "category": "Type",
-    "text": "JsonFormatter uses the JSON pkg to format the Record into a valid JSON string.\n\n\n\n"
+    "text": "JsonFormatter\n\nUses the JSON pkg to format the Record into a valid JSON string.\n\n\n\n"
 },
 
 {
@@ -493,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.format",
     "category": "Method",
-    "text": "format(::DefaultFormatter, ::Record) iteratively replaces entries in the format string with the appropriate fields in the Record\n\n\n\n"
+    "text": "format(::DefaultFormatter, ::Record) -> String\n\nIteratively replaces entries in the format string with the appropriate fields in the Record\n\n\n\n"
 },
 
 {
@@ -501,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.format",
     "category": "Method",
-    "text": "format(::JsonFormatter, ::Record) converts :date, :lookup and :stacktrace to strings and dicts respectively and call JSON.json() on the resulting dictionary. \n\n\n\n"
+    "text": "format(::JsonFormatter, ::Record) -> String\n\nConverts :date, :lookup and :stacktrace to strings and dicts respectively and call JSON.json() on the resulting dictionary.\n\n\n\n"
 },
 
 {
@@ -517,7 +541,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultRecord",
     "category": "Type",
-    "text": "DefaultRecord wraps a Dict{Symbol, Any} which stores basic logging event information.\n\nInfo:\n\ndate: timestamp of log event level: log level levelnum: integer value for log level msg: the log message itself name: the name of the source logger pid: the pid of where the log event occured lookup: the top StackFrame stacktrace: a stacktrace\n\n\n\n"
+    "text": "DefaultRecord\n\nStores the most common logging event information. NOTE: if you'd like more logging attributes you can:\n\nYou can add them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nYou can make a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{Symbol}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.DefaultRecord-Tuple{Dict{Symbol,Any}}",
+    "page": "Public",
+    "title": "Memento.DefaultRecord",
+    "category": "Method",
+    "text": "DefaultRecord(args::Dict{Symbol, Any})\n\nTakes a dict of initial log record arguments and creates the DefaultRecord.\n\nArguments\n\nargs::Dict{Symbol, Any}: takes a dict containing the log :level, :levelnum, :name and :msg\n\n\n\n"
 },
 
 {
@@ -525,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Record",
     "category": "Type",
-    "text": "Records are used to store information about a log event including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\n\n\n"
+    "text": "Record\n\nAre an Attribute container used to store information about a log events including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\nNOTE: you should access Attributes in a Record by using getindex (ie: record[:msg]) as this will correctly extract the value from the Attribute container.\n\n\n\n"
 },
 
 {
@@ -541,7 +573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.FileRoller",
     "category": "Type",
-    "text": "A FileRoller is responsible for managing a rolling log file.\n\nFields:\n\nprefix: filename prefix for the log.\nfolder: directory where the log should be written.\nfile: the current file IO handle\nbyteswritten: keeps track of how many bytes have been written to the current file.\nmax_sz: the maximum number of bytes written to a file before rolling over to another.\n\n\n\n"
+    "text": "FileRoller <: IO\n\nIs responsible for managing a rolling log file.\n\nFields\n\nprefix::AbstractString: filename prefix for the log.\nfolder::AbstractString: directory where the log should be written.\nfile::AbstractString: the current file IO handle\nbyteswritten::Int64: keeps track of how many bytes have been written to the current file.\nmax_sz::Int: the maximum number of bytes written to a file before rolling over to another.\n\n\n\n"
 },
 
 {
@@ -549,7 +581,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.FileRoller",
     "category": "Method",
-    "text": "FileRoller(prefix, dir; max_size=DEFAULT_MAX_FILE_SIZE) creates a rolling log file in the specified directory with the given prefix.\n\n\n\n"
+    "text": "FileRoller(prefix, dir; max_size=DEFAULT_MAX_FILE_SIZE)\n\nCreates a rolling log file in the specified directory with the given prefix.\n\n\n\n"
 },
 
 {
@@ -557,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.FileRoller",
     "category": "Method",
-    "text": "FileRoller(prefix; max_size=DEFAULT_MAX_FILE_SIZE) creates a rolling log file in the current working directory with the specified prefix.\n\n\n\n"
+    "text": "FileRoller(prefix; max_size=DEFAULT_MAX_FILE_SIZE)\n\nCreates a rolling log file in the current working directory with the specified prefix.\n\n\n\n"
 },
 
 {
@@ -565,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Syslog",
     "category": "Type",
-    "text": "Syslog handle writing message to syslog by shelling out to the logger command.\n\nFields:\n\nfacility: The syslog facility to write to (e.g., :local0, :ft, :daemon, etc) (defaults to :local0)\ntag: a tag to use for all message (defaults to \"julia\")\npid: tags julia's pid to messages (defaults to -1 which doesn't include the pid)\n\n\n\n"
+    "text": "Syslog <: IO\n\nSyslog handle writing message to syslog by shelling out to the logger command.\n\nFields\n\nfacility::Symbol: The syslog facility to write to (e.g., :local0, :ft, :daemon, etc) (defaults to :local0)\ntag::AbstractString: a tag to use for all message (defaults to \"julia\")\npid::Integer: tags julia's pid to messages (defaults to -1 which doesn't include the pid)\n\n\n\n"
 },
 
 {
@@ -597,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.show",
     "category": "Method",
-    "text": "Base.show(::IO, ::Logger) just prints Logger(logger.name) \n\n\n\n"
+    "text": "Base.show(::IO, ::Logger)\n\nJust prints Logger(logger.name)\n\n\n\n"
 },
 
 {
@@ -605,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.get_parent",
     "category": "Method",
-    "text": "get_parent(::AbstractString) takes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArgs:\n\nname: the name of the logger.\n\nReturns the parent logger.\n\n\n\n"
+    "text": "get_parent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
 },
 
 {
@@ -613,7 +645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.reset!",
     "category": "Method",
-    "text": "reset! removes all registered loggers and reinitializes the root logger without any handlers.\n\n\n\n"
+    "text": "reset!()\n\nRemoves all registered loggers and reinitializes the root logger without any handlers.\n\n\n\n"
 },
 
 {
@@ -625,11 +657,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/private.html#Memento.filters-Tuple{Memento.DefaultHandler}",
+    "page": "Private",
+    "title": "Memento.filters",
+    "category": "Method",
+    "text": "filters(handler::DefaultHandler) -> Array{Filter}\n\nReturns the filters for the handler.\n\n\n\n"
+},
+
+{
     "location": "api/private.html#Memento.setup_opts-Tuple{Any}",
     "page": "Private",
     "title": "Memento.setup_opts",
     "category": "Method",
-    "text": "setup_opts(opts) sets the default :colors if opts[:is_colorized] == true\n\n\n\n"
+    "text": "setup_opts(opts) -> Dict\n\nSets the default :colors if opts[:is_colorized] == true.\n\n\n\n"
 },
 
 {
@@ -649,27 +689,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/private.html#Base.getindex-Tuple{Memento.Record,Any}",
+    "location": "api/private.html#Base.Dict-Tuple{Memento.Record}",
     "page": "Private",
-    "title": "Base.getindex",
+    "title": "Base.Dict",
     "category": "Method",
-    "text": "getindex(::Record, key) returns the item from the inner dict\n\n\n\n"
+    "text": "Dict(rec::Record)\n\nExtracts the Record and its Attributes into a Dict NOTE: This may be an expensive operations, so you probably don't want to do this for every log record unless you're planning on using every Attribute.\n\n\n\n"
 },
 
 {
-    "location": "api/private.html#Base.keys-Tuple{Memento.Record}",
+    "location": "api/private.html#Memento.Attribute",
     "page": "Private",
-    "title": "Base.keys",
-    "category": "Method",
-    "text": "keys(::Record) returns all keys in the inner dict\n\n\n\n"
+    "title": "Memento.Attribute",
+    "category": "Type",
+    "text": "Attribute\n\nAn Attribute represents a lazily evaluated field in a log Record.\n\nFields\n\nf::Function: A function to evaluate in order to get a value if one is not set.\nx::Nullable: A value that may or may not exist yet.\n\n\n\n"
 },
 
 {
-    "location": "api/private.html#Memento.getdict-Tuple{Memento.Record}",
+    "location": "api/private.html#Memento.Attribute-Tuple{Any}",
     "page": "Private",
-    "title": "Memento.getdict",
+    "title": "Memento.Attribute",
     "category": "Method",
-    "text": "getdict(::Record) returns the inner dict of the record \n\n\n\n"
+    "text": "Attribute(x)\n\nSimply wraps the value x in a Nullable and sticks that in an Attribute with an empty Function.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.Attribute-Tuple{Type,Function}",
+    "page": "Private",
+    "title": "Memento.Attribute",
+    "category": "Method",
+    "text": "Attribute(T::Type, f::Function)\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.get-Tuple{Memento.Attribute}",
+    "page": "Private",
+    "title": "Base.get",
+    "category": "Method",
+    "text": "get(attr::Attribute{T}) -> T\n\nRun set attr.x to the output of attr.f if attr.x is not already set. We then return the value stored in attr.x\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.in-Tuple{StackFrame,Module}",
+    "page": "Private",
+    "title": "Base.in",
+    "category": "Method",
+    "text": "Base.in(frame::StackFrame, filter_mod::Module) -> Bool\n\nReturns whether the frame is from the provided Module\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.get_lookup-Tuple{Memento.Attribute{Array{StackFrame,1}}}",
+    "page": "Private",
+    "title": "Memento.get_lookup",
+    "category": "Method",
+    "text": "get_lookup(trace::Attribute{StackTrace})\n\nReturns the top StackFrame for trace if it isn't empty.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.get_msg-Tuple{Any}",
+    "page": "Private",
+    "title": "Memento.get_msg",
+    "category": "Method",
+    "text": "get_msg(msg) -> Function\n\nWraps msg in a function if it is a String.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.get_trace-Tuple{}",
+    "page": "Private",
+    "title": "Memento.get_trace",
+    "category": "Method",
+    "text": "get_trace()\n\nReturns the StackTrace with StackFrames from the Memento module filtered out.\n\n\n\n"
 },
 
 {
@@ -685,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.flush",
     "category": "Method",
-    "text": "flush(::FileRoller) flushes the current open file.\n\n\n\n"
+    "text": "flush(::FileRoller)\n\nFlushes the current open file.\n\n\n\n"
 },
 
 {
@@ -693,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.flush",
     "category": "Method",
-    "text": "flush(::Syslog) is defined just in case somebody decides to call flush, which is unnecessary.\n\n\n\n"
+    "text": "flush(::Syslog)\n\nIs defined just in case somebody decides to call flush, which is unnecessary.\n\n\n\n"
 },
 
 {
@@ -701,7 +789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.println",
     "category": "Method",
-    "text": "println(::FileRoller, ::AbstractString) writes the string to a file and creates a new file if we've reached the max file size.\n\n\n\n"
+    "text": "println(::FileRoller, ::AbstractString)\n\nWrites the string to a file and creates a new file if we've reached the max file size.\n\n\n\n"
 },
 
 {
@@ -709,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.println",
     "category": "Method",
-    "text": "println(::Syslog, ::AbstractString, ::AbstractString) converts the first AbstractString to a Symbol and call println(::Syslog, ::Symbol, ::AbstractString)\n\n\n\n"
+    "text": "println(::Syslog, ::AbstractString, ::AbstractString)\n\nConverts the first AbstractString to a Symbol and call println(::Syslog, ::Symbol, ::AbstractString)\n\n\n\n"
 },
 
 {
@@ -717,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.println",
     "category": "Method",
-    "text": "println(::Syslog, ::Symbol, ::AbstractString) writes the AbstractString to logger with the Symbol representing the syslog level.\n\n\n\n"
+    "text": "println(::Syslog, ::Symbol, ::AbstractString)\n\nWrites the AbstractString to logger with the Symbol representing the syslog level.\n\n\n\n"
 },
 
 {
@@ -725,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.getfile",
     "category": "Method",
-    "text": "getfile(folder::AbstractString, prefix::AbstractString) grabs the next log file.\n\n\n\n"
+    "text": "getfile(folder::AbstractString, prefix::AbstractString) -> String, IO\n\nGrabs the next log file.\n\n\n\n"
 },
 
 {
@@ -733,7 +821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.getsuffix",
     "category": "Method",
-    "text": "getsuffix(::Integer) formats the nth file suffix.\n\n\n\n"
+    "text": "getsuffix(::Integer) -> String\n\nFormats the nth file suffix.\n\n\n\n"
 },
 
 {
