@@ -13,5 +13,5 @@ elif [[ "$TEST_TYPE" == "bench" ]]; then
     export MEMENTO_BENCHMARK="true"
     export MEMENTO_CURR_COMMIT="HEAD"
     export MEMENTO_BASE_COMMIT="origin/master"
-    julia -e 'Pkg.test("Memento"; coverage)'
+    julia -e 'Pkg.test("Memento"; coverage=true)'
 fi
