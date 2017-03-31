@@ -4,15 +4,36 @@ os:
   - osx
 julia:
   - 0.5
-  # - nightly # Mocking is currently broken due to PR #17057 in Base (fix is on the way)
+  - nightly
+env:
+  - TEST_TYPE=parallel
+  - TEST_TYPE=io
+  - TEST_TYPE=bench
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: TEST_TYPE=bench
+    - julia: nightly
 notifications:
   email: false
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("Memento")'
   # Run parallel tests
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("Memento"); Pkg.test("Memento")';
+  - if [[ "$TEST_TYPE" == "parallel" ]]; then
+    julia -e 'Pkg.test("Memento"; coverage=true)';
+    fi
   # Run io tests (with mocking) and coverage
-  - julia --compilecache=no -e 'Pkg.test("Memento"; coverage=true)';
+  - if [[ "$TEST_TYPE" == "io" ]]; then
+    julia --compilecache=no -e 'Pkg.test("Memento"; coverage=true)';
+    fi
+  # Run benchmark tests
+  - if [[ "$TEST_TYPE" == "bench"]]; then
+    export MEMENTO_BENCHMARK="true"
+    export MEMENTO_CURR_COMMIT="HEAD"
+    export MEMENTO_BASE_COMMIT="origin/master"
+    julia -e 'Pkg.test("Memento"; coverage)';
+    fi
 after_success:
   - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
   - julia -e 'cd(Pkg.dir("Memento")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
