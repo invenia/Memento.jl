@@ -2,13 +2,13 @@
 
 ## Logging levels
 
-You can globally set the minimum logging level with `basic_config`.
+You can globally set the minimum logging level with `Memento.config`.
 ```julia
-julia>basic_config("debug")
+julia>Memento.config("debug")
 ```
 Will log all messages for all loggers at or above "debug".
 ```julia
-julia>basic_config("warn")
+julia>Memento.config("warn")
 ```
 Will only log message at or above the "warn" level.
 
@@ -51,9 +51,9 @@ warn: my warning message.
 ...
 ```
 
-The simplest way to globally change the log format is with `basic_config`
+The simplest way to globally change the log format is with `Memento.config`
 ```julia
-julia> basic_config("debug"; fmt="[{level} | {name}]: {msg}")
+julia> Memento.config("debug"; fmt="[{level} | {name}]: {msg}")
 ```
 
 The following fields are available via the `DefaultRecord`.

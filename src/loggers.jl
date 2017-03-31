@@ -94,7 +94,7 @@ Returns true or false as to whether the logger is set. (ie: logger.level != "not
 is_set(logger::Logger) = logger.level != "not_set"
 
 """
-    basic_config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
+    config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
 
 Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
 that prints to STDOUT.
@@ -109,7 +109,7 @@ that prints to STDOUT.
 # Returns
 * `Logger`: the root logger.
 """
-function basic_config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
+function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
     global _log_levels = levels
     _loggers["root"] = Logger("root"; level=level, levels=levels)
     add_handler(
