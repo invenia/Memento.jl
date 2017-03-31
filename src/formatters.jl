@@ -1,6 +1,8 @@
 using JSON
 
 """
+    Formatter
+
 A `Formatter` must implement a `format(::Formatter, ::Record)` method
 which takes a `Record` and returns a `String` representation of the
 log `Record`.
@@ -10,6 +12,8 @@ abstract Formatter
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
 
 """
+    DefaultFormatter
+
 The `DefaultFormatter` uses a simple format string to build
 the log message. Fields from the `Record` to be used should be
 wrapped curly brackets.
@@ -21,75 +25,116 @@ Ex) "[{level} | {name}]: {msg}" will print message of the form
 """
 immutable DefaultFormatter <: Formatter
     fmt_str::AbstractString
+    tokens::Vector{Pair{Symbol, Bool}}
 
     function DefaultFormatter(fmt_str::AbstractString=DEFAULT_FMT_STRING)
-        new(fmt_str)
+        #r"(?<={).+?(?=})
+        tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
+            #println(dump(m))
+            if m.captures[1] != nothing
+                return Symbol(strip(m.match, ('{', '}'))) => true
+            else
+                return Symbol(m.match) => false
+            end
+        end
+
+        new(fmt_str, tokens)
     end
 end
 
 """
-`format(::DefaultFormatter, ::Record)` iteratively replaces entries in the
+    format(::DefaultFormatter, ::Record) -> String
+
+Iteratively replaces entries in the
 format string with the appropriate fields in the `Record`
 """
 function format(fmt::DefaultFormatter, rec::Record)
-    rec_dict = copy(getdict(rec))
     result = fmt.fmt_str
 
-    for field in keys(rec)
-        if field === :lookup
-            # lookup is a StackFrame
-            name, file, line = rec_dict[field].func, rec_dict[field].file, rec_dict[field].line
-            rec_dict[field] = "$(name)@$(basename(string(file))):$(line)"
-        elseif field === :stacktrace
-            # stacktrace is a vector of StackFrames
-            rec_dict[field] = string(" stack:[",
-                join(
-                    map(f->"$(f.func)@$(basename(string(f.file))):$(f.line)", rec_dict[field]), ", "
-                ), "]"
-            )
+    parts = map(fmt.tokens) do token
+        content = token.first
+        value = content
+
+        if token.second
+            tmp_val = rec[content]
+
+            value = if content === :lookup
+                # lookup is a StackFrame
+                name, file, line = tmp_val.func, tmp_val.file, tmp_val.line
+                "$(name)@$(basename(string(file))):$(line)"
+            elseif content === :stacktrace
+                # stacktrace is a vector of StackFrames
+                str_frames = map(tmp_val) do frame
+                    string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
+                end
+
+                string(" stack:[", join(str_frames, ", "), "]")
+            else
+                tmp_val
+            end
         end
 
-        result = replace(result, "{$field}", rec_dict[field])
+        return value
     end
 
-    return result
+    return string(parts...)
 end
 
 """
-`JsonFormatter` uses the JSON pkg to format the `Record` into a valid
+    JsonFormatter
+
+Uses the JSON pkg to format the `Record` into a valid
 JSON string.
 """
-type JsonFormatter <: Formatter end
+type JsonFormatter <: Formatter
+    aliases::Nullable{Dict{Symbol, Symbol}}
+
+    JsonFormatter() = new(Nullable())
+    JsonFormatter(aliases::Dict{Symbol, Symbol}) = new(Nullable(aliases))
+end
 
 """
-`format(::JsonFormatter, ::Record)` converts :date, :lookup and :stacktrace to strings
-and dicts respectively and call `JSON.json()` on the resulting dictionary. 
+    format(::JsonFormatter, ::Record) -> String
+
+Converts :date, :lookup and :stacktrace to strings
+and dicts respectively and call `JSON.json()` on the resulting dictionary.
 """
 function format(fmt::JsonFormatter, rec::Record)
-    rec_dict = copy(getdict(rec))
-
-    if haskey(rec_dict, :date)
-        rec_dict[:date] = string(rec_dict[:date])
+    aliases = if isnull(fmt.aliases)
+        names = fieldnames(rec)
+        Dict(zip(names, names))
+    else
+        get(fmt.aliases)
     end
 
-    if haskey(rec_dict, :lookup)
-        rec_dict[:lookup] = Dict(
-            :name => rec_dict[:lookup].func,
-            :file => basename(string(rec_dict[:lookup].file)),
-            :line => rec_dict[:lookup].line
-        )
+    dict = Dict{Symbol, Any}()
+
+    for (alias, key) in aliases
+        tmp_val = rec[key]
+
+        value = if key === :date
+            string(tmp_val)
+        elseif key === :lookup
+            Dict(
+                :name => tmp_val.func,
+                :file => basename(string(tmp_val.file)),
+                :line => tmp_val.line
+            )
+        elseif key === :stacktrace
+            map(
+                frame -> Dict(
+                    :name => frame.func,
+                    :file => basename(string(frame.file)),
+                    :line => frame.line
+                ),
+                tmp_val
+            )
+        else
+            tmp_val
+        end
+
+        dict[alias] = value
     end
 
-    if haskey(rec_dict, :stacktrace)
-        rec_dict[:stacktrace] = map(
-            f -> Dict(
-                :name => f.func,
-                :file => basename(string(f.file)),
-                :line => f.line
-            ),
-            rec_dict[:stacktrace]
-        )
-    end
-
-    return json(rec_dict)
+    return json(dict)
 end

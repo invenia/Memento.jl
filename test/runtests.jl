@@ -8,7 +8,6 @@ files = [
 ]
 
 opts = Base.JLOptions()
-
 if isdefined(opts, :use_compilecache) && Bool(opts.use_compilecache)
     info("test/io.jl not included as they require mocking which requires that compilecache is disabled.")
     info("To include test/io.jl tests run with `--compilecache=no`")
@@ -21,12 +20,14 @@ else
     push!(files, "io.jl")
 end
 
+if haskey(ENV, "MEMENTO_BENCHMARK")
+    files = ["benchmarks.jl"]
+end
 
 using Memento
 using JSON
 
 cd(dirname(@__FILE__))
-
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
@@ -65,7 +66,9 @@ cd(dirname(@__FILE__))
 
             msg = "This should propagate to the root logger."
             warn(baz, msg)
-            @test contains(takebuf_string(io), "Foo.Bar.Baz - warn: $msg")
+            result = takebuf_string(io)
+            expected = "Foo.Bar.Baz - warn: $msg"
+            @test contains(result, expected)
 
             set_level(baz, "debug")
             add_handler(

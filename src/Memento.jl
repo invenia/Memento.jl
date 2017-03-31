@@ -11,8 +11,8 @@ if !isdefined(Base, :StackTraces)
 end
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
-       is_set, is_root, set_level, add_level, set_record,
-       add_handler, remove_handler, remove_handlers,
+       is_set, is_root, set_level, add_level, set_record, add_filter,
+       add_handler, remove_handler, remove_handlers, emit,
        basic_config, get_logger, get_handlers, format,
 
        Logger,
@@ -24,7 +24,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
 
 const DEFAULT_LOG_LEVEL = "warn"
 
-global _log_levels = Dict{AbstractString, Int}(
+const global _log_levels = Dict{AbstractString, Int}(
     "not_set" => 0,
     "debug" => 10,
     "info" => 20,
@@ -40,12 +40,13 @@ global _loggers
 
 include("io.jl")
 include("records.jl")
+include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
 
 function __init__()
-    global _loggers = Dict{Any, Logger}(
+    global _loggers = Dict{AbstractString, Logger}(
         "root" => Logger("root"),
     )
 end

@@ -3,16 +3,17 @@ import Base.println, Base.flush
 const DEFAULT_MAX_FILE_SIZE = 5000 * 1028
 
 """
-A `FileRoller` is responsible for managing a rolling
+    FileRoller <: IO
+
+Is responsible for managing a rolling
 log file.
 
-Fields:
-
-- `prefix`: filename prefix for the log.
-- `folder`: directory where the log should be written.
-- `file`: the current file IO handle
-- `byteswritten`: keeps track of how many bytes have been written to the current file.
-- `max_sz`: the maximum number of bytes written to a file before rolling over to another.
+# Fields
+* `prefix::AbstractString`: filename prefix for the log.
+* `folder::AbstractString`: directory where the log should be written.
+* `file::AbstractString`: the current file IO handle
+* `byteswritten::Int64`: keeps track of how many bytes have been written to the current file.
+* `max_sz::Int`: the maximum number of bytes written to a file before rolling over to another.
 """
 type FileRoller <: IO
     prefix::AbstractString
@@ -24,7 +25,9 @@ type FileRoller <: IO
 end
 
 """
-`getsuffix(::Integer)` formats the nth file suffix.
+    getsuffix(::Integer) -> String
+
+Formats the nth file suffix.
 """
 function getsuffix(n::Integer)
     str = string(n)
@@ -35,8 +38,9 @@ function getsuffix(n::Integer)
 end
 
 """
-`getfile(folder::AbstractString, prefix::AbstractString)`
-grabs the next log file.
+    getfile(folder::AbstractString, prefix::AbstractString) -> String, IO
+
+Grabs the next log file.
 """
 function getfile(folder::AbstractString, prefix::AbstractString)
     i = 1
@@ -50,22 +54,27 @@ function getfile(folder::AbstractString, prefix::AbstractString)
 end
 
 """
-`FileRoller(prefix; max_size=DEFAULT_MAX_FILE_SIZE)` creates a rolling log file in the
-current working directory with the specified prefix.
+    FileRoller(prefix; max_size=DEFAULT_MAX_FILE_SIZE)
+
+Creates a rolling log file in the current working directory
+with the specified prefix.
 """
 FileRoller(prefix; max_sz=DEFAULT_MAX_FILE_SIZE) = FileRoller(prefix, pwd(); max_sz=max_sz)
 
 """
-`FileRoller(prefix, dir; max_size=DEFAULT_MAX_FILE_SIZE)` creates a rolling log file in the
-specified directory with the given prefix.
+    FileRoller(prefix, dir; max_size=DEFAULT_MAX_FILE_SIZE)
+
+Creates a rolling log file in the specified directory with the given prefix.
 """
 function FileRoller(prefix, dir; max_sz=DEFAULT_MAX_FILE_SIZE)
     FileRoller(prefix, dir, (getfile(dir, prefix))..., 0, max_sz)
 end
 
 """
-`println(::FileRoller, ::AbstractString)` writes the string to a file
-and creates a new file if we've reached the max file size.
+    println(::FileRoller, ::AbstractString)
+
+Writes the string to a file and creates a new file if
+we've reached the max file size.
 """
 function println(f::FileRoller, s::AbstractString)
     if f.byteswritten > f.max_sz
@@ -78,7 +87,9 @@ function println(f::FileRoller, s::AbstractString)
 end
 
 """
-`flush(::FileRoller)` flushes the current open file.
+    flush(::FileRoller)
+
+Flushes the current open file.
 """
 flush(f::FileRoller) = flush(f.file)
 
@@ -93,14 +104,15 @@ FACILITIES = [
 ]
 
 """
+    Syslog <: IO
+
 `Syslog` handle writing message to `syslog` by shelling out to the
 `logger` command.
 
-Fields:
-
-- `facility`: The syslog facility to write to (e.g., :local0, :ft, :daemon, etc) (defaults to :local0)
-- `tag`: a tag to use for all message (defaults to "julia")
-- `pid`: tags julia's pid to messages (defaults to -1 which doesn't include the pid)
+# Fields
+* `facility::Symbol`: The syslog facility to write to (e.g., :local0, :ft, :daemon, etc) (defaults to :local0)
+* `tag::AbstractString`: a tag to use for all message (defaults to "julia")
+* `pid::Integer`: tags julia's pid to messages (defaults to -1 which doesn't include the pid)
 """
 type Syslog <: IO
     facility::Symbol
@@ -126,8 +138,10 @@ type Syslog <: IO
 end
 
 """
-`println(::Syslog, ::Symbol, ::AbstractString)` writes the AbstractString
-to `logger` with the Symbol representing the syslog level.
+    println(::Syslog, ::Symbol, ::AbstractString)
+
+Writes the AbstractString to `logger` with the Symbol
+representing the syslog level.
 """
 function println(log::Syslog, level::Symbol, msg::AbstractString)
     level = get(ALIAS_LEVELS, level, level)
@@ -142,15 +156,18 @@ function println(log::Syslog, level::Symbol, msg::AbstractString)
 end
 
 """
-`println(::Syslog, ::AbstractString, ::AbstractString)` converts the first
-AbstractString to a Symbol and call `println(::Syslog, ::Symbol, ::AbstractString)`
+    println(::Syslog, ::AbstractString, ::AbstractString)
+
+Converts the first AbstractString to a Symbol and call
+`println(::Syslog, ::Symbol, ::AbstractString)`
 """
 function println(log::Syslog, level::AbstractString, msg::AbstractString)
     println(log, Symbol(lowercase(level)), msg)
 end
 
 """
-`flush(::Syslog)` is defined just in case somebody decides
-to call flush, which is unnecessary.
+    flush(::Syslog)
+
+Is defined just in case somebody decides to call flush, which is unnecessary.
 """
 flush(log::Syslog) = log
