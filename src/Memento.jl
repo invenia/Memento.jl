@@ -13,7 +13,7 @@ end
 export log, debug, info, notice, warn, error, critical, alert, emergency,
        is_set, is_root, set_level, add_level, set_record, add_filter,
        add_handler, remove_handler, remove_handlers, emit,
-       basic_config, get_logger, get_handlers, format,
+       get_logger, get_handlers, format,
 
        Logger,
        Record, DefaultRecord,

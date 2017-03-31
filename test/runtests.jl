@@ -31,7 +31,7 @@ cd(dirname(@__FILE__))
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
-        basic_config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
+        Memento.config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
         logger1 = get_logger(current_module())
         debug(logger1, "Something that won't get logged.")
         info(logger1, "Something you might want to know.")

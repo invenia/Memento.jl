@@ -55,7 +55,7 @@ using Memento
 using Requests  # For send logs to our fake logging REST service
 
 # Start by setting up our basic console logging for the root logger.
-logger = basic_config("info"; fmt="[{level} | {name}]: {msg}")
+logger = Memento.config("info"; fmt="[{level} | {name}]: {msg}")
 
 # We create our custom EC2Record type
 type EC2Record <: Record

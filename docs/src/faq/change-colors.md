@@ -40,7 +40,7 @@ add_handler(logger, DefaultHandler(
     "console"
 )
 ```
-You can also globally disable colorization when running `basic_config`
+You can also globally disable colorization when running `Memento.config`
 ```julia
-julia> basic_config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
+julia> Memento.config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
 ```
