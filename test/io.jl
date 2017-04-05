@@ -76,7 +76,7 @@ using Base.Test
                                     `logger -t julia -p local0.$(sys_level) "$(level): Message"`
                                 )
                             else
-                                @test_throws ErrorException log(logger, "invalid", "Message")
+                                @test_throws CompositeException log(logger, "invalid", "Message")
                             end
                         end
                     end
