@@ -2,12 +2,13 @@ using Documenter
 using Memento
 
 makedocs(
-    modules = [Memento],
-    clean = false,
-    format = :html,
-    sitename = "Memento.jl",
-    authors = "Rory Finnegan and contributors.",
-    pages = Any[
+    modules=[Memento],
+    format=:html,
+    repo="https://github.com/invenia/Trace.jl/blob/{commit}{path}#L{line}",
+    sitename="Memento.jl",
+    authors="Invenia Technical Computing Corporation and contributors.",
+    assets = ["assets/invenia.css"],
+    pages=Any[
         "Home" => "index.md",
         "Manual" => Any[
             "man/intro.md",
@@ -27,7 +28,7 @@ makedocs(
             "api/private.md",
         ],
         "Contributing" => "contributing.md",
-    ]
+    ],
 )
 
 deploydocs(

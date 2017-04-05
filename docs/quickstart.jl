@@ -13,6 +13,6 @@ alert(logger, "Alert the sysadmin if they're still sleeping.")
 emergency(logger, "The world has exploded and you probably brought down the server.")
 child_logger = get_logger("Foo.bar")
 set_level(child_logger, "warn")
-add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")))
+add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")));
 debug(child_logger, "Something that should only be printed to STDOUT on the root_logger.")
 warn(child_logger, "Warning to STDOUT and the log file.")
