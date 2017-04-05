@@ -266,26 +266,23 @@ and `args[:level]` is above the priority of `logger.level`.
 If this logger is not the root logger and `logger.propagate` is `true` then the
 parent logger is called.
 
+NOTE: This method calls all handlers asynchronously and is recursive, so you should call this
+method with a `@sync` in order to synchronize all handler tasks.
+
 # Arguments
 * `logger::Logger`: the logger to log `args` to.
 * `args::Dict`: a dict of msg fields and values that should be passed to `logger.record`.
 """
-function log(logger::Logger, args::Dict{Symbol, Any})
-    level = args[:level]
-    llevel = logger.level
-    levels = logger.levels
-
-    rec = logger.record(args)
-
+function log(logger::Logger, rec::Record)
     # If none of the `Filter`s return false we're good to log our record.
     if all(f -> f(rec), logger.filters)
         for (name, handler) in logger.handlers
-            log(handler, logger.record(args))
+            @async log(handler, rec)
         end
     end
 
     if !is_root(logger) && logger.propagate
-        log(get_parent(logger.name), args)
+        log(get_parent(logger.name), rec)
     end
 end
 
@@ -300,16 +297,14 @@ with the created `Dict`).
 * `logger::Logger`: the logger to log to.
 * `level::AbstractString`: the log level as a `String`
 * `msg::AbstractString`: the msg to log as a `String`
+
+# Throws
+* `CompositeException`: may be thrown if an error occurs in one of the handlers
+   (which are run with `@async`)
 """
 function log(logger::Logger, level::AbstractString, msg::AbstractString)
-    dict = Dict{Symbol, Any}(
-        :name => logger.name,
-        :level => level,
-        :levelnum => logger.levels[level],
-        :msg => msg
-    )
-
-    log(logger, dict)
+    rec = logger.record(logger.name, level, logger.levels[level], msg)
+    @sync log(logger, rec)
 end
 
 """
@@ -322,16 +317,14 @@ be a function that returns the log message string.
 * `msg::Function`: a function that returns a message `String`
 * `logger::Logger`: the logger to log to.
 * `level::AbstractString`: the log level as a `String`
+
+# Throws
+* `CompositeException`: may be thrown if an error occurs in one of the handlers
+   (which are run with `@async`)
 """
 function log(msg::Function, logger::Logger, level::AbstractString)
-    dict = Dict{Symbol, Any}(
-        :name => logger.name,
-        :level => level,
-        :levelnum => logger.levels[level],
-        :msg => msg
-    )
-
-    log(logger, dict)
+    rec = logger.record(logger.name, level, logger.levels[level], msg)
+    @sync log(logger, rec)
 end
 
 #=

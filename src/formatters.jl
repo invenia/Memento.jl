@@ -58,19 +58,24 @@ function format(fmt::DefaultFormatter, rec::Record)
         if token.second
             tmp_val = rec[content]
 
-            value = if content === :lookup
-                # lookup is a StackFrame
-                name, file, line = tmp_val.func, tmp_val.file, tmp_val.line
-                "$(name)@$(basename(string(file))):$(line)"
+            if content === :lookup
+                name, file, line = if isa(tmp_val, StackFrame)
+                    # lookup is a StackFrame
+                    tmp_val.func, tmp_val.file, tmp_val.line
+                else
+                    "<nothing>", "", -1
+                end
+
+                value = "$(name)@$(basename(string(file))):$(line)"
             elseif content === :stacktrace
                 # stacktrace is a vector of StackFrames
                 str_frames = map(tmp_val) do frame
                     string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
                 end
 
-                string(" stack:[", join(str_frames, ", "), "]")
+                value = string(" stack:[", join(str_frames, ", "), "]")
             else
-                tmp_val
+                value = tmp_val
             end
         end
 
@@ -112,16 +117,24 @@ function format(fmt::JsonFormatter, rec::Record)
     for (alias, key) in aliases
         tmp_val = rec[key]
 
-        value = if key === :date
-            string(tmp_val)
+        if key === :date
+            value = string(tmp_val)
         elseif key === :lookup
-            Dict(
-                :name => tmp_val.func,
-                :file => basename(string(tmp_val.file)),
-                :line => tmp_val.line
-            )
+            value = if isa(tmp_val, StackFrame)
+                Dict(
+                    :name => tmp_val.func,
+                    :file => basename(string(tmp_val.file)),
+                    :line => tmp_val.line
+                )
+            else
+                Dict(
+                    :name => "<nothing>",
+                    :file => "",
+                    :line => -1
+                )
+            end
         elseif key === :stacktrace
-            map(
+            value = map(
                 frame -> Dict(
                     :name => frame.func,
                     :file => basename(string(frame.file)),
@@ -130,7 +143,7 @@ function format(fmt::JsonFormatter, rec::Record)
                 tmp_val
             )
         else
-            tmp_val
+            value = tmp_val
         end
 
         dict[alias] = value
