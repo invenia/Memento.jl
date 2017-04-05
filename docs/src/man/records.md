@@ -22,16 +22,16 @@ type EC2Record <: Record
     public_ip::Attribute
     iam_user::Attribute
 
-    function EC2Record(args::Dict)
+    function EC2Record(name::AbstractString, level::AbstractString, msg)
         time = now()
         trace = Attribute(StackTrace, get_trace)
 
         EC2Record(
             Attribute(DateTime, () -> round(time, Base.Dates.Second)),
-            Attribute(args[:level]),
-            Attribute(args[:levelnum]),
-            Attribute(AbstractString, get_msg(args[:msg])),
-            Attribute(args[:name]),
+            Attribute(level),
+            Attribute(-1),
+            Attribute(AbstractString, get_msg(msg)),
+            Attribute(name),
             Attribute(myid()),
             Attribute(StackFrame, get_lookup(trace)),
             trace,

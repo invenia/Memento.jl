@@ -75,8 +75,8 @@ end
 Stores the most common logging event information.
 NOTE: if you'd like more logging attributes you can:
 
-1. You can add them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.
-2. You can make a custom `Record` type.
+1. add them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.
+2. make a custom `Record` type.
 
 # Fields
 * `date::Attribute{DateTime}`: timestamp of log event
@@ -100,25 +100,27 @@ immutable DefaultRecord <: Record
 end
 
 """
-    DefaultRecord(args::Dict{Symbol, Any})
+    DefaultRecord(name::AbstractString, level::AbstractString, msg::AbstractString)
 
-Takes a dict of initial log record arguments and creates the `DefaultRecord`.
+Takes a few initial log record arguments and creates a `DefaultRecord`.
 
 # Arguments
-* `args::Dict{Symbol, Any}`: takes a dict containing the log :level, :levelnum, :name and :msg
+* `name::AbstractString`: the name of the source logger.
+* `level::AbstractString`: the log level.
+* `msg::AbstractString`: the message being logged.
 """
-function DefaultRecord(args::Dict{Symbol, Any})
+function DefaultRecord(name::AbstractString, level::AbstractString, msg)
     time = now()
     trace = Attribute(StackTrace, get_trace)
 
     DefaultRecord(
         Attribute(DateTime, () -> round(time, Base.Dates.Second)),
-        Attribute(args[:level]),
-        Attribute(args[:levelnum]),
-        Attribute(AbstractString, get_msg(args[:msg])),
-        Attribute(args[:name]),
+        Attribute(level),
+        Attribute(-1),
+        Attribute(AbstractString, get_msg(msg)),
+        Attribute(name),
         Attribute(myid()),
-        Attribute(StackFrame, get_lookup(trace)),
+        Attribute(Union{StackFrame, Void}, get_lookup(trace)),
         trace,
     )
 end

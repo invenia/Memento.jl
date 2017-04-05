@@ -1,12 +1,8 @@
 import Memento: Attribute
 
 @testset "Formatters" begin
-    rec = DefaultRecord(Dict{Symbol, Any}(
-        :name => "Logger.example",
-        :level => :info,
-        :levelnum => 20,
-        :msg => "blah",
-    ))
+    rec = DefaultRecord("Logger.example", "info", "blah")
+
     @testset "DefaultFormatter" begin
         fmt = DefaultFormatter("{lookup}|{msg}|{stacktrace}")
         result = format(fmt, rec)

@@ -1,11 +1,6 @@
 @testset "Records" begin
     @testset "DefaultRecord" begin
-        rec = DefaultRecord(Dict{Symbol, Any}(
-            :name => "Logger.example",
-            :level => :info,
-            :levelnum => 20,
-            :msg => "blah",
-        ))
+        rec = DefaultRecord("Logger.example", "info", "blah")
 
         @test rec[:date] == get(rec.date)
         @test get(rec.date) == get(rec.date.x)
