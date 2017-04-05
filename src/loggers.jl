@@ -66,18 +66,7 @@ end
 function Memento.Filter(l::Logger)
     function level_filter(rec::Record)
         level = rec[:level]
-
-        # NOTE: This is kind of a hack, but the logger can set the
-        # record.levelnum value if it is not set yet.
-        if haskey(l.levels, level)
-            if isnull(rec.levelnum) || get(rec.levelnum) < 0
-                rec.levelnum.x = Nullable(l.levels[level])
-            end
-
-            return l.levels[level] >= l.levels[l.level]
-        else
-            return false
-        end
+        return l.levels[level] >= l.levels[l.level]
     end
 
     Memento.Filter(level_filter)
@@ -314,7 +303,7 @@ with the created `Dict`).
    (which are run with `@async`)
 """
 function log(logger::Logger, level::AbstractString, msg::AbstractString)
-    rec = logger.record(logger.name, level, msg)
+    rec = logger.record(logger.name, level, logger.levels[level], msg)
     @sync log(logger, rec)
 end
 
@@ -334,7 +323,7 @@ be a function that returns the log message string.
    (which are run with `@async`)
 """
 function log(msg::Function, logger::Logger, level::AbstractString)
-    rec = logger.record(logger.name, level, msg)
+    rec = logger.record(logger.name, level, logger.levels[level], msg)
     @sync log(logger, rec)
 end
 

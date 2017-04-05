@@ -109,14 +109,14 @@ Takes a few initial log record arguments and creates a `DefaultRecord`.
 * `level::AbstractString`: the log level.
 * `msg::AbstractString`: the message being logged.
 """
-function DefaultRecord(name::AbstractString, level::AbstractString, msg)
+function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
     time = now()
     trace = Attribute(StackTrace, get_trace)
 
     DefaultRecord(
         Attribute(DateTime, () -> round(time, Base.Dates.Second)),
         Attribute(level),
-        Attribute(-1),
+        Attribute(levelnum),
         Attribute(AbstractString, get_msg(msg)),
         Attribute(name),
         Attribute(myid()),

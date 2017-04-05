@@ -1,7 +1,7 @@
 import Memento: Attribute
 
 @testset "Formatters" begin
-    rec = DefaultRecord("Logger.example", "info", "blah")
+    rec = DefaultRecord("Logger.example", "info", 20, "blah")
 
     @testset "DefaultFormatter" begin
         fmt = DefaultFormatter("{lookup}|{msg}|{stacktrace}")
