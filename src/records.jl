@@ -133,7 +133,7 @@ Returns the `StackTrace` with `StackFrame`s from the `Memento` module filtered o
 function get_trace()
     trace = StackTraces.stacktrace()
     return filter!(trace) do frame
-        !in(frame, Memento)
+        !from(frame, Memento)
     end
 end
 
@@ -161,11 +161,11 @@ function get_msg(msg)
 end
 
 """
-    Base.in(frame::StackFrame, filter_mod::Module) -> Bool
+    from(frame::StackFrame, filter_mod::Module) -> Bool
 
 Returns whether the `frame` is from the provided `Module`
 """
-function Base.in(frame::StackFrame, filter_mod::Module)
+function from(frame::StackFrame, filter_mod::Module)
     finfo = frame.linfo
     result = false
 
