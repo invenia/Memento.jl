@@ -1,14 +1,8 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
-
 module Memento
 
 using Mocking
 
 import Base: show, info, warn, error, log
-
-if !isdefined(Base, :StackTraces)
-    import StackTraces
-end
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
        is_set, is_root, set_level, add_level, set_record, add_filter,
