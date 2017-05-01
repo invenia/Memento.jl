@@ -133,7 +133,8 @@ without any handlers.
 """
 function reset!()
     empty!(_loggers)
-    Memento.__init__()
+    _loggers["root"] = Logger("root")
+    nothing
 end
 
 """
