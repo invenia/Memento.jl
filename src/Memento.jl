@@ -30,8 +30,6 @@ const global _log_levels = Dict{AbstractString, Int}(
     "emergency" => 70
 )
 
-global _loggers
-
 include("io.jl")
 include("records.jl")
 include("filters.jl")
@@ -39,10 +37,8 @@ include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
 
-function __init__()
-    global _loggers = Dict{AbstractString, Logger}(
-        "root" => Logger("root"),
-    )
-end
+const global _loggers = Dict{AbstractString, Logger}(
+    "root" => Logger("root"),
+)
 
 end
