@@ -15,6 +15,8 @@ elif [[ "$TEST_TYPE" == "bench" ]]; then
     export MEMENTO_BASE_COMMIT="origin/master"
     julia -e 'Pkg.test("Memento"; coverage=true)'
 elif [[ "$TEST_TYPE" == "userimage" ]]; then
+    # Create a user image which includes Memento to make sure that _loggers is assigned at compile-time
+    # See: https://github.com/invenia/Memento.jl/pull/21
     julia -e '
         LIB_PATH = abspath(Base.JULIA_HOME, Base.LIBDIR)
         sysimg_lib = joinpath(LIB_PATH, "julia", "sys.$(Libdl.dlext)")
