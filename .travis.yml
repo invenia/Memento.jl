@@ -9,6 +9,7 @@ env:
   - TEST_TYPE=parallel
   - TEST_TYPE=io
   - TEST_TYPE=bench
+  - TEST_TYPE=userimage
 matrix:
   fast_finish: true
   allow_failures:
