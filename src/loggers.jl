@@ -359,7 +359,8 @@ for key in keys(_log_levels)
                 end
 
                 function $level(logger::Logger, exc::Exception)
-                    $level(logger, sprint(io->showerror(io,exc)))
+                    log(logger, $key, sprint(io -> showerror(io, exc)))
+                    throw(exc)
                 end
             end
             f = eval(level)

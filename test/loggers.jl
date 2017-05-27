@@ -1,3 +1,7 @@
+immutable TestError <: Exception
+    msg
+end
+
 @testset "Loggers" begin
     FMT_STR = "[{level}]:{name} - {msg}"
 
@@ -52,6 +56,9 @@
 
             Memento.debug(logger, "This shouldn't get logged")
             @test isempty(takebuf_string(io))
+
+            @test_throws TestError Memento.error(logger, TestError("I failed."))
+            @test contains(takebuf_string(io), "I failed")
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
