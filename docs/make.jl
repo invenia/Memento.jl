@@ -4,7 +4,7 @@ using Memento
 makedocs(
     modules=[Memento],
     format=:html,
-    repo="https://github.com/invenia/Trace.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/invenia/Memento.jl/blob/{commit}{path}#L{line}",
     sitename="Memento.jl",
     authors="Invenia Technical Computing Corporation and contributors.",
     assets = ["assets/invenia.css"],
