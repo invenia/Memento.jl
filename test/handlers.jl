@@ -33,14 +33,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
+                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
 
                 Memento.debug(logger, "This shouldn't get logged")
-                @test isempty(takebuf_string(io))
+                @test isempty(String(take!(io)))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test contains(takebuf_string(io), "[fubar]:$(logger.name) - $msg")
+                @test contains(String(take!(io)), "[fubar]:$(logger.name) - $msg")
             finally
                 close(io)
             end
@@ -79,7 +79,7 @@
                 handler1 = DefaultHandler(io)
 
                 @test handler1.fmt.fmt_str == Memento.DEFAULT_FMT_STRING
-                @test isempty(takebuf_string(handler1.io))
+                @test isempty(String(take!(handler1.io)))
                 @test !(handler1.opts[:is_colorized])
 
                 handler2 = DefaultHandler(
@@ -154,14 +154,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
+                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
 
                 Memento.debug(logger, "This shouldn't get logged")
-                @test isempty(takebuf_string(io))
+                @test isempty(String(take!(io)))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test contains(takebuf_string(io), "[fubar]:$(logger.name) - $msg")
+                @test contains(String(take!(io)), "[fubar]:$(logger.name) - $msg")
             finally
                 close(io)
             end
@@ -189,7 +189,7 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(takebuf_string(io), "[info]:$(logger.name) - $msg")
+                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
 
                 # Filter out log messages < LEVELS["warn"]
                 set_level(handler, "warn")
@@ -199,7 +199,7 @@
                 # )
 
                 Memento.info(logger, "This shouldn't get logged")
-                @test isempty(takebuf_string(io))
+                @test isempty(String(take!(io)))
             finally
                 close(io)
             end

@@ -66,7 +66,7 @@ cd(dirname(@__FILE__))
 
             msg = "This should propagate to the root logger."
             warn(baz, msg)
-            result = takebuf_string(io)
+            result = String(take!(io))
             expected = "Foo.Bar.Baz - warn: $msg"
             @test contains(result, expected)
 
@@ -79,7 +79,7 @@ cd(dirname(@__FILE__))
 
             msg = "Message"
             warn(baz, msg)
-            str = takebuf_string(io)
+            str = String(take!(io))
 
             # The message should be written twice for "root" and "Foo.Bar.Baz"
             @test length(str) > length("Foo.Bar.Baz - warn: $msg") * 2
@@ -87,11 +87,11 @@ cd(dirname(@__FILE__))
             debug(baz, msg)
             # Test that the "root" logger won't print anything bug the baz logger will
             # because of their respective logging levels
-            @test contains(takebuf_string(io), "Foo.Bar.Baz - debug: $msg")
+            @test contains(String(take!(io)), "Foo.Bar.Baz - debug: $msg")
 
             info(car, msg)
             # the Foo.Car logger should still be unaffected.
-            @test contains(takebuf_string(io), "Foo.Car - info: $msg")
+            @test contains(String(take!(io)), "Foo.Car - info: $msg")
         finally
             close(io)
         end

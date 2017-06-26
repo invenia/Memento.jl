@@ -9,7 +9,7 @@ method.
 NOTE: Handlers can useful if you need to special case logging behaviour
 based on the `Formatter`, `IO` and/or `Record` types.
 """
-abstract Handler{F<:Formatter, O<:IO}
+@compat abstract type Handler{F<:Formatter, O<:IO} end
 
 function Memento.Filter(h::Handler)
     function level_filter(rec::Record)
