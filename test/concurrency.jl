@@ -16,7 +16,7 @@
             )
 
             asyncmap(x -> warn(get_logger(), "message"), 1:10)
-            all_msgs = split(takebuf_string(io), '\n')
+            all_msgs = split(String(take!(io)), '\n')
 
             @test !isempty(all_msgs)
             @test all(m -> m == all_msgs[1], all_msgs[2:end-1])

@@ -48,21 +48,21 @@ end
             add_level(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(takebuf_string(io), "Logger(Logger.example)")
+            @test contains(String(take!(io)), "Logger(Logger.example)")
 
             msg = "It works!"
             Memento.info(logger, msg)
-            @test contains(takebuf_string(io), "[info]:Logger.example - $msg")
+            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
 
             Memento.debug(logger, "This shouldn't get logged")
-            @test isempty(takebuf_string(io))
+            @test isempty(String(take!(io)))
 
             @test_throws TestError Memento.error(logger, TestError("I failed."))
-            @test contains(takebuf_string(io), "I failed")
+            @test contains(String(take!(io)), "I failed")
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
-            @test contains(takebuf_string(io), "[fubar]:Logger.example - $msg")
+            @test contains(String(take!(io)), "[fubar]:Logger.example - $msg")
 
             new_logger = Logger("new_logger")
         finally
@@ -112,18 +112,18 @@ end
             add_level(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(takebuf_string(io), "Logger(Logger.example)")
+            @test contains(String(take!(io)), "Logger(Logger.example)")
 
             msg = "It works!"
             Memento.info(msg_func(msg), logger)
-            @test contains(takebuf_string(io), "[info]:Logger.example - $msg")
+            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
 
             Memento.debug(msg_func("This shouldn't get logged"), logger)
-            @test isempty(takebuf_string(io))
+            @test isempty(String(take!(io)))
 
             msg = "Something went very wrong"
             @test_throws ErrorException error(msg_func(msg), logger)
-            @test contains(takebuf_string(io), "[error]:Logger.example - $msg")
+            @test contains(String(take!(io)), "[error]:Logger.example - $msg")
 
             new_logger = Logger("new_logger")
         finally
