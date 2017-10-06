@@ -75,7 +75,7 @@ end
         # which will execute only if the message is
         # evaluated.
         function msg_func(msg)
-            inner() = msg
+            inner(io) = print(io, msg)
             return inner
         end
 

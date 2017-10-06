@@ -148,17 +148,26 @@ function get_lookup(trace::Attribute{StackTrace})
 end
 
 """
-    get_msg(msg) -> Function
+    get_msg(msg::AbstractString) -> Function
 
-Wraps `msg` in a function if it is a String.
+Wraps `msg` in a 0-argument function if it is an `AbstractString`, for use in a `Record`.
 """
-function get_msg(msg)
-    if isa(msg, AbstractString)
-        return () -> msg
-    else
-        return msg
-    end
-end
+get_msg(msg::AbstractString) = () -> msg
+
+"""
+    get_msg(msg::Function) -> Function
+
+Accepts a 1-argument function `msg` which accepts and prints to an `IO` object.
+Wraps `msg` in a 0-argument function which calls `sprint`.
+"""
+get_msg(msg::Function) = () -> sprint(msg)
+
+"""
+    get_msg(msg::T) -> T
+
+Returns `msg` as a generic fallback.
+"""
+get_msg(msg) = msg
 
 """
     from(frame::StackFrame, filter_mod::Module) -> Bool

@@ -355,7 +355,7 @@ for key in keys(_log_levels)
 
                 function $level(msg::Function, logger::Logger)
                     log(msg, logger, $key)
-                    throw(ErrorException(msg()))
+                    throw(ErrorException(sprint(msg)))
                 end
 
                 function $level(logger::Logger, exc::Exception)
