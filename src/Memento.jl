@@ -46,4 +46,8 @@ const global _loggers = Dict{AbstractString, Logger}(
     "root" => Logger("root"),
 )
 
+function __init__()
+    Memento.config("warn")
+end
+
 end
