@@ -29,6 +29,7 @@ type Logger
     function Logger(name::AbstractString, handlers::Dict, level::AbstractString,
                     levels::Dict, record::Type, propagate::Bool)
         @assert haskey(levels, "not_set")
+        @assert haskey(levels, DEFAULT_LOG_LEVEL)
 
         logger = new(
             name,
@@ -51,7 +52,7 @@ type Logger
     end
 end
 
-function Logger{R<:Record}(name; level="not_set", levels=_log_levels,
+function Logger{R<:Record}(name; level=DEFAULT_LOG_LEVEL, levels=_log_levels,
                 record::Type{R}=DefaultRecord, propagate=true)
     logger = Logger(
         name,
@@ -66,7 +67,7 @@ end
 function Memento.Filter(l::Logger)
     function level_filter(rec::Record)
         level = rec[:level]
-        return l.levels[level] >= l.levels[l.level]
+        return haskey(l.levels, level) && l.levels[level] >= l.levels[l.level]
     end
 
     Memento.Filter(level_filter)
@@ -87,11 +88,18 @@ Returns true if `logger.name`is "root" or ""
 is_root(logger::Logger) = logger.name == "root" || logger.name == ""
 
 """
-    is_set(:Logger)
+    is_set(::Logger)
 
 Returns true or false as to whether the logger is set. (ie: logger.level != "not_set")
 """
 is_set(logger::Logger) = logger.level != "not_set"
+
+"""
+    get_level(::Logger)
+
+Returns the current logger level.
+"""
+get_level(logger::Logger) = logger.level
 
 """
     config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger

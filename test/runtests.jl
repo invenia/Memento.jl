@@ -50,7 +50,8 @@ cd(dirname(@__FILE__))
         car = get_logger("Foo.Car")
 
         for l in (foo, bar, baz, car)
-            @test !is_set(l)
+            @test is_set(l)
+            @test get_level(l) == "warn"
             @test length(get_handlers(l)) == 0
         end
 
