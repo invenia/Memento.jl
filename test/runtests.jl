@@ -97,6 +97,10 @@ cd(dirname(@__FILE__))
             close(io)
         end
     end
+
+    @testset "Default Levels" begin
+        @test allunique(values(Memento._log_levels))
+    end
 end
 
 
