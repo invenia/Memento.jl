@@ -28,9 +28,9 @@ const global _log_levels = Dict{AbstractString, Int}(
     "notice" => 30,
     "warn" => 40,
     "error" => 50,
-    "critical" => 50,
-    "alert" => 60,
-    "emergency" => 70
+    "critical" => 60,
+    "alert" => 70,
+    "emergency" => 80
 )
 
 include("io.jl")
