@@ -1,9 +1,7 @@
 language: julia
 os:
   - linux
-  - osx
 julia:
-  - 0.5
   - 0.6
   - nightly
 env:
@@ -16,15 +14,14 @@ matrix:
   allow_failures:
     - julia: nightly
     - env: TEST_TYPE=bench
+  include:
+    - if: branch = master
+      julia: 0.6
+      os: osx
+      env: TEST_TYPE=io
   exclude:
     - julia: nightly
       env: TEST_TYPE=userimage
-    - julia: 0.5
-      env: TEST_TYPE=userimage
-    - julia: 0.5
-      env: TEST_TYPE=bench
-    - os: osx
-      env: TEST_TYPE=bench
 
 notifications:
   email: false
