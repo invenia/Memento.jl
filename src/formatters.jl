@@ -7,7 +7,7 @@ A `Formatter` must implement a `format(::Formatter, ::Record)` method
 which takes a `Record` and returns a `String` representation of the
 log `Record`.
 """
-@compat abstract type Formatter end
+abstract type Formatter end
 
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
 

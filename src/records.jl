@@ -51,7 +51,7 @@ message strings.
 NOTE: you should access `Attribute`s in a `Record` by using `getindex` (ie: record[:msg])
 as this will correctly extract the value from the `Attribute` container.
 """
-@compat abstract type Record end
+abstract type Record end
 
 Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
 

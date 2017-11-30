@@ -3,7 +3,6 @@ os:
   - linux
   - osx
 julia:
-  - 0.5
   - 0.6
   - nightly
 env:
@@ -17,12 +16,10 @@ matrix:
     - julia: nightly
     - env: TEST_TYPE=bench
   exclude:
+    - if: branch != master
+      os: osx
     - julia: nightly
       env: TEST_TYPE=userimage
-    - julia: 0.5
-      env: TEST_TYPE=userimage
-    - julia: 0.5
-      env: TEST_TYPE=bench
     - os: osx
       env: TEST_TYPE=bench
 

@@ -3,7 +3,6 @@ __precompile__()
 module Memento
 
 using Mocking
-using Compat
 
 import Base: show, info, warn, error, log
 
