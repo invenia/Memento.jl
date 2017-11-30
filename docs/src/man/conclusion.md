@@ -58,7 +58,7 @@ using Requests  # For send logs to our fake logging REST service
 logger = Memento.config("info"; fmt="[{level} | {name}]: {msg}")
 
 # We create our custom EC2Record type
-type EC2Record <: Record
+mutable struct EC2Record <: Record
     date::Attribute
     level::Attribute
     levelnum::Attribute
@@ -92,7 +92,7 @@ type EC2Record <: Record
 end
 
 # A really simple CSVFormatter
-type CSVFormatter <: Formatter
+mutable struct CSVFormatter <: Formatter
     delim::Char
     vals::Array{Symbol}
 
@@ -111,7 +111,7 @@ function format(fmt::CSVFormatter, rec::Record)
 end
 
 # Create our custom REST IO type
-type REST <: IO
+mutable struct REST <: IO
     account_uri::AbstractString
     app_name::AbstractString
     access_key::AbstractString
@@ -128,7 +128,7 @@ end
 flush(io::REST) = io
 
 # We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`
-function log{F<:Formatter, O<:REST}(handler::DefaultHandler{F, O}, rec::Record)
+function log(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}
     msg = format(handler.fmt, rec)
     println(handler.io, rec[:level], msg)
     flush(handler.io)
