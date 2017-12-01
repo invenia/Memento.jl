@@ -1,4 +1,8 @@
-using Base.Test
+using Compat
+using Compat.Test
+
+import Compat: Dates
+import Compat:Sys
 
 files = [
     "records.jl",
@@ -7,16 +11,14 @@ files = [
     "loggers.jl",
 ]
 
-opts = Base.JLOptions()
-if isdefined(opts, :use_compilecache) && Bool(opts.use_compilecache)
-    info("test/io.jl not included as they require mocking which requires that compilecache is disabled.")
-    info("To include test/io.jl tests run with `--compilecache=no`")
+if haskey(ENV, "MEMENTO_PARALLEL")
+    info("IO tests not included as they require mocking and compilecache disabled.")
+    info("Running the parallel tests without compilecache causes errors in julia.")
     push!(files, "concurrency.jl")
 else
-    info("test/concurrency.jl not included as they require that compilecache is enabled.")
-    info("To include test/concurrency.jl tests run without `--compilecache=no`")
+    info("Skipping parallel tests. Enabled by setting an environment variable `MEMENTO_PARALLEL=true`.")
     using Mocking
-    Mocking.enable()
+    Mocking.enable(force=true)
     push!(files, "io.jl")
 end
 
@@ -32,7 +34,7 @@ cd(dirname(@__FILE__))
 @testset "Logging" begin
     @testset "Sample Usage" begin
         Memento.config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
-        logger1 = get_logger(current_module())
+        logger1 = get_logger(@__MODULE__)
         debug(logger1, "Something that won't get logged.")
         info(logger1, "Something you might want to know.")
         warn(logger1, "This might cause an error.")

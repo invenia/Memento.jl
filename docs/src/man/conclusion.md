@@ -76,7 +76,7 @@ type EC2Record <: Record
         trace = Attribute(StackTrace, get_trace)
 
         EC2Record(
-            Attribute(DateTime, () -> round(time, Base.Dates.Second)),
+            Attribute(DateTime, () -> round(time, Dates.Second)),
             Attribute(args[:level]),
             Attribute(args[:levelnum]),
             Attribute(AbstractString, get_msg(args[:msg])),

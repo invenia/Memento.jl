@@ -7,7 +7,7 @@ An `Attribute` represents a lazily evaluated field in a log `Record`.
 * `f::Function`: A function to evaluate in order to get a value if one is not set.
 * `x::Nullable`: A value that may or may not exist yet.
 """
-type Attribute{T}
+mutable struct Attribute{T}
     f::Function
     x::Nullable{T}
 end
@@ -63,7 +63,7 @@ NOTE: This may be an expensive operations, so you probably don't want to do this
 log record unless you're planning on using every `Attribute`.
 """
 function Base.Dict(rec::Record)
-    return map(fieldnames(rec)) do key
+    return map(fieldnames(typeof(rec))) do key
         key => rec[key]
     end |> Dict
 end
@@ -88,7 +88,7 @@ NOTE: if you'd like more logging attributes you can:
 * `lookup::Attribute{StackFrame}`: the top StackFrame
 * `stacktrace::Attribute{StackTrace}`: a stacktrace
 """
-immutable DefaultRecord <: Record
+struct DefaultRecord <: Record
     date::Attribute
     level::Attribute
     levelnum::Attribute
@@ -110,11 +110,11 @@ Takes a few initial log record arguments and creates a `DefaultRecord`.
 * `msg::AbstractString`: the message being logged.
 """
 function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
-    time = now()
+    time = Dates.now()
     trace = Attribute(StackTrace, get_trace)
 
     DefaultRecord(
-        Attribute(DateTime, () -> round(time, Base.Dates.Second)),
+        Attribute(DateTime, () -> round(time, Dates.Second)),
         Attribute(level),
         Attribute(levelnum),
         Attribute(AbstractString, get_msg(msg)),
@@ -133,7 +133,7 @@ Returns the `StackTrace` with `StackFrame`s from the `Memento` module filtered o
 function get_trace()
     trace = StackTraces.stacktrace()
     return filter!(trace) do frame
-        !from(frame, Memento)
+        !Base.StackTraces.from(frame, Memento)
     end
 end
 
@@ -158,21 +158,4 @@ function get_msg(msg)
     else
         return msg
     end
-end
-
-"""
-    from(frame::StackFrame, filter_mod::Module) -> Bool
-
-Returns whether the `frame` is from the provided `Module`
-"""
-function from(frame::StackFrame, filter_mod::Module)
-    finfo = frame.linfo
-    result = false
-
-    if !isnull(finfo)
-        frame_mod = get(finfo).def.module
-        result = module_name(frame_mod) === module_name(filter_mod)
-    end
-
-    return result
 end

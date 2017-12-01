@@ -5,7 +5,7 @@ import Memento: Attribute
 
     @testset "DefaultFormatter" begin
         fmt = DefaultFormatter("{lookup}|{msg}|{stacktrace}")
-        result = format(fmt, rec)
+        result = Memento.format(fmt, rec)
         parts = split(result, "|")
         @test length(parts) == 3
         @test parts[2] == "blah"
@@ -19,7 +19,7 @@ import Memento: Attribute
 
     @testset "JsonFormatter" begin
         fmt = JsonFormatter()
-        result = format(fmt, rec)
+        result = Memento.format(fmt, rec)
         for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
             @test contains(result, string(key))
         end
@@ -36,7 +36,7 @@ import Memento: Attribute
         )
 
         fmt2 = JsonFormatter(aliases)
-        result = format(fmt2, rec)
+        result = Memento.format(fmt2, rec)
 
         for key in [:location, :message, :timestamp, :process_id]
             @test contains(result, string(key))

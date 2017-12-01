@@ -23,7 +23,7 @@ Ex) "[{level} | {name}]: {msg}" will print message of the form
 [warn | root]: my warning message.
 ...
 """
-immutable DefaultFormatter <: Formatter
+struct DefaultFormatter <: Formatter
     fmt_str::AbstractString
     tokens::Vector{Pair{Symbol, Bool}}
 
@@ -91,7 +91,7 @@ end
 Uses the JSON pkg to format the `Record` into a valid
 JSON string.
 """
-type JsonFormatter <: Formatter
+struct JsonFormatter <: Formatter
     aliases::Nullable{Dict{Symbol, Symbol}}
 
     JsonFormatter() = new(Nullable())
@@ -106,7 +106,7 @@ and dicts respectively and call `JSON.json()` on the resulting dictionary.
 """
 function format(fmt::JsonFormatter, rec::Record)
     aliases = if isnull(fmt.aliases)
-        names = fieldnames(rec)
+        names = fieldnames(typeof(rec))
         Dict(zip(names, names))
     else
         get(fmt.aliases)

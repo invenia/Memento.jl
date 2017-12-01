@@ -1,4 +1,4 @@
-immutable TestError <: Exception
+struct TestError <: Exception
     msg
 end
 
