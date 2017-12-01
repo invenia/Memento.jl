@@ -15,7 +15,7 @@ log file.
 * `byteswritten::Int64`: keeps track of how many bytes have been written to the current file.
 * `max_sz::Int`: the maximum number of bytes written to a file before rolling over to another.
 """
-type FileRoller <: IO
+mutable struct FileRoller <: IO
     prefix::AbstractString
     folder::AbstractString
     filepath::AbstractString
@@ -114,7 +114,7 @@ FACILITIES = [
 * `tag::AbstractString`: a tag to use for all message (defaults to "julia")
 * `pid::Integer`: tags julia's pid to messages (defaults to -1 which doesn't include the pid)
 """
-type Syslog <: IO
+mutable struct Syslog <: IO
     facility::Symbol
     tag::AbstractString
     pid::Integer

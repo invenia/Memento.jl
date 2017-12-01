@@ -17,7 +17,7 @@ loggers propagate their message to their parent loggers.
 * `propagate::Bool`: whether or not this logger should propagate its message to its parent
     (defaults to `true`).
 """
-type Logger
+mutable struct Logger
     name::AbstractString
     handlers::Dict{Any, Handler}
     level::AbstractString
@@ -52,8 +52,8 @@ type Logger
     end
 end
 
-function Logger{R<:Record}(name; level=DEFAULT_LOG_LEVEL, levels=_log_levels,
-                record::Type{R}=DefaultRecord, propagate=true)
+function Logger(name; level=DEFAULT_LOG_LEVEL, levels=_log_levels,
+                record::Type{R}=DefaultRecord, propagate=true) where {R<:Record}
     logger = Logger(
         name,
         Dict{Any, Handler}(),
@@ -218,7 +218,7 @@ Sets the record type for the logger.
 * `logger::Logger`: the logger to set.
 * `rec::Record`: A `Record` type to use for logging messages (ie: `DefaultRecord`).
 """
-set_record{R<:Record}(logger::Logger, rec::Type{R}) = logger.record = rec
+set_record(logger::Logger, rec::Type{R}) where {R<:Record} = logger.record = rec
 
 """
     remove_handler(logger::Logger, name)

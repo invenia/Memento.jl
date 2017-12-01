@@ -70,7 +70,7 @@
             log(logger, "fubar", "Something went very wrong")
 
             @test isfile(filename)
-            @test is_windows() ? true : success(`rm $filename`)
+            @test Sys.iswindows() ? true : success(`rm $filename`)
         end
 
         @testset "IO Construction" begin

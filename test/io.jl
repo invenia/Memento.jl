@@ -1,6 +1,3 @@
-using Base.Test
-#import Mocking: mend TODO
-
 @testset "IO" begin
     @testset "FileRoller" begin
         levels = Dict(
@@ -42,7 +39,7 @@ using Base.Test
 
     @testset "Syslog" begin
         @testset "Sample Usage" begin
-            if !is_windows()
+            if !Sys.iswindows()
                 levels = copy(Memento._log_levels)
                 levels["invalid"] = 100
                 handler = DefaultHandler(Syslog(:local0, "julia"), DefaultFormatter("{level}: {msg}"))
@@ -92,7 +89,7 @@ using Base.Test
                 @test_throws ErrorException Syslog(:local0, "julia")
             end
 
-            if is_windows()
+            if Sys.iswindows()
                 @test_throws ErrorException Syslog(:local0, "julia")
             end
         end

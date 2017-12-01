@@ -50,7 +50,7 @@ Fields:
             )
         )```
 """
-type DefaultHandler{F<:Formatter, O<:IO} <: Handler{F, O}
+mutable struct DefaultHandler{F, O} <: Handler{F, O}
     fmt::F
     io::O
     opts::Dict{Symbol, Any}
@@ -60,7 +60,7 @@ type DefaultHandler{F<:Formatter, O<:IO} <: Handler{F, O}
 end
 
 """
-    DefaultHandler{F<Formatter, O<:IO}(io::O, fmt::F, opts::Dict{Symbol, Any})
+    DefaultHandler{F, O}(io::O, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter, O<:IO}
 
 Creates a DefaultHandler with the specified IO type.
 
@@ -69,7 +69,7 @@ Creates a DefaultHandler with the specified IO type.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
+function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter, O<:IO}
     setup_opts(opts)
     handler = DefaultHandler(fmt, io, opts, Memento.Filter[], Ref(_log_levels), "not_set")
     push!(handler.filters, Memento.Filter(handler))
@@ -77,7 +77,7 @@ function DefaultHandler{F<:Formatter, O<:IO}(io::O, fmt::F=DefaultFormatter(), o
 end
 
 """
-    DefaultHandler{F<Formatter}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any})`
+    DefaultHandler{F}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter}
 
 Creates a DefaultHandler with a IO handle to the specified filename.
 
@@ -86,12 +86,12 @@ Creates a DefaultHandler with a IO handle to the specified filename.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler{F<:Formatter}(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}())
+function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter}
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
     push!(handler.filters, Memento.Filter(handler))
-    finalizer(handler, (h)->close(h.io))
+    finalizer(h -> close(h.io), handler)
     handler
 end
 
@@ -140,11 +140,11 @@ function set_level(handler::DefaultHandler, level::AbstractString)
 end
 
 """
-    emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F ,O}, rec::Record)
+    emit{F, O}(handler::DefaultHandler{F ,O}, rec::Record) where {F<:Formatter, O<:IO}
 
 Handles printing any `Record` with any `Formatter` and `IO` types.
 """
-function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
+function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:IO}
     level = rec[:level]
     str = format(handler.fmt, rec)
 
@@ -162,11 +162,11 @@ function emit{F<:Formatter, O<:IO}(handler::DefaultHandler{F, O}, rec::Record)
 end
 
 """
-    emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
+    emit{F, O}(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
 
 Handles printing any records with any `Formatter` and a `Syslog` `IO` type.
 """
-function emit{F<:Formatter, O<:Syslog}(handler::DefaultHandler{F, O}, rec::Record)
+function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
     str = format(handler.fmt, rec)
     println(handler.io, rec[:level], str)
     flush(handler.io)
