@@ -3,6 +3,13 @@ import Memento: Attribute
 @testset "Formatters" begin
     rec = DefaultRecord("Logger.example", "info", 20, "blah")
 
+    # NOTE: This check might not be needed as of 0.6 because I can't find a
+    # condition where the stacktrace is empty.
+    no_lookup = DefaultRecord(
+        rec.date, rec.level, rec.levelnum, rec.msg, rec.name, rec.pid,
+        Attribute(nothing), rec.stacktrace
+    )
+
     @testset "DefaultFormatter" begin
         fmt = DefaultFormatter("{lookup}|{msg}|{stacktrace}")
         result = Memento.format(fmt, rec)
@@ -15,6 +22,9 @@ import Memento: Attribute
         @test !contains(parts[3], "get_trace")
         @test !contains(parts[3], "DefaultRecord")
         @test !contains(parts[3], "get")
+
+        nl_result = Memento.format(fmt, no_lookup)
+        @test startswith(nl_result, "<nothing>")
     end
 
     @testset "JsonFormatter" begin
@@ -44,5 +54,8 @@ import Memento: Attribute
         end
 
         @test contains(result, "blah")
+
+        nl_result = Memento.format(fmt, no_lookup)
+        @test contains(nl_result, "<nothing>")
     end
 end
