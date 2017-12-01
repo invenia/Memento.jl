@@ -9,7 +9,7 @@ For example, if you're running a julia application on a cloud service provider l
 
 ```julia
 # TODO: Fix this example.
-type EC2Record <: Record
+mutable struct EC2Record <: Record
     date::Attribute
     level::Attribute
     levelnum::Attribute
