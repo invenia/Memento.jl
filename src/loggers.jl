@@ -273,7 +273,7 @@ end
 Temporarily change the level a logger will log at for the duration of the function `f`.
 """
 function set_level(f::Function, logger::Logger, level::AbstractString)
-    original_level = logger.level
+    original_level = get_level(logger)
     set_level(logger, level)
     try
         f()
