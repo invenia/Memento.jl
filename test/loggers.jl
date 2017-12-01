@@ -43,6 +43,12 @@ end
             set_level(logger, "info")
             @test logger.level == "info"
 
+            set_level(logger, "critical") do
+                @test logger.level == "critical"
+                warn("silenced message should not be displayed")
+            end
+            @test logger.level == "info"
+
             set_record(logger, DefaultRecord)
 
             add_level(logger, "fubar", 50)

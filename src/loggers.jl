@@ -268,6 +268,21 @@ function set_level(logger::Logger, level::AbstractString)
 end
 
 """
+    set_level(f::Function, logger::Logger, level::AbstractString)
+
+Temporarily change the level a logger will log at for the duration of the function `f`.
+"""
+function set_level(f::Function, logger::Logger, level::AbstractString)
+    original_level = logger.level
+    set_level(logger, level)
+    try
+        f()
+    finally
+        set_level(logger, original_level)
+    end
+end
+
+"""
     log(logger::Logger, args::Dict{Symbol, Any})
 
 Logs `logger.record(args)` to its handlers if it has the appropriate `args[:level]`
