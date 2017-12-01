@@ -49,8 +49,6 @@ Iteratively replaces entries in the
 format string with the appropriate fields in the `Record`
 """
 function format(fmt::DefaultFormatter, rec::Record)
-    result = fmt.fmt_str
-
     parts = map(fmt.tokens) do token
         content = token.first
         value = content
