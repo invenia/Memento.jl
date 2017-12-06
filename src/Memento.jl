@@ -2,7 +2,6 @@ __precompile__()
 
 module Memento
 
-using Mocking
 using Compat
 using Compat.Dates
 
