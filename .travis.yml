@@ -5,8 +5,7 @@ julia:
   - 0.6
   - nightly
 env:
-  - TEST_TYPE=parallel
-  - TEST_TYPE=io
+  - TEST_TYPE=basic
   # - TEST_TYPE=bench
   - TEST_TYPE=userimage
 matrix:
@@ -18,7 +17,7 @@ matrix:
     - if: branch = master
       julia: 0.6
       os: osx
-      env: TEST_TYPE=io
+      env: TEST_TYPE=basic
   exclude:
     - julia: nightly
       env: TEST_TYPE=userimage
