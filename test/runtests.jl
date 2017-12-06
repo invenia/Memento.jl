@@ -17,7 +17,6 @@ Sys.isunix() ? push!(files, "ext/syslogs.jl") : nothing
 haskey(ENV, "MEMENTO_BENCHMARK") ? files = ["benchmarks.jl"] : nothing
 
 using Memento
-using JSON
 
 cd(dirname(@__FILE__))
 
