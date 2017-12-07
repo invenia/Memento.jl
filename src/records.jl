@@ -62,7 +62,7 @@ Extracts the `Record` and its `Attribute`s into a `Dict`
 NOTE: This may be an expensive operations, so you probably don't want to do this for every
 log record unless you're planning on using every `Attribute`.
 """
-function Base.convert(::Type{Dict}, rec::Record)
+function Base.Dict(rec::Record)
     return map(fieldnames(typeof(rec))) do key
         key => rec[key]
     end |> Dict
