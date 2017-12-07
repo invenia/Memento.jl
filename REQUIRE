@@ -1,4 +1,3 @@
 julia 0.6
 Compat 0.37.0
 JSON 0.8
-Mocking 0.3

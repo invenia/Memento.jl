@@ -9,22 +9,12 @@ files = [
     "formatters.jl",
     "handlers.jl",
     "loggers.jl",
+    "io.jl",
+    "concurrency.jl",
 ]
 
-if haskey(ENV, "MEMENTO_PARALLEL")
-    info("IO tests not included as they require mocking and compilecache disabled.")
-    info("Running the parallel tests without compilecache causes errors in julia.")
-    push!(files, "concurrency.jl")
-else
-    info("Skipping parallel tests. Enabled by setting an environment variable `MEMENTO_PARALLEL=true`.")
-    using Mocking
-    Mocking.enable(force=true)
-    push!(files, "io.jl")
-end
-
-if haskey(ENV, "MEMENTO_BENCHMARK")
-    files = ["benchmarks.jl"]
-end
+Sys.isunix() ? push!(files, "ext/syslogs.jl") : nothing
+haskey(ENV, "MEMENTO_BENCHMARK") ? files = ["benchmarks.jl"] : nothing
 
 using Memento
 using JSON

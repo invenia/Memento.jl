@@ -18,9 +18,12 @@ end
 
 However, under some circumstances it may be necessary to customize this
 behaviour based on the `Formatter`, `IO` or `Record` types being used.
-For example, the `Syslog` `IO` type needs an extra `level` argument to
-its `println` so we special case this like so:
+For example, if you'd like to use the `Syslog` `IO` type from
+[Syslogs.jl](https://github.com/invenia/Syslogs.jl) you'll need topass in an extra `level`
+argument to its `println` so we special case this like so:
 ```julia
+using Syslogs
+
 function emit(handler::MyHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
     str = Memento.format(handler.fmt, rec)
     println(handler.io, rec[:level], str)

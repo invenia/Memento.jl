@@ -91,7 +91,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
     push!(handler.filters, Memento.Filter(handler))
-    finalizer(h -> close(h.io), handler)
+    finalizer(handler, h -> close(h.io))
     handler
 end
 
@@ -158,16 +158,5 @@ function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O
         println(handler.io, str)
     end
 
-    flush(handler.io)
-end
-
-"""
-    emit{F, O}(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
-
-Handles printing any records with any `Formatter` and a `Syslog` `IO` type.
-"""
-function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
-    str = format(handler.fmt, rec)
-    println(handler.io, rec[:level], str)
     flush(handler.io)
 end

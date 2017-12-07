@@ -49,7 +49,7 @@
             end
 
             @test isfile(parallel_test_filename)
-            @test is_windows() ? true : success(`rm $parallel_test_filename`)   # Get UNLINK Error on windows
+            @test Sys.iswindows() ? true : success(`rm $parallel_test_filename`)   # Get UNLINK Error on windows
         finally
             rmprocs(numprocs)
         end

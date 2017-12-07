@@ -2,7 +2,6 @@ __precompile__()
 
 module Memento
 
-using Mocking
 using Compat
 using Compat.Dates
 
@@ -17,8 +16,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
        Record, DefaultRecord,
        Formatter, DefaultFormatter, JsonFormatter,
        Handler, DefaultHandler,
-       FileRoller, Syslog
-
+       FileRoller
 
 const DEFAULT_LOG_LEVEL = "warn"
 
