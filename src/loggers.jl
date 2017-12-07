@@ -106,7 +106,7 @@ get_level(logger::Logger) = logger.level
 
 Register an existing logger with Memento.
 """
-register(logger::Logger) = global _loggers[logger.name] = logger
+register(logger::Logger) = _loggers[logger.name] = logger
 
 """
     config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
@@ -125,7 +125,7 @@ that prints to STDOUT.
 * `Logger`: the root logger.
 """
 function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
-    global _log_levels = levels
+    _log_levels = levels
     logger = Logger("root"; level=level, levels=levels)
     add_handler(
         logger,
@@ -149,7 +149,7 @@ without any handlers.
 """
 function reset!()
     empty!(_loggers)
-    _loggers["root"] = Logger("root")
+    register(Logger("root"))
     nothing
 end
 
