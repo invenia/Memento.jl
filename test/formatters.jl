@@ -27,8 +27,8 @@ import Memento: Attribute
         @test startswith(nl_result, "<nothing>")
     end
 
-    @testset "JsonFormatter" begin
-        fmt = JsonFormatter()
+    @testset "DictFormatter" begin
+        fmt = DictFormatter()
         result = Memento.format(fmt, rec)
         for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
             @test contains(result, string(key))
@@ -45,7 +45,7 @@ import Memento: Attribute
             :process_id => :pid,
         )
 
-        fmt2 = JsonFormatter(aliases)
+        fmt2 = DictFormatter(aliases)
         result = Memento.format(fmt2, rec)
 
         for key in [:location, :message, :timestamp, :process_id]

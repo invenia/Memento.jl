@@ -11,13 +11,13 @@ files = [
     "loggers.jl",
     "io.jl",
     "concurrency.jl",
+    "ext/json.jl",
 ]
 
 Sys.isunix() ? push!(files, "ext/syslogs.jl") : nothing
 haskey(ENV, "MEMENTO_BENCHMARK") ? files = ["benchmarks.jl"] : nothing
 
 using Memento
-using JSON
 
 cd(dirname(@__FILE__))
 

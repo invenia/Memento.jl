@@ -1,5 +1,3 @@
-using JSON
-
 """
     Formatter
 
@@ -83,26 +81,33 @@ function format(fmt::DefaultFormatter, rec::Record)
     return string(parts...)
 end
 
-"""
-    JsonFormatter
-
-Uses the JSON pkg to format the `Record` into a valid
-JSON string.
-"""
-struct JsonFormatter <: Formatter
+struct DictFormatter <: Formatter
     aliases::Nullable{Dict{Symbol, Symbol}}
-
-    JsonFormatter() = new(Nullable())
-    JsonFormatter(aliases::Dict{Symbol, Symbol}) = new(Nullable(aliases))
+    serializer::Function
 end
 
 """
-    format(::JsonFormatter, ::Record) -> String
+    DictFormatter([aliases, serializer])
+
+Formats the record to Dict that is amenable to serialization formats such as JSON and then runs
+the serializer function on the produced dictionary.
+
+# Arguments
+- `aliases::Dict{Symbol, Symbol}`: Mapping where the keys represent aliases and values represent
+  existing record attributes to include in the dictionary (defaults to all attributes).
+- `serializer::Function`: A function that takes a Dictionary and returns a string. Defaults to `string(dict)`.
+"""
+DictFormatter() = DictFormatter(Nullable(), string)
+DictFormatter(aliases::Dict{Symbol, Symbol}) = DictFormatter(aliases, string)
+DictFormatter(serializer::Function) = DictFormatter(Nullable(), serializer)
+
+"""
+    format(::DictFormatter, ::Record) -> Dict
 
 Converts :date, :lookup and :stacktrace to strings
-and dicts respectively and call `JSON.json()` on the resulting dictionary.
+and dicts respectively.
 """
-function format(fmt::JsonFormatter, rec::Record)
+function format(fmt::DictFormatter, rec::Record)
     aliases = if isnull(fmt.aliases)
         names = fieldnames(typeof(rec))
         Dict(zip(names, names))
@@ -147,5 +152,5 @@ function format(fmt::JsonFormatter, rec::Record)
         dict[alias] = value
     end
 
-    return json(dict)
+    return fmt.serializer(dict)
 end

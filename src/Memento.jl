@@ -14,7 +14,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
 
        Logger,
        Record, DefaultRecord,
-       Formatter, DefaultFormatter, JsonFormatter,
+       Formatter, DefaultFormatter, DictFormatter,
        Handler, DefaultHandler,
        FileRoller
 

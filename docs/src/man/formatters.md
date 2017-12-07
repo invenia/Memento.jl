@@ -4,7 +4,7 @@
 
 1. `DefaultFormatter`: use a simple template string format to map keys in the `Record` to places in the resulting string. (ie: `DefaultFormatter("[{date} | {level} | {name}]: {msg}")`
 
-2. `JsonFormatter`: builds an appropriate formatted `Dict` from the `Record` in order to use `JSON.json(dict)` to produce the resulting string.
+2. `DictFormatter`: builds an appropriately formatted `Dict` from the `Record` so that it can be serialized to a string with various formats. (e.g., `string`, `JSON.json`).
 
 You should only need to write a custom `Formatter` type if you're needing to produce very specific string formats regardless of the `Record` type being used.
 For example, we may want a `CSVFormatter` which always writes logs in a CSV Format.
