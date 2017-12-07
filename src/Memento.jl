@@ -21,7 +21,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
 
 const DEFAULT_LOG_LEVEL = "warn"
 
-const global _log_levels = Dict{AbstractString, Int}(
+const _log_levels = Dict{AbstractString, Int}(
     "not_set" => 0,
     "debug" => 10,
     "info" => 20,
@@ -42,7 +42,7 @@ include("loggers.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to STDOUT.
-const global _loggers = Dict{AbstractString, Logger}(
+const _loggers = Dict{AbstractString, Logger}(
     "root" => Logger("root"),
 )
 
