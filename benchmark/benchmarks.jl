@@ -111,12 +111,12 @@ end
     @bench(
         "Unfiltered log as JSON (no aliases)",
         info(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter())),
+        setup=(logger = memento_setup(DictFormatter())),
     )
     @bench(
         "Filtered log as JSON (no aliases)",
         debug(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter())),
+        setup=(logger = memento_setup(DictFormatter())),
     )
     no_trace_aliases = Dict(
         :message => :msg,
@@ -126,12 +126,12 @@ end
     @bench(
         "Unfiltered log as JSON (aliases w/o trace)",
         info(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter($no_trace_aliases))),
+        setup=(logger = memento_setup(DictFormatter($no_trace_aliases))),
     )
     @bench(
         "Filtered log as JSON (aliases w/o trace)",
         debug(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter($no_trace_aliases))),
+        setup=(logger = memento_setup(DictFormatter($no_trace_aliases))),
     )
     trace_aliases = Dict(
         :backtrace => :stacktrace,
@@ -142,11 +142,11 @@ end
     @bench(
         "Unfiltered log as JSON (aliases w/ trace)",
         info(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter($trace_aliases))),
+        setup=(logger = memento_setup(DictFormatter($trace_aliases))),
     )
     @bench(
         "Filtered log as JSON (aliases w/ trace)",
         debug(memento_msg("Msg"), logger),
-        setup=(logger = memento_setup(JsonFormatter($trace_aliases))),
+        setup=(logger = memento_setup(DictFormatter($trace_aliases))),
     )
 end

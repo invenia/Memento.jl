@@ -25,7 +25,7 @@ function udp_srv(port::Int)
     return r
 end
 
-@testset "Syslogs" begin
+@testset "Ext - Syslogs" begin
     levels = copy(Memento._log_levels)
     levels["invalid"] = 100
 

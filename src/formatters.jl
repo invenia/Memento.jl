@@ -81,20 +81,25 @@ function format(fmt::DefaultFormatter, rec::Record)
     return string(parts...)
 end
 
-"""
-    DictFormatter([aliases])
-
-Formats the record to Dict that is amenable to serialization formats such as JSON.
-The `aliases` argument is a `Dict{Symbol, Symbol}` where they keys represented aliases and
-values represent existing record attributes to include in the dictionary.
-If no `aliases` argument is provided then all fields in the record type will be used.
-"""
 struct DictFormatter <: Formatter
     aliases::Nullable{Dict{Symbol, Symbol}}
-
-    DictFormatter() = new(Nullable())
-    DictFormatter(aliases::Dict{Symbol, Symbol}) = new(Nullable(aliases))
+    serializer::Function
 end
+
+"""
+    DictFormatter([aliases, serializer])
+
+Formats the record to Dict that is amenable to serialization formats such as JSON and then runs
+the serializer function on the produced dictionary.
+
+# Arguments
+- `aliases::Dict{Symbol, Symbol}`: Mapping where the keys represent aliases and values represent
+  existing record attributes to include in the dictionary (defaults to all attributes).
+- `serializer::Function`: A function that takes a Dictionary and returns a string. Defaults to `string(dict)`.
+"""
+DictFormatter() = DictFormatter(Nullable(), string)
+DictFormatter(aliases::Dict{Symbol, Symbol}) = DictFormatter(aliases, string)
+DictFormatter(serializer::Function) = DictFormatter(Nullable(), serializer)
 
 """
     format(::DictFormatter, ::Record) -> Dict
@@ -147,5 +152,5 @@ function format(fmt::DictFormatter, rec::Record)
         dict[alias] = value
     end
 
-    return dict
+    return fmt.serializer(dict)
 end

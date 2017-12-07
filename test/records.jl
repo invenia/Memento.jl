@@ -5,7 +5,7 @@
         @test rec[:date] == get(rec.date)
         @test get(rec.date) == get(rec.date.x)
 
-        dict = Dict(rec)
+        dict = convert(Dict, rec)
         @test rec[:date] == dict[:date]
     end
 end

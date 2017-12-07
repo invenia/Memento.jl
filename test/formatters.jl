@@ -49,13 +49,13 @@ import Memento: Attribute
         result = Memento.format(fmt2, rec)
 
         for key in [:location, :message, :timestamp, :process_id]
-            @test haskey(result, key)
-            @test !haskey(result, aliases[key])
+            @test contains(result, string(key))
+            @test !contains(result, string(aliases[key]))
         end
 
-        @test contains(result[:message], "blah")
+        @test contains(result, "blah")
 
         nl_result = Memento.format(fmt, no_lookup)
-        @test contains(nl_result[:location], "<nothing>")
+        @test contains(nl_result, "<nothing>")
     end
 end

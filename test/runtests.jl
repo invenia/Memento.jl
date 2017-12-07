@@ -11,6 +11,7 @@ files = [
     "loggers.jl",
     "io.jl",
     "concurrency.jl",
+    "ext/json.jl",
 ]
 
 Sys.isunix() ? push!(files, "ext/syslogs.jl") : nothing
