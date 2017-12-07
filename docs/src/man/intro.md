@@ -83,3 +83,24 @@ There are five main components of Memento.jl that you can manipulate:
 5. IO
 
 The remainder of this manual will discuss how you can use these components to customize Memento to you particular application.
+
+## Using Memento from Julia Modules
+
+Some care needs to be taken when working with Memento from [precompiled modules](http://docs.julialang.org/en/latest/manual/modules/#module-initialization-and-precompilation).
+Specifically, it is important to note that if you want folks be able to configure your logger from outside the module you'll want to register the logger in your `__init__()` method.
+
+```julia
+__precompile__() # this module is safe to precompile
+module MyModule
+
+using Memento
+
+# Create our module level logger (this will get precompiled)
+const LOGGER = get_logger("MyModule")
+
+# Register the module level logger at runtime so that folks can access the logger via `get_logger("MyModule")`
+# NOTE: If this line is not included then the precompiled `MyModule.LOGGER` won't be registered at runtime.
+__init__() = Memento.register(LOGGER)
+
+end
+```

@@ -102,6 +102,13 @@ Returns the current logger level.
 get_level(logger::Logger) = logger.level
 
 """
+    register(::Logger)
+
+Register an existing logger with Memento.
+"""
+register(logger::Logger) = global _loggers[logger.name] = logger
+
+"""
     config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
 
 Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
@@ -119,9 +126,9 @@ that prints to STDOUT.
 """
 function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
     global _log_levels = levels
-    _loggers["root"] = Logger("root"; level=level, levels=levels)
+    logger = Logger("root"; level=level, levels=levels)
     add_handler(
-        _loggers["root"],
+        logger,
         DefaultHandler(
             STDOUT,
             DefaultFormatter(fmt),
@@ -129,8 +136,9 @@ function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, l
         ),
         "console"
     )
+    register(logger)
 
-    return _loggers["root"]
+    return logger
 end
 
 """
@@ -203,7 +211,7 @@ function get_logger(name="root")
 
     if !(haskey(_loggers, logger_name))
         parent = get_parent(logger_name)
-        _loggers[logger_name] = Logger(logger_name)
+        register(Logger(logger_name))
     end
 
     return _loggers[logger_name]
