@@ -45,7 +45,7 @@ end
 
             set_level(logger, "error") do
                 @test get_level(logger) == "error"
-                warn("silenced message should not be displayed")
+                warn(logger, "silenced message should not be displayed")
             end
             @test get_level(logger) == "info"
 

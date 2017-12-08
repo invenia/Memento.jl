@@ -5,6 +5,9 @@ module Memento
 using Compat
 using Compat.Dates
 
+import Syslogs
+import JSON
+
 import Base: show, info, warn, error, log
 
 export log, debug, info, notice, warn, error, critical, alert, emergency,
@@ -16,7 +19,7 @@ export log, debug, info, notice, warn, error, critical, alert, emergency,
        Record, DefaultRecord,
        Formatter, DefaultFormatter, DictFormatter,
        Handler, DefaultHandler,
-       FileRoller
+       FileRoller, Syslog
 
 const DEFAULT_LOG_LEVEL = "warn"
 
@@ -38,6 +41,7 @@ include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
+include("deprecates.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to STDOUT.
