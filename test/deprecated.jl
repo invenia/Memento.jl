@@ -1,11 +1,14 @@
-@testset "Deprecations" begin
-    @testset "Syslog" begin
-        if Sys.isunix()
+@testset "v0.4 deprecations" begin
+    if Sys.isunix()
+        @testset "Syslog" begin
             levels = copy(Memento._log_levels)
             levels["invalid"] = 100
 
             # Create our DefaultHandler w/ the Syslog IO type
-            handler = DefaultHandler(Memento.Syslog(), DefaultFormatter("{level}: {msg}"))
+            handler = @test_warn(
+                "Syslog has been moved to Syslogs.jl",
+                DefaultHandler(Memento.Syslog(), DefaultFormatter("{level}: {msg}"))
+            )
 
             logger = Logger(
                 "Deprecated",
@@ -17,14 +20,21 @@
             )
 
             # We just want to test that our glue code works with Syslogs.jl
-            info(logger, "Hello World!")
+            @test_warn(
+                "The custom `Memento.emit` method for Syslog IO types will not be provided in the future.",
+                info(logger, "Hello World!")
+            )
         end
     end
 
     @testset "JsonFormatter" begin
         rec = DefaultRecord("Logger.example", "info", 20, "blah")
 
-        fmt = JsonFormatter()
+        fmt = @test_warn(
+            "JsonFormatter(aliases=Nullable()) is deprecated, use DictFormatter(aliases, JSON.json) instead.",
+            JsonFormatter()
+        )
+
         result = Memento.format(fmt, rec)
         @test isa(JSON.parse(result), Dict)
 

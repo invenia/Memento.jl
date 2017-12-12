@@ -1,3 +1,5 @@
+# BEGIN Memento 0.4 deprecations
+
 function Syslog(facility=:local0, tag="julia", tag_pid::Bool=false)
     Base.depwarn("Syslog has been moved to Syslogs.jl", :Syslog)
     Syslogs.Syslog(facility)
@@ -15,3 +17,5 @@ function Memento.emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Form
 end
 
 @deprecate JsonFormatter(aliases=Nullable()) DictFormatter(aliases, JSON.json)
+
+# END Memento 0.4 deprecations
