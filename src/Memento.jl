@@ -55,6 +55,7 @@ include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
 include("deprecated.jl")
+include("test.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to STDOUT.
