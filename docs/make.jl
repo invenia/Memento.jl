@@ -36,7 +36,7 @@ makedocs(
 
 deploydocs(
     repo   = "github.com/invenia/Memento.jl.git",
-    julia  = "0.5",
+    julia  = "0.6",
     target = "build",
     deps = nothing,
     make = nothing,
