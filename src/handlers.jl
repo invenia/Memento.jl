@@ -11,15 +11,6 @@ based on the `Formatter`, `IO` and/or `Record` types.
 """
 abstract type Handler{F<:Formatter, O<:IO} end
 
-function Memento.Filter(h::Handler)
-    function level_filter(rec::Record)
-        level = rec[:level]
-        return h.levels.x[level] >= h.levels.x[h.level]
-    end
-
-    Memento.Filter(level_filter)
-end
-
 """
     log(handler::Handler, rec::Record)
 
@@ -90,7 +81,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    push!(handler.filters, Memento.Filter(handler))
+    add_filter(handler, Memento.Filter(handler))
     finalizer(handler, h -> close(h.io))
     handler
 end
@@ -122,12 +113,30 @@ function setup_opts(opts)
     opts
 end
 
+function Memento.Filter(h::DefaultHandler)
+    function level_filter(rec::Record)
+        level = rec[:level]
+        return h.levels.x[level] >= h.levels.x[h.level]
+    end
+
+    Memento.Filter(level_filter)
+end
+
 """
     filters(handler::DefaultHandler) -> Array{Filter}
 
 Returns the filters for the handler.
 """
 filters(handler::DefaultHandler) = handler.filters
+
+"""
+    add_filter(handler::DefaultHandler, filter::Memento.Filter)
+
+Adds an new `Filter` to the handler.
+"""
+function add_filter(handler::DefaultHandler, filter::Memento.Filter)
+    push!(handler.filters, filter)
+end
 
 """
     set_level(handler::DefaultHandler, level::AbstractString)
