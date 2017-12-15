@@ -81,7 +81,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    push!(handler.filters, Memento.Filter(handler))
+    add_filter(handler, Memento.Filter(handler))
     finalizer(handler, h -> close(h.io))
     handler
 end
