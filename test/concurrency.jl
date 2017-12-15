@@ -8,14 +8,13 @@
         io = IOBuffer()
 
         try
-            set_level(get_logger(), "info")
-            add_handler(
-                get_logger(),
-                DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")),
-                "io"
+            setlevel!(getlogger(), "info")
+            push!(
+                getlogger(),
+                DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}"))
             )
 
-            asyncmap(x -> warn(get_logger(), "message"), 1:10)
+            asyncmap(x -> warn(getlogger(), "message"), 1:10)
             all_msgs = split(String(take!(io)), '\n')
 
             @test !isempty(all_msgs)
@@ -33,14 +32,13 @@
             @eval @everywhere parallel_test_filename = $(tempname())
 
             @everywhere using Memento
-            @everywhere set_level(get_logger(), "info")
-            @everywhere add_handler(
-                get_logger(),
-                DefaultHandler(parallel_test_filename, DefaultFormatter("{name} - {level}: {msg}")),
-                "io"
+            @everywhere setlevel!(getlogger(), "info")
+            @everywhere push!(
+                getlogger(),
+                DefaultHandler(parallel_test_filename, DefaultFormatter("{name} - {level}: {msg}"))
             )
 
-            pmap(x -> warn(get_logger(), "message"), 1:10)
+            pmap(x -> warn(getlogger(), "message"), 1:10)
 
             open(parallel_test_filename) do f
                 all_msgs = readlines(f)

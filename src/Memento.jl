@@ -10,16 +10,29 @@ import JSON
 
 import Base: show, info, warn, error, log
 
-export log, debug, info, notice, warn, error, critical, alert, emergency,
-       is_set, is_root, get_level, set_level, add_level, set_record, add_filter,
-       add_handler, remove_handler, remove_handlers, emit,
-       get_logger, get_handlers, format,
+export debug, notice, error, critical, alert, emergency,
+       isset, isroot, ispropagating, setpropagating!,
+       getlevel, setlevel!, addlevel!, setrecord!,
+       getlogger, gethandlers, getfilters, format, emit,
 
-       Logger,
-       Record, DefaultRecord,
-       Formatter, DefaultFormatter, DictFormatter,
-       Handler, DefaultHandler,
-       FileRoller, Syslog
+       Logger,Record, DefaultRecord, Formatter, Handler,
+       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller,
+
+       # Deprecated
+       Syslog,
+       JsonFormatter,
+       is_set,
+       is_root,
+       get_level,
+       set_level,
+       add_level,
+       set_record,
+       filters,
+       add_filter,
+       add_handler,
+       remove_handler,
+       get_logger,
+       get_handlers
 
 const DEFAULT_LOG_LEVEL = "warn"
 
