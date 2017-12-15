@@ -329,6 +329,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/public.html#Memento.add_filter-Tuple{Memento.Logger,Memento.Filter}",
+    "page": "Public",
+    "title": "Memento.add_filter",
+    "category": "Method",
+    "text": "add_filter(logger::Logger, filter::Memento.Filter)\n\nAdds an new Filter to the logger.\n\n\n\n"
+},
+
+{
     "location": "api/public.html#Memento.add_handler",
     "page": "Public",
     "title": "Memento.add_handler",
@@ -513,6 +521,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/public.html#Memento.add_filter-Tuple{Memento.DefaultHandler,Memento.Filter}",
+    "page": "Public",
+    "title": "Memento.add_filter",
+    "category": "Method",
+    "text": "add_filter(handler::DefaultHandler, filter::Memento.Filter)\n\nAdds an new Filter to the handler.\n\n\n\n"
+},
+
+{
     "location": "api/public.html#Memento.emit-Union{Tuple{F}, Tuple{Memento.DefaultHandler{F,O},Memento.Record}, Tuple{O}} where O<:IO where F<:Memento.Formatter",
     "page": "Public",
     "title": "Memento.emit",
@@ -678,6 +694,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Memento.config",
     "category": "Method",
     "text": "config(level::AbstractString; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to STDOUT.\n\nArguments\n\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to STDOUT should be colorized.\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.filters-Tuple{Memento.Logger}",
+    "page": "Private",
+    "title": "Memento.filters",
+    "category": "Method",
+    "text": "filters(logger::Logger) -> Array{Filter}\n\nReturns the filters for the logger.\n\n\n\n"
 },
 
 {
