@@ -45,8 +45,8 @@ mutable struct Logger
             handler.levels = Ref(logger.levels)
         end
 
-        push!(logger.filters, Memento.Filter(rec -> is_set(logger)))
-        push!(logger.filters, Memento.Filter(logger))
+        add_filter(logger, Memento.Filter(rec -> is_set(logger)))
+        add_filter(logger, Memento.Filter(logger))
 
         return logger
     end
@@ -229,6 +229,22 @@ Sets the record type for the logger.
 set_record(logger::Logger, rec::Type{R}) where {R<:Record} = logger.record = rec
 
 """
+    filters(logger::Logger) -> Array{Filter}
+
+Returns the filters for the logger.
+"""
+filters(logger::Logger) = logger.filters
+
+"""
+    add_filter(logger::Logger, filter::Memento.Filter)
+
+Adds an new `Filter` to the logger.
+"""
+function add_filter(logger::Logger, filter::Memento.Filter)
+    push!(logger.filters, filter)
+end
+
+"""
     remove_handler(logger::Logger, name)
 
 Removes the `Handler` with the provided name from the logger.handlers.
@@ -307,7 +323,7 @@ method with a `@sync` in order to synchronize all handler tasks.
 """
 function log(logger::Logger, rec::Record)
     # If none of the `Filter`s return false we're good to log our record.
-    if all(f -> f(rec), logger.filters)
+    if all(f -> f(rec), filters(logger))
         for (name, handler) in logger.handlers
             @async log(handler, rec)
         end
