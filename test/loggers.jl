@@ -41,6 +41,9 @@ end
             setlevel!(logger, "info")
             @test logger.level == "info"
 
+            push!(logger, Memento.Filter(logger))
+            @test length(getfilters(logger)) == 3
+
             setlevel!(logger, "error") do
                 @test getlevel(logger) == "error"
                 warn(logger, "silenced message should not be displayed")
