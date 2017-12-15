@@ -50,13 +50,13 @@ ERROR: Something that should throw an error.
 Now maybe you want to have a different logger for each module/submodule.
 This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.
 ```julia
-julia> child_logger = get_logger("Foo.bar")
+julia> child_logger = getlogger("Foo.bar")
 Logger(Foo.bar)
 
-julia> set_level(child_logger, "warn")
+julia> setlevel!(child_logger, "warn")
 "warn"
 
-julia> add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")))
+julia> child_logger += DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))
 
 Memento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter("[{date} | {level} | {name}]: {msg}"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))
 
@@ -66,4 +66,4 @@ julia> debug(child_logger, "Something that should only be printed to STDOUT on t
 julia> warn(child_logger, "Warning to STDOUT and the log file.")
 [warn | Foo.bar]: Warning to STDOUT and the log file.
 ```
-NOTE: We used `get_logger("Foo.bar")`, but you can also do `get_logger(current_module())` which allows us to avoid hard coding in logger names.
+NOTE: We used `getlogger("Foo.bar")`, but you can also do `getlogger(current_module())` which allows us to avoid hard coding in logger names.

@@ -14,7 +14,7 @@ Will only log message at or above the "warn" level.
 
 We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.
 ```julia
-julia>set_level(get_logger("Main"), "info")
+julia>setlevel!(getlogger("Main"), "info")
 ```
 Will only set the logging level to "info" for the "Main" logger and any future children of the "Main" logger.
 

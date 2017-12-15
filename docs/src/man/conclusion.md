@@ -14,7 +14,7 @@ using Memento
 
 function run(f::Function, args...; kwargs...)
     ret = nothing
-    logger = get_logger(current_module())
+    logger = getlogger(current_module())
     info(logger, "Got logger $logger")
 
     notice(logger, "Running function...")
@@ -136,7 +136,7 @@ end
 
 # Now we can tie this all together, but adding a new DefaultHandler
 # with the CSVFormatter and REST IO type.
-add_handler(logger, DefaultHandler(
+logger += DefaultHandler(
     REST(
         "memento.mylogrestservice.com", "myapp",
         "qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A"
@@ -145,10 +145,10 @@ add_handler(logger, DefaultHandler(
         ',',
         [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]
     )
-))
+)
 
 # Don't forget to update the root logger `Record` type.
-set_record(logger, EC2Record)
+setrecord!(logger, EC2Record)
 
 Wrapper.run(exp, 10)
 # Should log some things.
