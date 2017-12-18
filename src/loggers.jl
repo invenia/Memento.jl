@@ -45,8 +45,8 @@ mutable struct Logger
             handler.levels = Ref(logger.levels)
         end
 
-        logger += Memento.Filter(rec -> isset(logger))
-        logger += Memento.Filter(logger)
+        push!(logger, Memento.Filter(rec -> isset(logger)))
+        push!(logger, Memento.Filter(logger))
 
         return logger
     end
@@ -71,13 +71,6 @@ function Memento.Filter(l::Logger)
     end
 
     Memento.Filter(level_filter)
-end
-
-# We overload `+`, so that folks can push handlers and filters into the logger with
-# `logger += handler`
-function Base.:+(logger::Logger, x::Union{Handler, Memento.Filter})
-    push!(logger, x)
-    return logger
 end
 
 """

@@ -136,14 +136,17 @@ end
 
 # Now we can tie this all together, but adding a new DefaultHandler
 # with the CSVFormatter and REST IO type.
-logger += DefaultHandler(
-    REST(
-        "memento.mylogrestservice.com", "myapp",
-        "qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A"
-    ),
-    CSVFormatter(
-        ',',
-        [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]
+push!(
+    logger,
+    DefaultHandler(
+        REST(
+            "memento.mylogrestservice.com", "myapp",
+            "qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A"
+        ),
+        CSVFormatter(
+            ',',
+            [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]
+        )
     )
 )
 

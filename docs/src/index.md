@@ -56,7 +56,7 @@ Logger(Foo.bar)
 julia> setlevel!(child_logger, "warn")
 "warn"
 
-julia> child_logger += DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}"))
+julia> push!(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")))
 
 Memento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter("[{date} | {level} | {name}]: {msg}"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))
 

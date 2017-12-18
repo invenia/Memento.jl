@@ -62,7 +62,7 @@ cd(dirname(@__FILE__))
             @test contains(result, expected)
 
             setlevel!(baz, "debug")
-            baz += DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}"))
+            push!(baz, DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")))
 
             msg = "Message"
             warn(baz, msg)

@@ -68,7 +68,7 @@ Creates a DefaultHandler with the specified IO type.
 function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter, O<:IO}
     setup_opts(opts)
     handler = DefaultHandler(fmt, io, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    handler += Memento.Filter(handler)
+    push!(handler, Memento.Filter(handler))
     return handler
 end
 
@@ -86,7 +86,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    handler += Memento.Filter(handler)
+    push!(handler, Memento.Filter(handler))
     finalizer(handler, h -> close(h.io))
     handler
 end

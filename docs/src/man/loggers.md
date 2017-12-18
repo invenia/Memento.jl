@@ -10,7 +10,7 @@ julia> logger = getlogger(current_module())
 Log messages are brought to different output streams by `Handlers`. From here you can add and remove handlers. To add a handler that writes to rotating log files, simply:
 
 ```julia
-julia> logger += DefaultHandler("mylogfile.log")
+julia> push!(logger, DefaultHandler("mylogfile.log"))
 ```
 
 Now there is a handler named "file-logging", and it will write all of your logs to `mylogfile.log`. Your logs will still show up in the console, however, because -by default- there is a handler named "console" already hard at work.

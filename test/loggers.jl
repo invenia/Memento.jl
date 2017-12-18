@@ -32,7 +32,7 @@ end
             @test logger.level == "error"
             @test length(gethandlers(logger)) == 1
 
-            logger += DefaultHandler(tempname())
+            push!(logger, DefaultHandler(tempname()))
             @test length(gethandlers(logger)) == 2
 
             @test ispropagating(logger)
@@ -104,7 +104,7 @@ end
             @test logger.level == "error"
             @test length(gethandlers(logger)) == 1
 
-            logger += DefaultHandler(tempname())
+            push!(logger, DefaultHandler(tempname()))
             @test length(gethandlers(logger)) == 2
 
             setlevel!(logger, "info")
