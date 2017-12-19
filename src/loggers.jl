@@ -45,8 +45,8 @@ mutable struct Logger
             handler.levels = Ref(logger.levels)
         end
 
-        add_filter(logger, Memento.Filter(rec -> is_set(logger)))
-        add_filter(logger, Memento.Filter(logger))
+        push!(logger, Memento.Filter(rec -> isset(logger)))
+        push!(logger, Memento.Filter(logger))
 
         return logger
     end
@@ -81,25 +81,39 @@ Just prints `Logger(logger.name)`
 Base.show(io::IO, logger::Logger) = print(io, "Logger($(logger.name))")
 
 """
-    is_root(::Logger)
+    isroot(::Logger)
 
 Returns true if `logger.name`is "root" or ""
 """
-is_root(logger::Logger) = logger.name == "root" || logger.name == ""
+isroot(logger::Logger) = logger.name == "root" || logger.name == ""
 
 """
-    is_set(::Logger)
+    isset(::Logger)
 
 Returns true or false as to whether the logger is set. (ie: logger.level != "not_set")
 """
-is_set(logger::Logger) = logger.level != "not_set"
+isset(logger::Logger) = logger.level != "not_set"
 
 """
-    get_level(::Logger)
+    ispropagating(::Logger)
+
+Returns true or false as to whether the logger is propagating.
+"""
+ispropagating(logger::Logger) = logger.propagate
+
+"""
+    setpropagating!(::Logger, [::Bool])
+
+Sets the logger to be propagating or not (Defaults to true).
+"""
+setpropagating!(logger::Logger, val::Bool=true) = logger.propagate = val
+
+"""
+    getlevel(::Logger)
 
 Returns the current logger level.
 """
-get_level(logger::Logger) = logger.level
+getlevel(logger::Logger) = logger.level
 
 """
     register(::Logger)
@@ -127,15 +141,9 @@ that prints to STDOUT.
 function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
     _log_levels = levels
     logger = Logger("root"; level=level, levels=levels)
-    add_handler(
-        logger,
-        DefaultHandler(
-            STDOUT,
-            DefaultFormatter(fmt),
-            Dict{Symbol, Any}(:is_colorized => colorized)
-        ),
-        "console"
-    )
+    handler = DefaultHandler(STDOUT, DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized))
+
+    logger.handlers["console"] = handler
     register(logger)
 
     return logger
@@ -154,7 +162,7 @@ function reset!()
 end
 
 """
-    get_parent(name::AbstractString) -> Logger
+    getparent(name::AbstractString) -> Logger
 
 Takes a string representing the name of a logger and returns
 its parent. If the logger name has no parent then the root logger is returned.
@@ -167,20 +175,20 @@ Parent loggers are extracted assuming a naming convention of "foo.bar.baz", wher
 # Returns
 * `Logger`: the parent logger.
 """
-function get_parent(name)
+function getparent(name)
     tokenized = split(name, '.')
 
     if length(tokenized) == 1
-        return get_logger("root")
+        return getlogger("root")
     elseif length(tokenized) == 2
-        return get_logger(tokenized[1])
+        return getlogger(tokenized[1])
     else
-        return get_logger(join(tokenized[1:end-1], '.'))
+        return getlogger(join(tokenized[1:end-1], '.'))
     end
 end
 
 """
-    get_logger(name::Module) -> Logger
+    getlogger(name::Module) -> Logger
 
 Converts the `Module` to a `String` and calls `get_logger(name::String)`.
 
@@ -192,10 +200,10 @@ Converts the `Module` to a `String` and calls `get_logger(name::String)`.
 
 Returns the logger.
 """
-get_logger(name::Module) = get_logger("$name")
+getlogger(name::Module) = getlogger("$name")
 
 """
-    get_logger(name::AbstractString) -> Logger
+    getlogger(name::AbstractString) -> Logger
 
 If the logger or its parents do not exist then they are initialized
 with no handlers and not set.
@@ -206,11 +214,11 @@ with no handlers and not set.
 # Returns
 * `Logger`: the logger.
 """
-function get_logger(name="root")
+function getlogger(name="root")
     logger_name = name == "" ? "root" : name
 
     if !(haskey(_loggers, logger_name))
-        parent = get_parent(logger_name)
+        parent = getparent(logger_name)
         register(Logger(logger_name))
     end
 
@@ -218,7 +226,7 @@ function get_logger(name="root")
 end
 
 """
-    set_record{R<:Record}(logger::Logger, rec::Type{R})
+    setrecord!{R<:Record}(logger::Logger, rec::Type{R})
 
 Sets the record type for the logger.
 
@@ -226,83 +234,68 @@ Sets the record type for the logger.
 * `logger::Logger`: the logger to set.
 * `rec::Record`: A `Record` type to use for logging messages (ie: `DefaultRecord`).
 """
-set_record(logger::Logger, rec::Type{R}) where {R<:Record} = logger.record = rec
+setrecord!(logger::Logger, rec::Type{R}) where {R<:Record} = logger.record = rec
 
 """
-    filters(logger::Logger) -> Array{Filter}
+    getfilters(logger::Logger) -> Array{Filter}
 
 Returns the filters for the logger.
 """
-filters(logger::Logger) = logger.filters
+getfilters(logger::Logger) = logger.filters
 
 """
-    add_filter(logger::Logger, filter::Memento.Filter)
+    push!(logger::Logger, filter::Memento.Filter)
 
 Adds an new `Filter` to the logger.
 """
-function add_filter(logger::Logger, filter::Memento.Filter)
-    push!(logger.filters, filter)
-end
+Base.push!(logger::Logger, filter::Memento.Filter) = push!(logger.filters, filter)
 
 """
-    remove_handler(logger::Logger, name)
-
-Removes the `Handler` with the provided name from the logger.handlers.
-"""
-remove_handler(logger::Logger, name) = delete!(logger.handlers, name)
-
-"""
-    get_handlers(logger::Logger)
+    gethandlers(logger::Logger)
 
 Returns logger.handlers
 """
-get_handlers(logger::Logger) = logger.handlers
+gethandlers(logger::Logger) = logger.handlers
 
 """
-    add_handler(logger::Logger, handler::Handler, name)
+    push!(logger::Logger, handler::Handler)
 
-Adds a new handler to `logger.handlers`. If a name is not provided a
-random one will be generated.
-
-# Arguments
-* `logger::Logger`: the logger to use.
-* `handler::Handler`: the handler to add.
-* `name::AbstractString`: a name to identify the handler.
+Adds a new `Handler` to the logger.
 """
-function add_handler(logger::Logger, handler::Handler, name=string(Base.Random.uuid4()))
+function Base.push!(logger::Logger, handler::Handler)
     handler.levels.x = logger.levels
-    logger.handlers[name] = handler
+    logger.handlers[string(Base.Random.uuid4())] = handler
 end
 
 """
-    add_level(logger::Logger, level::AbstractString, val::Int)
+    addlevel!(logger::Logger, level::AbstractString, val::Int)
 
 Adds a new `level::String` and `priority::Int` to the `logger.levels`
 """
-add_level(logger::Logger, level::AbstractString, val::Int) = logger.levels[level] = val
+addlevel!(logger::Logger, level::AbstractString, val::Int) = logger.levels[level] = val
 
 """
-    set_level(logger::Logger, level::AbstractString)
+    setlevel!(logger::Logger, level::AbstractString)
 
 Changes what level this logger should log at.
 """
-function set_level(logger::Logger, level::AbstractString)
+function setlevel!(logger::Logger, level::AbstractString)
     logger.levels[level]    # Throw a key error if the levels isn't in levels
     logger.level = level
 end
 
 """
-    set_level(f::Function, logger::Logger, level::AbstractString)
+    setlevel!(f::Function, logger::Logger, level::AbstractString)
 
 Temporarily change the level a logger will log at for the duration of the function `f`.
 """
-function set_level(f::Function, logger::Logger, level::AbstractString)
-    original_level = get_level(logger)
-    set_level(logger, level)
+function setlevel!(f::Function, logger::Logger, level::AbstractString)
+    original_level = getlevel(logger)
+    setlevel!(logger, level)
     try
         f()
     finally
-        set_level(logger, original_level)
+        setlevel!(logger, original_level)
     end
 end
 
@@ -323,14 +316,14 @@ method with a `@sync` in order to synchronize all handler tasks.
 """
 function log(logger::Logger, rec::Record)
     # If none of the `Filter`s return false we're good to log our record.
-    if all(f -> f(rec), filters(logger))
+    if all(f -> f(rec), getfilters(logger))
         for (name, handler) in logger.handlers
             @async log(handler, rec)
         end
     end
 
-    if !is_root(logger) && logger.propagate
-        log(get_parent(logger.name), rec)
+    if !isroot(logger) && logger.propagate
+        log(getparent(logger.name), rec)
     end
 end
 

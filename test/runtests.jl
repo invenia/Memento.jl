@@ -1,5 +1,6 @@
 using Compat
 using Compat.Test
+using Suppressor
 
 import Compat: Dates
 import Compat:Sys
@@ -25,38 +26,34 @@ cd(dirname(@__FILE__))
 @testset "Logging" begin
     @testset "Sample Usage" begin
         Memento.config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
-        logger1 = get_logger(@__MODULE__)
+        logger1 = getlogger(@__MODULE__)
         debug(logger1, "Something that won't get logged.")
         info(logger1, "Something you might want to know.")
         warn(logger1, "This might cause an error.")
         warn(logger1, ErrorException("A caught exception that we want to log as a warning."))
         @test_throws ErrorException error(logger1, "Something that should throw an error.")
         @test_throws ErrorException error(logger1, ErrorException("A caught exception that we should log and rethrow"))
-        logger2 = get_logger("Pkg.Foo.Bar")
+        logger2 = getlogger("Pkg.Foo.Bar")
     end
 
     @testset "Logger Hierarchy" begin
         Memento.reset!()
-        foo = get_logger("Foo")
-        bar = get_logger("Foo.Bar")
-        baz = get_logger("Foo.Bar.Baz")
-        car = get_logger("Foo.Car")
+        foo = getlogger("Foo")
+        bar = getlogger("Foo.Bar")
+        baz = getlogger("Foo.Bar.Baz")
+        car = getlogger("Foo.Car")
 
         for l in (foo, bar, baz, car)
-            @test is_set(l)
-            @test get_level(l) == "warn"
-            @test length(get_handlers(l)) == 0
+            @test isset(l)
+            @test getlevel(l) == "warn"
+            @test length(gethandlers(l)) == 0
         end
 
         io = IOBuffer()
 
         try
-            set_level(get_logger(), "info")
-            add_handler(
-                get_logger(),
-                DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")),
-                "io"
-            )
+            setlevel!(getlogger(), "info")
+            push!(getlogger(), DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")))
 
             msg = "This should propagate to the root logger."
             warn(baz, msg)
@@ -64,12 +61,8 @@ cd(dirname(@__FILE__))
             expected = "Foo.Bar.Baz - warn: $msg"
             @test contains(result, expected)
 
-            set_level(baz, "debug")
-            add_handler(
-                baz,
-                DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")),
-                "io"
-            )
+            setlevel!(baz, "debug")
+            push!(baz, DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")))
 
             msg = "Message"
             warn(baz, msg)

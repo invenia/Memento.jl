@@ -18,7 +18,7 @@ julia> Pkg.add("Memento")
 
 ## Quick Start
 
-[![asciicast](https://asciinema.org/a/152535.png)](https://asciinema.org/a/152535)
+[![asciicast](https://asciinema.org/a/153324.png)](https://asciinema.org/a/153324)
 
 ## Documentation
 

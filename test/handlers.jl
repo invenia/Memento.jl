@@ -15,9 +15,7 @@
             io = IOBuffer()
 
             try
-                handler = DefaultHandler(
-                    io, DefaultFormatter(FMT_STR)
-                )
+                handler = DefaultHandler(io, DefaultFormatter(FMT_STR))
 
                 logger = Logger(
                     "DefaultHandler.sample_io",
@@ -171,9 +169,7 @@
             io = IOBuffer()
 
             try
-                handler = DefaultHandler(
-                    io, DefaultFormatter(FMT_STR)
-                )
+                handler = DefaultHandler(io, DefaultFormatter(FMT_STR))
 
                 logger = Logger(
                     "DefaultHandler.sample_io",
@@ -192,7 +188,7 @@
                 @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
 
                 # Filter out log messages < LEVELS["warn"]
-                set_level(handler, "warn")
+                setlevel!(handler, "warn")
                 # add_filter(
                 #     handler,
                 #     Filter((rec) -> rec[:levelnum] >= LEVELS["warn"])

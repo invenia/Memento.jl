@@ -11,6 +11,11 @@ based on the `Formatter`, `IO` and/or `Record` types.
 """
 abstract type Handler{F<:Formatter, O<:IO} end
 
+function Base.:+(handler::Handler, filter::Memento.Filter)
+    push!(handler, filter)
+    return handler
+end
+
 """
     log(handler::Handler, rec::Record)
 
@@ -18,7 +23,7 @@ Checks the `Handler` filters and if they all pass then
 `emit` the record.
 """
 function log(handler::Handler, rec::Record)
-    if all(f -> f(rec), filters(handler))
+    if all(f -> f(rec), getfilters(handler))
         emit(handler, rec)
     end
 end
@@ -63,7 +68,7 @@ Creates a DefaultHandler with the specified IO type.
 function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter, O<:IO}
     setup_opts(opts)
     handler = DefaultHandler(fmt, io, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    push!(handler.filters, Memento.Filter(handler))
+    push!(handler, Memento.Filter(handler))
     return handler
 end
 
@@ -81,7 +86,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
-    add_filter(handler, Memento.Filter(handler))
+    push!(handler, Memento.Filter(handler))
     finalizer(handler, h -> close(h.io))
     handler
 end
@@ -123,27 +128,27 @@ function Memento.Filter(h::DefaultHandler)
 end
 
 """
-    filters(handler::DefaultHandler) -> Array{Filter}
+    getfilters(handler::DefaultHandler) -> Array{Filter}
 
 Returns the filters for the handler.
 """
-filters(handler::DefaultHandler) = handler.filters
+getfilters(handler::DefaultHandler) = handler.filters
 
 """
-    add_filter(handler::DefaultHandler, filter::Memento.Filter)
+    push!(handler::DefaultHandler, filter::Memento.Filter)
 
 Adds an new `Filter` to the handler.
 """
-function add_filter(handler::DefaultHandler, filter::Memento.Filter)
+function Base.push!(handler::DefaultHandler, filter::Memento.Filter)
     push!(handler.filters, filter)
 end
 
 """
-    set_level(handler::DefaultHandler, level::AbstractString)
+    setlevel!(handler::DefaultHandler, level::AbstractString)
 
 Sets the minimum level required to `emit` the record from the handler.
 """
-function set_level(handler::DefaultHandler, level::AbstractString)
+function setlevel!(handler::DefaultHandler, level::AbstractString)
     handler.levels.x[level]     # Throw a key error if the levels isn't in levels
     handler.level = level
 end

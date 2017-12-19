@@ -17,9 +17,7 @@ end
         io = IOBuffer()
 
         try
-            handler = DefaultHandler(
-                io, DefaultFormatter(FMT_STR)
-            )
+            handler = DefaultHandler(io, DefaultFormatter(FMT_STR))
 
             logger = Logger(
                 "Logger.example",
@@ -32,26 +30,29 @@ end
 
             @test logger.name == "Logger.example"
             @test logger.level == "error"
-            @test length(get_handlers(logger)) == 1
+            @test length(gethandlers(logger)) == 1
 
-            add_handler(logger, DefaultHandler(tempname()), "filehandler")
-            @test length(get_handlers(logger)) == 2
+            push!(logger, DefaultHandler(tempname()))
+            @test length(gethandlers(logger)) == 2
 
-            remove_handler(logger, "filehandler")
-            @test length(get_handlers(logger)) == 1
+            @test ispropagating(logger)
+            @test setpropagating!(logger, true)
 
-            set_level(logger, "info")
+            setlevel!(logger, "info")
             @test logger.level == "info"
 
-            set_level(logger, "error") do
-                @test get_level(logger) == "error"
+            push!(logger, Memento.Filter(logger))
+            @test length(getfilters(logger)) == 3
+
+            setlevel!(logger, "error") do
+                @test getlevel(logger) == "error"
                 warn(logger, "silenced message should not be displayed")
             end
-            @test get_level(logger) == "info"
+            @test getlevel(logger) == "info"
 
-            set_record(logger, DefaultRecord)
+            setrecord!(logger, DefaultRecord)
 
-            add_level(logger, "fubar", 50)
+            addlevel!(logger, "fubar", 50)
 
             show(io, logger)
             @test contains(String(take!(io)), "Logger(Logger.example)")
@@ -88,9 +89,7 @@ end
         io = IOBuffer()
 
         try
-            handler = DefaultHandler(
-                io, DefaultFormatter(FMT_STR)
-            )
+            handler = DefaultHandler(io, DefaultFormatter(FMT_STR))
 
             logger = Logger(
                 "Logger.example",
@@ -103,19 +102,16 @@ end
 
             @test logger.name == "Logger.example"
             @test logger.level == "error"
-            @test length(get_handlers(logger)) == 1
+            @test length(gethandlers(logger)) == 1
 
-            add_handler(logger, DefaultHandler(tempname()), "filehandler")
-            @test length(get_handlers(logger)) == 2
+            push!(logger, DefaultHandler(tempname()))
+            @test length(gethandlers(logger)) == 2
 
-            remove_handler(logger, "filehandler")
-            @test length(get_handlers(logger)) == 1
-
-            set_level(logger, "info")
+            setlevel!(logger, "info")
             @test logger.level == "info"
 
-            set_record(logger, DefaultRecord)
-            add_level(logger, "fubar", 50)
+            setrecord!(logger, DefaultRecord)
+            addlevel!(logger, "fubar", 50)
 
             show(io, logger)
             @test contains(String(take!(io)), "Logger(Logger.example)")

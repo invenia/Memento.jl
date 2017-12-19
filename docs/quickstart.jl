@@ -8,8 +8,9 @@ notice(logger, "This is probably pretty important.")
 warn(logger, ErrorException("A caught exception that we want to log as a warning."))
 error(logger, "Something that should throw an error.")
 critical(logger, "The world is exploding")
-child_logger = get_logger("Foo.bar")
-set_level(child_logger, "warn")
-add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")));
+child_logger = getlogger("Foo.bar")
+setlevel!(child_logger, "warn")
+push!(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")));
 debug(child_logger, "Something that should only be printed to STDOUT on the root_logger.")
 warn(child_logger, "Warning to STDOUT and the log file.")
+exit()
