@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Quick Start",
     "category": "section",
-    "text": "Start by using Mementojulia> using MementoNow setup basic logging on the root logger with Memento.config.julia> logger = Memento.config(\"debug\"; fmt=\"[{level} | {name}]: {msg}\")\nLogger(root)Now start logging with the root logger.julia> debug(logger, \"Something to help you track down a bug.\")\n[debug | root]: Something to help you track down a bug.\n\njulia> info(logger, \"Something you might want to know.\")\n[info | root]: Something you might want to know.\n\njulia> notice(logger, \"This is probably pretty important.\")\n[notice | root]: This is probably pretty important.\n\njulia> warn(logger, \"This might cause an error.\")\n[warn | root]: This might cause an error.\n\njulia> warn(logger, ErrorException(\"A caught exception that we want to log as a warning.\"))\n[warn | root]: A caught exception that we want to log as a warning.\n\njulia> error(logger, \"Something that should throw an error.\")\n[error | root]: Something that should throw an error.\nERROR: Something that should throw an error.\n in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250Now maybe you want to have a different logger for each module/submodule. This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.julia> child_logger = get_logger(\"Foo.bar\")\nLogger(Foo.bar)\n\njulia> set_level(child_logger, \"warn\")\n\"warn\"\n\njulia> add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\")))\n\nMemento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))\n\njulia> debug(child_logger, \"Something that should only be printed to STDOUT on the root_logger.\")\n[debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.\n\njulia> warn(child_logger, \"Warning to STDOUT and the log file.\")\n[warn | Foo.bar]: Warning to STDOUT and the log file.NOTE: We used get_logger(\"Foo.bar\"), but you can also do get_logger(current_module()) which allows us to avoid hard coding in logger names."
+    "text": "Start by using Mementojulia> using MementoNow setup basic logging on the root logger with Memento.config.julia> logger = Memento.config(\"debug\"; fmt=\"[{level} | {name}]: {msg}\")\nLogger(root)Now start logging with the root logger.julia> debug(logger, \"Something to help you track down a bug.\")\n[debug | root]: Something to help you track down a bug.\n\njulia> info(logger, \"Something you might want to know.\")\n[info | root]: Something you might want to know.\n\njulia> notice(logger, \"This is probably pretty important.\")\n[notice | root]: This is probably pretty important.\n\njulia> warn(logger, \"This might cause an error.\")\n[warn | root]: This might cause an error.\n\njulia> warn(logger, ErrorException(\"A caught exception that we want to log as a warning.\"))\n[warn | root]: A caught exception that we want to log as a warning.\n\njulia> error(logger, \"Something that should throw an error.\")\n[error | root]: Something that should throw an error.\nERROR: Something that should throw an error.\n in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250Now maybe you want to have a different logger for each module/submodule. This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.julia> child_logger = getlogger(\"Foo.bar\")\nLogger(Foo.bar)\n\njulia> setlevel!(child_logger, \"warn\")\n\"warn\"\n\njulia> push!(child_logger, DefaultHandler(tempname(), DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\")))\n\nMemento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))\n\njulia> debug(child_logger, \"Something that should only be printed to STDOUT on the root_logger.\")\n[debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.\n\njulia> warn(child_logger, \"Warning to STDOUT and the log file.\")\n[warn | Foo.bar]: Warning to STDOUT and the log file.NOTE: We used getlogger(\"Foo.bar\"), but you can also do getlogger(current_module()) which allows us to avoid hard coding in logger names."
 },
 
 {
@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "Logging levels",
     "category": "section",
-    "text": "You can globally set the minimum logging level with Memento.config.julia>Memento.config(\"debug\")Will log all messages for all loggers at or above \"debug\".julia>Memento.config(\"warn\")Will only log message at or above the \"warn\" level.We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.julia>set_level(get_logger(\"Main\"), \"info\")Will only set the logging level to \"info\" for the \"Main\" logger and any future children of the \"Main\" logger.By default Memento has 9 logging levels.Level Number Description\nnot_set 0 Will not log anything, but may still propagate messages to its parents.\ndebug 10 Log verbose message used for debugging.\ninfo 20 Log general information about a program.\nnotice 30 Log important events that are still part of normal execution.\nwarn 40 Log warning that may cause the program to fail.\nerror 50 Log errors and throw or rethrow an error.\ncritical 60 Entire application has crashed.\nalert 70 The entire application crashed and is not recoverable. Probably need to wake up the sysadmin.\nemergency 80 System is unusable. Applications shouldn't need to call this so it may be removed in the future."
+    "text": "You can globally set the minimum logging level with Memento.config.julia>Memento.config(\"debug\")Will log all messages for all loggers at or above \"debug\".julia>Memento.config(\"warn\")Will only log message at or above the \"warn\" level.We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.julia>setlevel!(getlogger(\"Main\"), \"info\")Will only set the logging level to \"info\" for the \"Main\" logger and any future children of the \"Main\" logger.By default Memento has 9 logging levels.Level Number Description\nnot_set 0 Will not log anything, but may still propagate messages to its parents.\ndebug 10 Log verbose message used for debugging.\ninfo 20 Log general information about a program.\nnotice 30 Log important events that are still part of normal execution.\nwarn 40 Log warning that may cause the program to fail.\nerror 50 Log errors and throw or rethrow an error.\ncritical 60 Entire application has crashed.\nalert 70 The entire application crashed and is not recoverable. Probably need to wake up the sysadmin.\nemergency 80 System is unusable. Applications shouldn't need to call this so it may be removed in the future."
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Loggers",
     "title": "Loggers",
     "category": "section",
-    "text": "A Logger is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default \"root\" logger stored in global _loggers inside the Memento module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code. To create a new logger for you code it is recommended to do get_logger(current_module()).julia> logger = get_logger(current_module())Log messages are brought to different output streams by Handlers. From here you can add and remove handlers. To add a handler that writes to rotating log files, simply:julia> add_handler(logger, DefaultHandler(\"mylogfile.log\"), \"file-logging\")Now there is a handler named \"file-logging\", and it will write all of your logs to mylogfile.log. Your logs will still show up in the console, however, because -by default- there is a handler named \"console\" already hard at work. Remove it by calling:julia> remove_handler(logger, \"console\")The operations presented here will only apply to the current logger, leaving existing loggers (e.g., Logger(root)) unaffected. However, any child loggers of Logger(Main) (e.g., Logger(Main.Foo) will have both the \"console\" and \"file-logging\" handlers available to it.We can also set the level and Record type for our logger.julia> set_level(logger, \"warn\")Now we won't log any messages with this logger unless they are at least warning messages.julia> set_record(logger, MyRecord)Now our logger will call create MyRecords instead of DefaultRecords"
+    "text": "A Logger is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default \"root\" logger stored in global _loggers inside the Memento module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code. To create a new logger for you code it is recommended to do getlogger(current_module()).julia> logger = getlogger(current_module())Log messages are brought to different output streams by Handlers. From here you can add and remove handlers. To add a handler that writes to rotating log files, simply:julia> push!(logger, DefaultHandler(\"mylogfile.log\"))Now there is a handler named \"file-logging\", and it will write all of your logs to mylogfile.log. Your logs will still show up in the console, however, because -by default- there is a handler named \"console\" already hard at work.The operations presented here will only apply to the current logger, leaving existing loggers (e.g., Logger(root)) unaffected. However, any child loggers of Logger(Main) (e.g., Logger(Main.Foo) will have both the \"console\" and \"file-logging\" handlers available to it.We can also set the level and Record type for our logger.julia> setlevel!(logger, \"warn\")Now we won't log any messages with this logger unless they are at least warning messages.julia> setrecord!(logger, MyRecord)Now our logger will call create MyRecords instead of DefaultRecords"
 },
 
 {
@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Conclusion",
     "title": "Conclusion",
     "category": "section",
-    "text": "We've reviewed all the different components you can use to configure logging in you application, but how do they all fit together? Let's work through a sample use case that uses all of the components we've discussed.NOTE: The example provided is a bit contrived for simplicity.First, let's start with a julia Pkg called Wrapper that runs a function wrapped in some Memento logging.# Wrapper.jl\nmodule Wrapper\n\nusing Memento\n\nfunction run(f::Function, args...; kwargs...)\n    ret = nothing\n    logger = get_logger(current_module())\n    info(logger, \"Got logger $logger\")\n\n    notice(logger, \"Running function...\")\n\n    try\n        ret = f(args...; kwargs...)\n    catch exc\n        warn(logger, exc)\n    end\n\n    return ret\nend\n\nendNow we want to start writing our application code that uses this package, but our logging requirements are very specific and Memento doesn't support our particular use case yet.Requirements:This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.\nWe want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>.\nWe want our logs to be written in a CSV format... for some reason.Okay, so how do we address all of those requirements using Memento's API?Steps:Create a custom Record type called EC2Record that stores the Amazon EC2 information to address the first requirement.\nCreate a custom IO type called REST that writes log strings to the REST endpoint to partly address the second requirement.\nCreate a custom Formatter type called CSVFormatter that converts Records to (comma, tab, etc) delimited strings.NOTE: The code below is not intended to be a working example because it assumes a fake REST service.# myapp.jl\nusing Wrapper\nusing Memento\nusing Requests  # For send logs to our fake logging REST service\n\n# Start by setting up our basic console logging for the root logger.\nlogger = Memento.config(\"info\"; fmt=\"[{level} | {name}]: {msg}\")\n\n# We create our custom EC2Record type\nmutable struct EC2Record <: Record\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(args::Dict)\n        time = now()\n        trace = Attribute(StackTrace, get_trace)\n\n        EC2Record(\n            Attribute(DateTime, () -> round(time, Dates.Second)),\n            Attribute(args[:level]),\n            Attribute(args[:levelnum]),\n            Attribute(AbstractString, get_msg(args[:msg])),\n            Attribute(args[:name]),\n            Attribute(myid()),\n            Attribute(StackFrame, get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nend\n\n# A really simple CSVFormatter\nmutable struct CSVFormatter <: Formatter\n    delim::Char\n    vals::Array{Symbol}\n\n    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)\nend\n\nfunction format(fmt::CSVFormatter, rec::Record)\n    fields = isempty(fmt.vals) ? keys(rec) : fmt.vals\n\n    # For a real world use case we might want to do some\n    # string formatting of fields like :stacktrace here.\n\n    val = map(k -> rec[k], fields)\n\n    return join(val, fmt.delim)\nend\n\n# Create our custom REST IO type\nmutable struct REST <: IO\n    account_uri::AbstractString\n    app_name::AbstractString\n    access_key::AbstractString\nend\n\n# Our print method builds the correct uri using the log level\n# and sends the put request.\nfunction println(io::REST, level::AbstractString, msg::AbstractString)\n    uri = \"https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)\"\n    @async put(uri; data=msg)\nend\n\n# Not relevant, but good to have.\nflush(io::REST) = io\n\n# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`\nfunction log(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}\n    msg = format(handler.fmt, rec)\n    println(handler.io, rec[:level], msg)\n    flush(handler.io)\nend\n\n# Now we can tie this all together, but adding a new DefaultHandler\n# with the CSVFormatter and REST IO type.\nadd_handler(logger, DefaultHandler(\n    REST(\n        \"memento.mylogrestservice.com\", \"myapp\",\n        \"qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A\"\n    ),\n    CSVFormatter(\n        ',',\n        [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]\n    )\n))\n\n# Don't forget to update the root logger `Record` type.\nset_record(logger, EC2Record)\n\nWrapper.run(exp, 10)\n# Should log some things.\n\nWrapper.run(exp, \"foo\")\n# Should log a warning about a method error."
+    "text": "We've reviewed all the different components you can use to configure logging in you application, but how do they all fit together? Let's work through a sample use case that uses all of the components we've discussed.NOTE: The example provided is a bit contrived for simplicity.First, let's start with a julia Pkg called Wrapper that runs a function wrapped in some Memento logging.# Wrapper.jl\nmodule Wrapper\n\nusing Memento\n\nfunction run(f::Function, args...; kwargs...)\n    ret = nothing\n    logger = getlogger(current_module())\n    info(logger, \"Got logger $logger\")\n\n    notice(logger, \"Running function...\")\n\n    try\n        ret = f(args...; kwargs...)\n    catch exc\n        warn(logger, exc)\n    end\n\n    return ret\nend\n\nendNow we want to start writing our application code that uses this package, but our logging requirements are very specific and Memento doesn't support our particular use case yet.Requirements:This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.\nWe want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>.\nWe want our logs to be written in a CSV format... for some reason.Okay, so how do we address all of those requirements using Memento's API?Steps:Create a custom Record type called EC2Record that stores the Amazon EC2 information to address the first requirement.\nCreate a custom IO type called REST that writes log strings to the REST endpoint to partly address the second requirement.\nCreate a custom Formatter type called CSVFormatter that converts Records to (comma, tab, etc) delimited strings.NOTE: The code below is not intended to be a working example because it assumes a fake REST service.# myapp.jl\nusing Wrapper\nusing Memento\nusing Requests  # For send logs to our fake logging REST service\n\n# Start by setting up our basic console logging for the root logger.\nlogger = Memento.config(\"info\"; fmt=\"[{level} | {name}]: {msg}\")\n\n# We create our custom EC2Record type\nmutable struct EC2Record <: Record\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(args::Dict)\n        time = now()\n        trace = Attribute(StackTrace, get_trace)\n\n        EC2Record(\n            Attribute(DateTime, () -> round(time, Dates.Second)),\n            Attribute(args[:level]),\n            Attribute(args[:levelnum]),\n            Attribute(AbstractString, get_msg(args[:msg])),\n            Attribute(args[:name]),\n            Attribute(myid()),\n            Attribute(StackFrame, get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nend\n\n# A really simple CSVFormatter\nmutable struct CSVFormatter <: Formatter\n    delim::Char\n    vals::Array{Symbol}\n\n    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)\nend\n\nfunction format(fmt::CSVFormatter, rec::Record)\n    fields = isempty(fmt.vals) ? keys(rec) : fmt.vals\n\n    # For a real world use case we might want to do some\n    # string formatting of fields like :stacktrace here.\n\n    val = map(k -> rec[k], fields)\n\n    return join(val, fmt.delim)\nend\n\n# Create our custom REST IO type\nmutable struct REST <: IO\n    account_uri::AbstractString\n    app_name::AbstractString\n    access_key::AbstractString\nend\n\n# Our print method builds the correct uri using the log level\n# and sends the put request.\nfunction println(io::REST, level::AbstractString, msg::AbstractString)\n    uri = \"https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)\"\n    @async put(uri; data=msg)\nend\n\n# Not relevant, but good to have.\nflush(io::REST) = io\n\n# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`\nfunction log(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}\n    msg = format(handler.fmt, rec)\n    println(handler.io, rec[:level], msg)\n    flush(handler.io)\nend\n\n# Now we can tie this all together, but adding a new DefaultHandler\n# with the CSVFormatter and REST IO type.\npush!(\n    logger,\n    DefaultHandler(\n        REST(\n            \"memento.mylogrestservice.com\", \"myapp\",\n            \"qM033cSYWTuu8VpXFSZm9QMm9ZESOU2A\"\n        ),\n        CSVFormatter(\n            ',',\n            [:date, :name, :level, :msg, :iam_user, :public_ip, :instance_id]\n        )\n    )\n)\n\n# Don't forget to update the root logger `Record` type.\nsetrecord!(logger, EC2Record)\n\nWrapper.run(exp, 10)\n# Should log some things.\n\nWrapper.run(exp, \"foo\")\n# Should log a warning about a method error."
 },
 
 {
@@ -281,75 +281,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Base.info",
+    "location": "api/public.html#Memento.addlevel!-Tuple{Memento.Logger,AbstractString,Int64}",
     "page": "Public",
-    "title": "Base.info",
-    "category": "Function",
-    "text": "info(logger::Logger, msg::AbstractString)\n\nLogs the message at the info level.\n\ninfo(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the info level.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Base.log-Tuple{Function,Memento.Logger,AbstractString}",
-    "page": "Public",
-    "title": "Base.log",
+    "title": "Memento.addlevel!",
     "category": "Method",
-    "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Base.log-Tuple{Memento.Logger,AbstractString,AbstractString}",
-    "page": "Public",
-    "title": "Base.log",
-    "category": "Method",
-    "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Base.log-Tuple{Memento.Logger,Memento.Record}",
-    "page": "Public",
-    "title": "Base.log",
-    "category": "Method",
-    "text": "log(logger::Logger, args::Dict{Symbol, Any})\n\nLogs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nNOTE: This method calls all handlers asynchronously and is recursive, so you should call this method with a @sync in order to synchronize all handler tasks.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nargs::Dict: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Base.warn",
-    "page": "Public",
-    "title": "Base.warn",
-    "category": "Function",
-    "text": "warn(logger::Logger, msg::AbstractString)\n\nLogs the message at the warn level.\n\nwarn(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the warn level.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Base.warn-Tuple{Memento.Logger,Exception}",
-    "page": "Public",
-    "title": "Base.warn",
-    "category": "Method",
-    "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Memento.add_filter-Tuple{Memento.Logger,Memento.Filter}",
-    "page": "Public",
-    "title": "Memento.add_filter",
-    "category": "Method",
-    "text": "add_filter(logger::Logger, filter::Memento.Filter)\n\nAdds an new Filter to the logger.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Memento.add_handler",
-    "page": "Public",
-    "title": "Memento.add_handler",
-    "category": "Function",
-    "text": "add_handler(logger::Logger, handler::Handler, name)\n\nAdds a new handler to logger.handlers. If a name is not provided a random one will be generated.\n\nArguments\n\nlogger::Logger: the logger to use.\nhandler::Handler: the handler to add.\nname::AbstractString: a name to identify the handler.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Memento.add_level-Tuple{Memento.Logger,AbstractString,Int64}",
-    "page": "Public",
-    "title": "Memento.add_level",
-    "category": "Method",
-    "text": "add_level(logger::Logger, level::AbstractString, val::Int)\n\nAdds a new level::String and priority::Int to the logger.levels\n\n\n\n"
+    "text": "addlevel!(logger::Logger, level::AbstractString, val::Int)\n\nAdds a new level::String and priority::Int to the logger.levels\n\n\n\n"
 },
 
 {
@@ -385,51 +321,67 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Memento.get_handlers-Tuple{Memento.Logger}",
+    "location": "api/public.html#Memento.getfilters-Tuple{Memento.Logger}",
     "page": "Public",
-    "title": "Memento.get_handlers",
+    "title": "Memento.getfilters",
     "category": "Method",
-    "text": "get_handlers(logger::Logger)\n\nReturns logger.handlers\n\n\n\n"
+    "text": "getfilters(logger::Logger) -> Array{Filter}\n\nReturns the filters for the logger.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.get_level-Tuple{Memento.Logger}",
+    "location": "api/public.html#Memento.gethandlers-Tuple{Memento.Logger}",
     "page": "Public",
-    "title": "Memento.get_level",
+    "title": "Memento.gethandlers",
     "category": "Method",
-    "text": "get_level(::Logger)\n\nReturns the current logger level.\n\n\n\n"
+    "text": "gethandlers(logger::Logger)\n\nReturns logger.handlers\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.get_logger",
+    "location": "api/public.html#Memento.getlevel-Tuple{Memento.Logger}",
     "page": "Public",
-    "title": "Memento.get_logger",
+    "title": "Memento.getlevel",
+    "category": "Method",
+    "text": "getlevel(::Logger)\n\nReturns the current logger level.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.getlogger",
+    "page": "Public",
+    "title": "Memento.getlogger",
     "category": "Function",
-    "text": "get_logger(name::AbstractString) -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname::AbstractString: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n"
+    "text": "getlogger(name::AbstractString) -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname::AbstractString: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.get_logger-Tuple{Module}",
+    "location": "api/public.html#Memento.getlogger-Tuple{Module}",
     "page": "Public",
-    "title": "Memento.get_logger",
+    "title": "Memento.getlogger",
     "category": "Method",
-    "text": "get_logger(name::Module) -> Logger\n\nConverts the Module to a String and calls get_logger(name::String).\n\nArguments\n\nname::Module: the Module a logger should be associated\n\nReturns\n\nLogger: the logger associated with the provided Module.\n\nReturns the logger.\n\n\n\n"
+    "text": "getlogger(name::Module) -> Logger\n\nConverts the Module to a String and calls get_logger(name::String).\n\nArguments\n\nname::Module: the Module a logger should be associated\n\nReturns\n\nLogger: the logger associated with the provided Module.\n\nReturns the logger.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.is_root-Tuple{Memento.Logger}",
+    "location": "api/public.html#Memento.ispropagating-Tuple{Memento.Logger}",
     "page": "Public",
-    "title": "Memento.is_root",
+    "title": "Memento.ispropagating",
     "category": "Method",
-    "text": "is_root(::Logger)\n\nReturns true if logger.nameis \"root\" or \"\"\n\n\n\n"
+    "text": "ispropagating(::Logger)\n\nReturns true or false as to whether the logger is propagating.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.is_set-Tuple{Memento.Logger}",
+    "location": "api/public.html#Memento.isroot-Tuple{Memento.Logger}",
     "page": "Public",
-    "title": "Memento.is_set",
+    "title": "Memento.isroot",
     "category": "Method",
-    "text": "is_set(::Logger)\n\nReturns true or false as to whether the logger is set. (ie: logger.level != \"not_set\")\n\n\n\n"
+    "text": "isroot(::Logger)\n\nReturns true if logger.nameis \"root\" or \"\"\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.isset-Tuple{Memento.Logger}",
+    "page": "Public",
+    "title": "Memento.isset",
+    "category": "Method",
+    "text": "isset(::Logger)\n\nReturns true or false as to whether the logger is set. (ie: logger.level != \"not_set\")\n\n\n\n"
 },
 
 {
@@ -441,35 +393,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Memento.remove_handler-Tuple{Memento.Logger,Any}",
+    "location": "api/public.html#Memento.setlevel!-Tuple{Function,Memento.Logger,AbstractString}",
     "page": "Public",
-    "title": "Memento.remove_handler",
+    "title": "Memento.setlevel!",
     "category": "Method",
-    "text": "remove_handler(logger::Logger, name)\n\nRemoves the Handler with the provided name from the logger.handlers.\n\n\n\n"
+    "text": "setlevel!(f::Function, logger::Logger, level::AbstractString)\n\nTemporarily change the level a logger will log at for the duration of the function f.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.set_level-Tuple{Function,Memento.Logger,AbstractString}",
+    "location": "api/public.html#Memento.setlevel!-Tuple{Memento.Logger,AbstractString}",
     "page": "Public",
-    "title": "Memento.set_level",
+    "title": "Memento.setlevel!",
     "category": "Method",
-    "text": "set_level(f::Function, logger::Logger, level::AbstractString)\n\nTemporarily change the level a logger will log at for the duration of the function f.\n\n\n\n"
+    "text": "setlevel!(logger::Logger, level::AbstractString)\n\nChanges what level this logger should log at.\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.set_level-Tuple{Memento.Logger,AbstractString}",
+    "location": "api/public.html#Memento.setpropagating!",
     "page": "Public",
-    "title": "Memento.set_level",
-    "category": "Method",
-    "text": "set_level(logger::Logger, level::AbstractString)\n\nChanges what level this logger should log at.\n\n\n\n"
+    "title": "Memento.setpropagating!",
+    "category": "Function",
+    "text": "setpropagating!(::Logger, [::Bool])\n\nSets the logger to be propagating or not (Defaults to true).\n\n\n\n"
 },
 
 {
-    "location": "api/public.html#Memento.set_record-Union{Tuple{Memento.Logger,Type{R}}, Tuple{R}} where R<:Memento.Record",
+    "location": "api/public.html#Memento.setrecord!-Union{Tuple{Memento.Logger,Type{R}}, Tuple{R}} where R<:Memento.Record",
     "page": "Public",
-    "title": "Memento.set_record",
+    "title": "Memento.setrecord!",
     "category": "Method",
-    "text": "set_record{R<:Record}(logger::Logger, rec::Type{R})\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n"
+    "text": "setrecord!{R<:Record}(logger::Logger, rec::Type{R})\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n"
 },
 
 {
@@ -513,22 +465,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Base.log-Tuple{Memento.Handler,Memento.Record}",
-    "page": "Public",
-    "title": "Base.log",
-    "category": "Method",
-    "text": "log(handler::Handler, rec::Record)\n\nChecks the Handler filters and if they all pass then emit the record.\n\n\n\n"
-},
-
-{
-    "location": "api/public.html#Memento.add_filter-Tuple{Memento.DefaultHandler,Memento.Filter}",
-    "page": "Public",
-    "title": "Memento.add_filter",
-    "category": "Method",
-    "text": "add_filter(handler::DefaultHandler, filter::Memento.Filter)\n\nAdds an new Filter to the handler.\n\n\n\n"
-},
-
-{
     "location": "api/public.html#Memento.emit-Union{Tuple{F}, Tuple{Memento.DefaultHandler{F,O},Memento.Record}, Tuple{O}} where O<:IO where F<:Memento.Formatter",
     "page": "Public",
     "title": "Memento.emit",
@@ -537,11 +473,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Memento.set_level-Tuple{Memento.DefaultHandler,AbstractString}",
+    "location": "api/public.html#Memento.getfilters-Tuple{Memento.DefaultHandler}",
     "page": "Public",
-    "title": "Memento.set_level",
+    "title": "Memento.getfilters",
     "category": "Method",
-    "text": "set_level(handler::DefaultHandler, level::AbstractString)\n\nSets the minimum level required to emit the record from the handler.\n\n\n\n"
+    "text": "getfilters(handler::DefaultHandler) -> Array{Filter}\n\nReturns the filters for the handler.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.setlevel!-Tuple{Memento.DefaultHandler,AbstractString}",
+    "page": "Public",
+    "title": "Memento.setlevel!",
+    "category": "Method",
+    "text": "setlevel!(handler::DefaultHandler, level::AbstractString)\n\nSets the minimum level required to emit the record from the handler.\n\n\n\n"
 },
 
 {
@@ -681,11 +625,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/private.html#Base.info",
+    "page": "Private",
+    "title": "Base.info",
+    "category": "Function",
+    "text": "info(logger::Logger, msg::AbstractString)\n\nLogs the message at the info level.\n\ninfo(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the info level.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.log-Tuple{Function,Memento.Logger,AbstractString}",
+    "page": "Private",
+    "title": "Base.log",
+    "category": "Method",
+    "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.log-Tuple{Memento.Logger,AbstractString,AbstractString}",
+    "page": "Private",
+    "title": "Base.log",
+    "category": "Method",
+    "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.log-Tuple{Memento.Logger,Memento.Record}",
+    "page": "Private",
+    "title": "Base.log",
+    "category": "Method",
+    "text": "log(logger::Logger, args::Dict{Symbol, Any})\n\nLogs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nNOTE: This method calls all handlers asynchronously and is recursive, so you should call this method with a @sync in order to synchronize all handler tasks.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nargs::Dict: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.push!-Tuple{Memento.Logger,Memento.Filter}",
+    "page": "Private",
+    "title": "Base.push!",
+    "category": "Method",
+    "text": "push!(logger::Logger, filter::Memento.Filter)\n\nAdds an new Filter to the logger.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.push!-Tuple{Memento.Logger,Memento.Handler}",
+    "page": "Private",
+    "title": "Base.push!",
+    "category": "Method",
+    "text": "push!(logger::Logger, handler::Handler)\n\nAdds a new Handler to the logger.\n\n\n\n"
+},
+
+{
     "location": "api/private.html#Base.show-Tuple{IO,Memento.Logger}",
     "page": "Private",
     "title": "Base.show",
     "category": "Method",
     "text": "Base.show(::IO, ::Logger)\n\nJust prints Logger(logger.name)\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.warn",
+    "page": "Private",
+    "title": "Base.warn",
+    "category": "Function",
+    "text": "warn(logger::Logger, msg::AbstractString)\n\nLogs the message at the warn level.\n\nwarn(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the warn level.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.warn-Tuple{Memento.Logger,Exception}",
+    "page": "Private",
+    "title": "Base.warn",
+    "category": "Method",
+    "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it.\n\n\n\n"
 },
 
 {
@@ -697,19 +705,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/private.html#Memento.filters-Tuple{Memento.Logger}",
+    "location": "api/private.html#Memento.getparent-Tuple{Any}",
     "page": "Private",
-    "title": "Memento.filters",
+    "title": "Memento.getparent",
     "category": "Method",
-    "text": "filters(logger::Logger) -> Array{Filter}\n\nReturns the filters for the logger.\n\n\n\n"
-},
-
-{
-    "location": "api/private.html#Memento.get_parent-Tuple{Any}",
-    "page": "Private",
-    "title": "Memento.get_parent",
-    "category": "Method",
-    "text": "get_parent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
+    "text": "getparent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
 },
 
 {
@@ -737,11 +737,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/private.html#Memento.filters-Tuple{Memento.DefaultHandler}",
+    "location": "api/private.html#Base.log-Tuple{Memento.Handler,Memento.Record}",
     "page": "Private",
-    "title": "Memento.filters",
+    "title": "Base.log",
     "category": "Method",
-    "text": "filters(handler::DefaultHandler) -> Array{Filter}\n\nReturns the filters for the handler.\n\n\n\n"
+    "text": "log(handler::Handler, rec::Record)\n\nChecks the Handler filters and if they all pass then emit the record.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Base.push!-Tuple{Memento.DefaultHandler,Memento.Filter}",
+    "page": "Private",
+    "title": "Base.push!",
+    "category": "Method",
+    "text": "push!(handler::DefaultHandler, filter::Memento.Filter)\n\nAdds an new Filter to the handler.\n\n\n\n"
 },
 
 {

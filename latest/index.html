@@ -18,13 +18,13 @@ julia&gt; warn(logger, ErrorException(&quot;A caught exception that we want to l
 julia&gt; error(logger, &quot;Something that should throw an error.&quot;)
 [error | root]: Something that should throw an error.
 ERROR: Something that should throw an error.
- in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250</code></pre><p>Now maybe you want to have a different logger for each module/submodule. This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.</p><pre><code class="language-julia">julia&gt; child_logger = get_logger(&quot;Foo.bar&quot;)
+ in error(::Memento.Logger, ::String) at /Users/rory/.julia/v0.5/Memento/src/loggers.jl:250</code></pre><p>Now maybe you want to have a different logger for each module/submodule. This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.</p><pre><code class="language-julia">julia&gt; child_logger = getlogger(&quot;Foo.bar&quot;)
 Logger(Foo.bar)
 
-julia&gt; set_level(child_logger, &quot;warn&quot;)
+julia&gt; setlevel!(child_logger, &quot;warn&quot;)
 &quot;warn&quot;
 
-julia&gt; add_handler(child_logger, DefaultHandler(tempname(), DefaultFormatter(&quot;[{date} | {level} | {name}]: {msg}&quot;)))
+julia&gt; push!(child_logger, DefaultHandler(tempname(), DefaultFormatter(&quot;[{date} | {level} | {name}]: {msg}&quot;)))
 
 Memento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter(&quot;[{date} | {level} | {name}]: {msg}&quot;),IOStream(&lt;file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA&gt;),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))
 
@@ -32,4 +32,4 @@ julia&gt; debug(child_logger, &quot;Something that should only be printed to STD
 [debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.
 
 julia&gt; warn(child_logger, &quot;Warning to STDOUT and the log file.&quot;)
-[warn | Foo.bar]: Warning to STDOUT and the log file.</code></pre><p>NOTE: We used <code>get_logger(&quot;Foo.bar&quot;)</code>, but you can also do <code>get_logger(current_module())</code> which allows us to avoid hard coding in logger names.</p><footer><hr/><a class="next" href="man/intro.html"><span class="direction">Next</span><span class="title">Introduction</span></a></footer></article></body></html>
+[warn | Foo.bar]: Warning to STDOUT and the log file.</code></pre><p>NOTE: We used <code>getlogger(&quot;Foo.bar&quot;)</code>, but you can also do <code>getlogger(current_module())</code> which allows us to avoid hard coding in logger names.</p><footer><hr/><a class="next" href="man/intro.html"><span class="direction">Next</span><span class="title">Introduction</span></a></footer></article></body></html>
