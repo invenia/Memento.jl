@@ -320,10 +320,10 @@ function log(logger::Logger, rec::Record)
         for (name, handler) in logger.handlers
             @async log(handler, rec)
         end
-    end
 
-    if !isroot(logger) && logger.propagate
-        log(getparent(logger.name), rec)
+        if !isroot(logger) && logger.propagate
+            log(getparent(logger.name), rec)
+        end
     end
 end
 
