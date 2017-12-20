@@ -11,11 +11,6 @@ based on the `Formatter`, `IO` and/or `Record` types.
 """
 abstract type Handler{F<:Formatter, O<:IO} end
 
-function Base.:+(handler::Handler, filter::Memento.Filter)
-    push!(handler, filter)
-    return handler
-end
-
 """
     log(handler::Handler, rec::Record)
 
