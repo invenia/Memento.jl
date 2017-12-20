@@ -49,39 +49,71 @@ cd(dirname(@__FILE__))
             @test length(gethandlers(l)) == 0
         end
 
-        io = IOBuffer()
+        root_io = IOBuffer()
+        baz_io = IOBuffer()
 
-        try
-            setlevel!(getlogger(), "info")
-            push!(getlogger(), DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")))
+        push!(getlogger(), DefaultHandler(root_io, DefaultFormatter("{name} - {level}: {msg}")))
 
-            msg = "This should propagate to the root logger."
-            warn(baz, msg)
-            result = String(take!(io))
-            expected = "Foo.Bar.Baz - warn: $msg"
-            @test contains(result, expected)
+        msg = "This should propagate and log because all loggers are set to :warn by default."
+        expected = "Foo.Car - warn: $msg"
+        warn(car, msg)
+        result = String(take!(root_io))
+        @test contains(result, expected)
 
-            setlevel!(baz, "debug")
-            push!(baz, DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}")))
+        msg = "This should not log because info messages don't have high enough importance."
+        info(bar, msg)
+        result = String(take!(root_io))
+        @test result == ""
 
-            msg = "Message"
-            warn(baz, msg)
-            str = String(take!(io))
+        setlevel!(getlogger(), "info")
+        msg = "This should log to because we've set the root logger to info"
+        info(getlogger(), msg)
+        result = String(take!(root_io))
+        expected = "root - info: $msg"
+        @test contains(result, expected)
 
-            # The message should be written twice for "root" and "Foo.Bar.Baz"
-            @test length(str) > length("Foo.Bar.Baz - warn: $msg") * 2
+        msg = "This should not log because `bar` is set too low"
+        info(bar, msg)
+        result = String(take!(root_io))
+        @test result == ""
 
-            debug(baz, msg)
-            # Test that the "root" logger won't print anything bug the baz logger will
-            # because of their respective logging levels
-            @test contains(String(take!(io)), "Foo.Bar.Baz - debug: $msg")
+        setlevel!(bar, "info")
+        msg = "This should still not log because `foo` is set too low"
+        info(bar, msg)
+        result = String(take!(root_io))
+        @test result == ""
 
-            info(car, msg)
-            # the Foo.Car logger should still be unaffected.
-            @test contains(String(take!(io)), "Foo.Car - info: $msg")
-        finally
-            close(io)
-        end
+        # Now if we have the chain of root, foo and bar all set to info then the log record
+        # will propagate up from the bar logger to be written to the buffer by the root loggers handler.
+        setlevel!(foo, "info")
+        msg = "Now this should log because `bar`, `foo` and the root logger are all set appropriately."
+        info(bar, msg)
+        expected = "Foo.Bar - info: $msg"
+        result = String(take!(root_io))
+        @test contains(result, expected)
+
+        # Now we'll test that a child logger can log messages to its handler even if it doesn't
+        # propagate to the root logger.
+        setlevel!(baz, "debug")
+        push!(baz, DefaultHandler(baz_io, DefaultFormatter("{name} - {level}: {msg}")))
+
+        msg = "This should log to `baz_io`, but not `root_io`"
+        debug(baz, msg)
+        expected = "Foo.Bar.Baz - debug: $msg"
+        result = String(take!(baz_io))
+        @test contains(result, expected)
+
+        result = String(take!(root_io))
+        @test result == ""
+
+        msg = "This should be logged to both `root_io` and `baz_io`"
+        info(baz, msg)
+        expected = "Foo.Bar.Baz - info: $msg"
+        result = String(take!(baz_io))
+        @test contains(result, expected)
+
+        result = String(take!(root_io))
+        @test contains(result, expected)
     end
 
     @testset "Default Levels" begin
