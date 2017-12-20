@@ -16,14 +16,15 @@ Adds a temporary test handler to the `logger` that checks for a record with the 
 macro test_log(logger, level, msg, expr)
     quote
         handler = TestHandler($level, $msg)
-        add_handler($(esc(logger)), handler, "TestHandler")
+        handlers = copy(gethandlers($(esc(logger))))
+        push!($(esc(logger)), handler)
 
         try
             ret = $(esc(expr))
             @test handler.found == (String($level), String($msg))
             ret
         finally
-            remove_handler($(esc(logger)), "TestHandler")
+            $(esc(logger)).handlers = handlers
         end
     end
 end
@@ -46,7 +47,7 @@ Disables the `logger` and calls `@test_throws extype, expr`.
 """
 macro test_throws(logger, extype, expr)
     quote
-        set_level($(esc(logger)), "not_set") do
+        setlevel!($(esc(logger)), "not_set") do
             @test_throws $(esc(extype)) $(esc(expr))
         end
     end
