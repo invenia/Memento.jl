@@ -13,6 +13,7 @@ files = [
     "io.jl",
     "concurrency.jl",
     "deprecated.jl",
+    "test.jl",
     "ext/json.jl",
 ]
 
