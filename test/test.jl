@@ -9,7 +9,8 @@ using Memento.Test
 
     @testset "@test_warn" begin
         logger = getlogger("test_warn")
-        @test_warn(logger, "Hello!", warn(logger, "Hello!"))
+        msg = "Hello!"
+        @test_warn(logger, msg, warn(logger, "Hello!"))
     end
 
     @testset "@test_throws" begin
