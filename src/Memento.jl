@@ -15,24 +15,9 @@ export debug, notice, error, critical, alert, emergency,
        getlevel, setlevel!, addlevel!, setrecord!,
        getlogger, gethandlers, getfilters, format, emit,
 
-       Logger,Record, DefaultRecord, Formatter, Handler,
-       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller,
+       Logger, Record, DefaultRecord, Formatter, Handler,
+       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller
 
-       # Deprecated
-       Syslog,
-       JsonFormatter,
-       is_set,
-       is_root,
-       get_level,
-       set_level,
-       add_level,
-       set_record,
-       filters,
-       add_filter,
-       add_handler,
-       remove_handler,
-       get_logger,
-       get_handlers
 
 const DEFAULT_LOG_LEVEL = "warn"
 
@@ -54,7 +39,6 @@ include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
-include("deprecated.jl")
 include("test.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
