@@ -1,9 +1,10 @@
 using Compat
 using Compat.Test
+using Compat.Distributed
 using Suppressor
 
-import Compat: Dates
-import Compat:Sys
+import Compat.Dates
+import Compat.Sys
 
 files = [
     "records.jl",
@@ -21,7 +22,7 @@ haskey(ENV, "MEMENTO_BENCHMARK") ? files = ["benchmarks.jl"] : nothing
 
 using Memento
 
-cd(dirname(@__FILE__))
+cd(@__DIR__)
 
 @testset "Logging" begin
     @testset "Sample Usage" begin

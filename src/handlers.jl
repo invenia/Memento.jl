@@ -82,7 +82,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
     push!(handler, Memento.Filter(handler))
-    finalizer(handler, h -> close(h.io))
+    @compat finalizer(h -> close(h.io), handler)
     handler
 end
 
@@ -158,10 +158,10 @@ function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O
     str = format(handler.fmt, rec)
 
     if handler.opts[:is_colorized] && haskey(handler.opts[:colors], level)
-        print_with_color(
-            handler.opts[:colors][level],
+        printstyled(
             handler.io,
-            string(str,"\n")
+            string(str,"\n"),
+            color=handler.opts[:colors][level],
         )
     else
         println(handler.io, str)

@@ -264,7 +264,7 @@ Adds a new `Handler` to the logger.
 """
 function Base.push!(logger::Logger, handler::Handler)
     handler.levels.x = logger.levels
-    logger.handlers[string(Base.Random.uuid4())] = handler
+    logger.handlers[string(uuid4())] = handler
 end
 
 """

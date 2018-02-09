@@ -2,11 +2,14 @@ __precompile__()
 
 module Memento
 
+using Base: StackTrace, StackFrame
 using Compat
+using Compat.UUIDs
 using Compat.Dates
 
 import Syslogs
 import JSON
+using Nullables
 
 import Base: show, info, warn, error, log
 
