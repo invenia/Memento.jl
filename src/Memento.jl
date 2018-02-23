@@ -42,6 +42,7 @@ include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
+include("syslogs.jl")
 include("test.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
