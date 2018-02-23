@@ -1,5 +1,3 @@
-using Syslogs
-
 # Simple test UDP server
 function udp_srv(port::Int)
     r = Future()

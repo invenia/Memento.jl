@@ -2,6 +2,10 @@ using Compat
 using Compat.Test
 using Compat.Distributed
 using Suppressor
+using JSON
+using Syslogs
+using Memento
+using Memento.Test
 
 import Compat.Dates
 import Compat.Sys
@@ -20,9 +24,12 @@ files = [
 Sys.isunix() ? push!(files, "ext/syslogs.jl") : nothing
 haskey(ENV, "MEMENTO_BENCHMARK") ? files = ["benchmarks.jl"] : nothing
 
-using Memento
+# for loggers.jl
+struct TestError <: Exception
+    msg
+end
 
-cd(@__DIR__)
+@testset "Memento" begin
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
@@ -126,5 +133,7 @@ end
 # Test files should assume the global _loggers has been reset
 for file in files
     Memento.reset!()
-    include(abspath(file))
+    include(file)
+end
+
 end
