@@ -132,4 +132,27 @@ end
             close(io)
         end
     end
+
+    @testset "Memento.config" begin
+        root_logger = Memento.config(
+            "info";
+            fmt="[{date} | {level} | {name}]: {msg}", colorized=false
+        )
+
+        my_logger = Memento.config(
+            getlogger("MyLogger"), "info";
+            fmt="[{date} | {level} | {name}]: {msg}", colorized=false
+        )
+
+        str_logger = Memento.config(
+            "StrLogger", "info";
+            fmt="[{date} | {level} | {name}]: {msg}", colorized=false
+        )
+
+        @test length(gethandlers(root_logger)) == 1
+        @test length(gethandlers(my_logger)) == 1
+        @test length(gethandlers(str_logger)) == 1
+
+        @test getlevel(root_logger) == getlevel(my_logger) == getlevel(str_logger)
+    end
 end
