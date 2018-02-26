@@ -139,14 +139,10 @@ that prints to STDOUT.
 # Returns
 * `Logger`: the root logger.
 """
-function config(level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
-    logger = Logger("root")
-    config(logger, level; fmt=fmt, levels=levels, colorized=colorized)
-end
+config(level::AbstractString; kwargs...) = config(Logger("root"), level; kwargs...)
 
-function config(logger::AbstractString, level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
-    _logger = Logger(logger)
-    config(_logger, level; fmt=fmt, levels=levels, colorized=colorized)
+function config(logger::AbstractString, level::AbstractString; kwargs...)
+    config(Logger(logger), level; kwargs...)
 end
 
 function config(logger::Logger, level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
