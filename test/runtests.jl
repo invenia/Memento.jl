@@ -6,6 +6,7 @@ using JSON
 using Syslogs
 using Memento
 using Memento.Test
+using TestSetExtensions
 
 import Compat.Dates
 import Compat.Sys
@@ -29,7 +30,7 @@ struct TestError <: Exception
     msg
 end
 
-@testset "Memento" begin
+@testset ExtendedTestSet "Memento" begin
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
