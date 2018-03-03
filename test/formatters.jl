@@ -1,5 +1,3 @@
-import Memento: Attribute
-
 @testset "Formatters" begin
     rec = DefaultRecord("Logger.example", "info", 20, "blah")
 
@@ -7,7 +5,7 @@ import Memento: Attribute
     # condition where the stacktrace is empty.
     no_lookup = DefaultRecord(
         rec.date, rec.level, rec.levelnum, rec.msg, rec.name, rec.pid,
-        Attribute(nothing), rec.stacktrace
+        Memento.Attribute(nothing), rec.stacktrace
     )
 
     @testset "DefaultFormatter" begin

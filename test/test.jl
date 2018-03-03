@@ -1,5 +1,3 @@
-using Memento.Test
-
 @testset "Memento.Test" begin
     @testset "@test_log" begin
         logger = getlogger("test_log")

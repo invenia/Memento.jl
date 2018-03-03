@@ -19,7 +19,7 @@ elif [[ "$TEST_TYPE" == "userimage" ]]; then
         sysimg_lib = joinpath(LIB_PATH, "julia", "sys.$(Libdl.dlext)")
         userimg_o = "userimg.o"
         userimg_lib = "userimg.$(Libdl.dlext)"
-        run(`$(Base.julia_cmd()) --output-o $userimg_o --sysimage $sysimg_lib --startup-file=no -e "using Memento; logger = get_logger(\"Test\")"`)
+        run(`$(Base.julia_cmd()) --output-o $userimg_o --sysimage $sysimg_lib --startup-file=no -e "using Memento; logger = getlogger(\"Test\")"`)
         run(`cc -shared -o $userimg_lib $userimg_o -ljulia -L$LIB_PATH`)
     '
 fi

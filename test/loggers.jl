@@ -1,7 +1,3 @@
-struct TestError <: Exception
-    msg
-end
-
 @testset "Loggers" begin
     FMT_STR = "[{level}]:{name} - {msg}"
 

@@ -120,7 +120,7 @@ function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::In
         Attribute(AbstractString, get_msg(msg)),
         Attribute(name),
         Attribute(myid()),
-        Attribute(Union{StackFrame, Void}, get_lookup(trace)),
+        Attribute(Union{StackFrame, Nothing}, get_lookup(trace)),
         trace,
     )
 end
