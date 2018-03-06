@@ -268,7 +268,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.Logger",
     "page": "Public",
     "title": "Memento.Logger",
-    "category": "Type",
+    "category": "type",
     "text": "Logger\n\nA Logger is responsible for converting msg strings into Records which are then passed to each handler. By default loggers propagate their message to their parent loggers.\n\nFields\n\nname::AbstractString: is the name of the logger (required).\nhandlers::Dict{Any, Handler}: is a collection of Handlers (defaults to empty Dict).\nlevel::AbstractString: the current minimum logging level for the logger to  log message to handlers (defaults to \"not_set\").\nlevels::Dict{AbstractString, Int}: a mapping of available logging levels to their   relative priority (represented as integer values) (defaults to using Memento._log_levels)\nrecord::Type: the Record type that should be produced by this logger   (defaults to DefaultRecord).\npropagate::Bool: whether or not this logger should propagate its message to its parent   (defaults to true).\n\n\n\n"
 },
 
@@ -276,7 +276,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Base.error",
     "page": "Public",
     "title": "Base.error",
-    "category": "Function",
+    "category": "function",
     "text": "error(logger::Logger, msg::AbstractString)\n\nLogs the message at the error level and throws an ErrorException with that message\n\nerror(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the error level and throws an ErrorException with that message.\n\nerror(logger::Logger, exc::Exception)\n\nCalls error(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
@@ -284,7 +284,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.addlevel!-Tuple{Memento.Logger,AbstractString,Int64}",
     "page": "Public",
     "title": "Memento.addlevel!",
-    "category": "Method",
+    "category": "method",
     "text": "addlevel!(logger::Logger, level::AbstractString, val::Int)\n\nAdds a new level::String and priority::Int to the logger.levels\n\n\n\n"
 },
 
@@ -292,7 +292,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.alert",
     "page": "Public",
     "title": "Memento.alert",
-    "category": "Function",
+    "category": "function",
     "text": "alert(logger::Logger, msg::AbstractString)\n\nLogs the message at the alert level and throws an ErrorException with that message\n\nalert(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the alert level and throws an ErrorException with that message.\n\nalert(logger::Logger, exc::Exception)\n\nCalls alert(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
@@ -300,7 +300,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.critical",
     "page": "Public",
     "title": "Memento.critical",
-    "category": "Function",
+    "category": "function",
     "text": "critical(logger::Logger, msg::AbstractString)\n\nLogs the message at the critical level and throws an ErrorException with that message\n\ncritical(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the critical level and throws an ErrorException with that message.\n\ncritical(logger::Logger, exc::Exception)\n\nCalls critical(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
@@ -308,7 +308,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.debug",
     "page": "Public",
     "title": "Memento.debug",
-    "category": "Function",
+    "category": "function",
     "text": "debug(logger::Logger, msg::AbstractString)\n\nLogs the message at the debug level.\n\ndebug(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the debug level.\n\n\n\n"
 },
 
@@ -316,7 +316,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.emergency",
     "page": "Public",
     "title": "Memento.emergency",
-    "category": "Function",
+    "category": "function",
     "text": "emergency(logger::Logger, msg::AbstractString)\n\nLogs the message at the emergency level and throws an ErrorException with that message\n\nemergency(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the emergency level and throws an ErrorException with that message.\n\nemergency(logger::Logger, exc::Exception)\n\nCalls emergency(logger, msg) with the contents of the Exception.\n\n\n\n"
 },
 
@@ -324,7 +324,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.getfilters-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.getfilters",
-    "category": "Method",
+    "category": "method",
     "text": "getfilters(logger::Logger) -> Array{Filter}\n\nReturns the filters for the logger.\n\n\n\n"
 },
 
@@ -332,7 +332,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.gethandlers-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.gethandlers",
-    "category": "Method",
+    "category": "method",
     "text": "gethandlers(logger::Logger)\n\nReturns logger.handlers\n\n\n\n"
 },
 
@@ -340,7 +340,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.getlevel-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.getlevel",
-    "category": "Method",
+    "category": "method",
     "text": "getlevel(::Logger)\n\nReturns the current logger level.\n\n\n\n"
 },
 
@@ -348,7 +348,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.getlogger",
     "page": "Public",
     "title": "Memento.getlogger",
-    "category": "Function",
+    "category": "function",
     "text": "getlogger(name::AbstractString) -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname::AbstractString: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n"
 },
 
@@ -356,7 +356,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.getlogger-Tuple{Module}",
     "page": "Public",
     "title": "Memento.getlogger",
-    "category": "Method",
+    "category": "method",
     "text": "getlogger(name::Module) -> Logger\n\nConverts the Module to a String and calls get_logger(name::String).\n\nArguments\n\nname::Module: the Module a logger should be associated\n\nReturns\n\nLogger: the logger associated with the provided Module.\n\nReturns the logger.\n\n\n\n"
 },
 
@@ -364,7 +364,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.ispropagating-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.ispropagating",
-    "category": "Method",
+    "category": "method",
     "text": "ispropagating(::Logger)\n\nReturns true or false as to whether the logger is propagating.\n\n\n\n"
 },
 
@@ -372,7 +372,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.isroot-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.isroot",
-    "category": "Method",
+    "category": "method",
     "text": "isroot(::Logger)\n\nReturns true if logger.nameis \"root\" or \"\"\n\n\n\n"
 },
 
@@ -380,7 +380,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.isset-Tuple{Memento.Logger}",
     "page": "Public",
     "title": "Memento.isset",
-    "category": "Method",
+    "category": "method",
     "text": "isset(::Logger)\n\nReturns true or false as to whether the logger is set. (ie: logger.level != \"not_set\")\n\n\n\n"
 },
 
@@ -388,7 +388,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.notice",
     "page": "Public",
     "title": "Memento.notice",
-    "category": "Function",
+    "category": "function",
     "text": "notice(logger::Logger, msg::AbstractString)\n\nLogs the message at the notice level.\n\nnotice(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the notice level.\n\n\n\n"
 },
 
@@ -396,7 +396,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.setlevel!-Tuple{Function,Memento.Logger,AbstractString}",
     "page": "Public",
     "title": "Memento.setlevel!",
-    "category": "Method",
+    "category": "method",
     "text": "setlevel!(f::Function, logger::Logger, level::AbstractString)\n\nTemporarily change the level a logger will log at for the duration of the function f.\n\n\n\n"
 },
 
@@ -404,7 +404,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.setlevel!-Tuple{Memento.Logger,AbstractString}",
     "page": "Public",
     "title": "Memento.setlevel!",
-    "category": "Method",
+    "category": "method",
     "text": "setlevel!(logger::Logger, level::AbstractString)\n\nChanges what level this logger should log at.\n\n\n\n"
 },
 
@@ -412,7 +412,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.setpropagating!",
     "page": "Public",
     "title": "Memento.setpropagating!",
-    "category": "Function",
+    "category": "function",
     "text": "setpropagating!(::Logger, [::Bool])\n\nSets the logger to be propagating or not (Defaults to true).\n\n\n\n"
 },
 
@@ -420,7 +420,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.setrecord!-Union{Tuple{Memento.Logger,Type{R}}, Tuple{R}} where R<:Memento.Record",
     "page": "Public",
     "title": "Memento.setrecord!",
-    "category": "Method",
+    "category": "method",
     "text": "setrecord!{R<:Record}(logger::Logger, rec::Type{R})\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n"
 },
 
@@ -436,7 +436,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultHandler",
     "page": "Public",
     "title": "Memento.DefaultHandler",
-    "category": "Type",
+    "category": "type",
     "text": "DefaultHanlder\n\nThe DefaultHandler manages any Formatter, IO and Record.\n\nFields:\n\nfmt: a Formatter for converting Records to Strings\nio: an IO type for printing String to.\nopts: a dictionary of optional arguments such as :is_colorized and :colors   Ex) Dict{Symbol, Any}(           :is_colorized => true,           :opts[:colors] => Dict{AbstractString, Symbol}(               \"debug\" => :blue,               \"info\" => :green,               ...           )       )\n\n\n\n"
 },
 
@@ -444,7 +444,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultHandler-Union{Tuple{AbstractString,F,Any}, Tuple{AbstractString,F}, Tuple{AbstractString}, Tuple{F}} where F<:Memento.Formatter",
     "page": "Public",
     "title": "Memento.DefaultHandler",
-    "category": "Method",
+    "category": "method",
     "text": "DefaultHandler{F}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter}\n\nCreates a DefaultHandler with a IO handle to the specified filename.\n\nArguments\n\nfilename::AbstractString: the filename of a log file to write to\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
@@ -452,7 +452,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultHandler-Union{Tuple{F}, Tuple{O,F,Any}, Tuple{O,F}, Tuple{O}, Tuple{O}} where O<:IO where F<:Memento.Formatter",
     "page": "Public",
     "title": "Memento.DefaultHandler",
-    "category": "Method",
+    "category": "method",
     "text": "DefaultHandler{F, O}(io::O, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter, O<:IO}\n\nCreates a DefaultHandler with the specified IO type.\n\nArguments\n\nio::IO: the IO type\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n"
 },
 
@@ -460,7 +460,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.Handler",
     "page": "Public",
     "title": "Memento.Handler",
-    "category": "Type",
+    "category": "type",
     "text": "Handler\n\nManage formatting Records and printing the resulting String to an IO type. All Handler subtypes must implement at least 1 log(::Handler, ::Record) method.\n\nNOTE: Handlers can useful if you need to special case logging behaviour based on the Formatter, IO and/or Record types.\n\n\n\n"
 },
 
@@ -468,7 +468,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.emit-Union{Tuple{F}, Tuple{Memento.DefaultHandler{F,O},Memento.Record}, Tuple{O}} where O<:IO where F<:Memento.Formatter",
     "page": "Public",
     "title": "Memento.emit",
-    "category": "Method",
+    "category": "method",
     "text": "emit{F, O}(handler::DefaultHandler{F ,O}, rec::Record) where {F<:Formatter, O<:IO}\n\nHandles printing any Record with any Formatter and IO types.\n\n\n\n"
 },
 
@@ -476,7 +476,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.getfilters-Tuple{Memento.DefaultHandler}",
     "page": "Public",
     "title": "Memento.getfilters",
-    "category": "Method",
+    "category": "method",
     "text": "getfilters(handler::DefaultHandler) -> Array{Filter}\n\nReturns the filters for the handler.\n\n\n\n"
 },
 
@@ -484,7 +484,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.setlevel!-Tuple{Memento.DefaultHandler,AbstractString}",
     "page": "Public",
     "title": "Memento.setlevel!",
-    "category": "Method",
+    "category": "method",
     "text": "setlevel!(handler::DefaultHandler, level::AbstractString)\n\nSets the minimum level required to emit the record from the handler.\n\n\n\n"
 },
 
@@ -500,7 +500,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultFormatter",
     "page": "Public",
     "title": "Memento.DefaultFormatter",
-    "category": "Type",
+    "category": "type",
     "text": "DefaultFormatter\n\nThe DefaultFormatter uses a simple format string to build the log message. Fields from the Record to be used should be wrapped curly brackets.\n\nEx) \"[{level} | {name}]: {msg}\" will print message of the form [info | root]: my info message. [warn | root]: my warning message. ...\n\n\n\n"
 },
 
@@ -508,7 +508,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DictFormatter-Tuple{}",
     "page": "Public",
     "title": "Memento.DictFormatter",
-    "category": "Method",
+    "category": "method",
     "text": "DictFormatter([aliases, serializer])\n\nFormats the record to Dict that is amenable to serialization formats such as JSON and then runs the serializer function on the produced dictionary.\n\nArguments\n\naliases::Dict{Symbol, Symbol}: Mapping where the keys represent aliases and values represent existing record attributes to include in the dictionary (defaults to all attributes).\nserializer::Function: A function that takes a Dictionary and returns a string. Defaults to string(dict).\n\n\n\n"
 },
 
@@ -516,7 +516,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.Formatter",
     "page": "Public",
     "title": "Memento.Formatter",
-    "category": "Type",
+    "category": "type",
     "text": "Formatter\n\nA Formatter must implement a format(::Formatter, ::Record) method which takes a Record and returns a String representation of the log Record.\n\n\n\n"
 },
 
@@ -524,7 +524,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.format-Tuple{Memento.DefaultFormatter,Memento.Record}",
     "page": "Public",
     "title": "Memento.format",
-    "category": "Method",
+    "category": "method",
     "text": "format(::DefaultFormatter, ::Record) -> String\n\nIteratively replaces entries in the format string with the appropriate fields in the Record\n\n\n\n"
 },
 
@@ -532,7 +532,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.format-Tuple{Memento.DictFormatter,Memento.Record}",
     "page": "Public",
     "title": "Memento.format",
-    "category": "Method",
+    "category": "method",
     "text": "format(::DictFormatter, ::Record) -> Dict\n\nConverts :date, :lookup and :stacktrace to strings and dicts respectively.\n\n\n\n"
 },
 
@@ -548,7 +548,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultRecord",
     "page": "Public",
     "title": "Memento.DefaultRecord",
-    "category": "Type",
+    "category": "type",
     "text": "DefaultRecord\n\nStores the most common logging event information. NOTE: if you\'d like more logging attributes you can:\n\nadd them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nmake a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{Symbol}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
 },
 
@@ -556,7 +556,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.DefaultRecord-Tuple{AbstractString,AbstractString,Int64,Any}",
     "page": "Public",
     "title": "Memento.DefaultRecord",
-    "category": "Method",
+    "category": "method",
     "text": "DefaultRecord(name::AbstractString, level::AbstractString, msg::AbstractString)\n\nTakes a few initial log record arguments and creates a DefaultRecord.\n\nArguments\n\nname::AbstractString: the name of the source logger.\nlevel::AbstractString: the log level.\nmsg::AbstractString: the message being logged.\n\n\n\n"
 },
 
@@ -564,7 +564,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.Record",
     "page": "Public",
     "title": "Memento.Record",
-    "category": "Type",
+    "category": "type",
     "text": "Record\n\nAre an Attribute container used to store information about a log events including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\nNOTE: you should access Attributes in a Record by using getindex (ie: record[:msg]) as this will correctly extract the value from the Attribute container.\n\n\n\n"
 },
 
@@ -580,7 +580,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.FileRoller",
     "page": "Public",
     "title": "Memento.FileRoller",
-    "category": "Type",
+    "category": "type",
     "text": "FileRoller <: IO\n\nIs responsible for managing a rolling log file.\n\nFields\n\nprefix::AbstractString: filename prefix for the log.\nfolder::AbstractString: directory where the log should be written.\nfile::AbstractString: the current file IO handle\nbyteswritten::Int64: keeps track of how many bytes have been written to the current file.\nmax_sz::Int: the maximum number of bytes written to a file before rolling over to another.\n\n\n\n"
 },
 
@@ -588,7 +588,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.FileRoller-Tuple{Any,Any}",
     "page": "Public",
     "title": "Memento.FileRoller",
-    "category": "Method",
+    "category": "method",
     "text": "FileRoller(prefix, dir; max_size=DEFAULT_MAX_FILE_SIZE)\n\nCreates a rolling log file in the specified directory with the given prefix.\n\n\n\n"
 },
 
@@ -596,7 +596,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/public.html#Memento.FileRoller-Tuple{Any}",
     "page": "Public",
     "title": "Memento.FileRoller",
-    "category": "Method",
+    "category": "method",
     "text": "FileRoller(prefix; max_size=DEFAULT_MAX_FILE_SIZE)\n\nCreates a rolling log file in the current working directory with the specified prefix.\n\n\n\n"
 },
 
@@ -628,7 +628,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.info",
     "page": "Private",
     "title": "Base.info",
-    "category": "Function",
+    "category": "function",
     "text": "info(logger::Logger, msg::AbstractString)\n\nLogs the message at the info level.\n\ninfo(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the info level.\n\n\n\n"
 },
 
@@ -636,7 +636,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.log-Tuple{Function,Memento.Logger,AbstractString}",
     "page": "Private",
     "title": "Base.log",
-    "category": "Method",
+    "category": "method",
     "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
 },
 
@@ -644,7 +644,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.log-Tuple{Memento.Logger,AbstractString,AbstractString}",
     "page": "Private",
     "title": "Base.log",
-    "category": "Method",
+    "category": "method",
     "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n"
 },
 
@@ -652,7 +652,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.log-Tuple{Memento.Logger,Memento.Record}",
     "page": "Private",
     "title": "Base.log",
-    "category": "Method",
+    "category": "method",
     "text": "log(logger::Logger, args::Dict{Symbol, Any})\n\nLogs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nNOTE: This method calls all handlers asynchronously and is recursive, so you should call this method with a @sync in order to synchronize all handler tasks.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nargs::Dict: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n"
 },
 
@@ -660,7 +660,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.push!-Tuple{Memento.Logger,Memento.Filter}",
     "page": "Private",
     "title": "Base.push!",
-    "category": "Method",
+    "category": "method",
     "text": "push!(logger::Logger, filter::Memento.Filter)\n\nAdds an new Filter to the logger.\n\n\n\n"
 },
 
@@ -668,7 +668,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.push!-Tuple{Memento.Logger,Memento.Handler}",
     "page": "Private",
     "title": "Base.push!",
-    "category": "Method",
+    "category": "method",
     "text": "push!(logger::Logger, handler::Handler)\n\nAdds a new Handler to the logger.\n\n\n\n"
 },
 
@@ -676,7 +676,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.show-Tuple{IO,Memento.Logger}",
     "page": "Private",
     "title": "Base.show",
-    "category": "Method",
+    "category": "method",
     "text": "Base.show(::IO, ::Logger)\n\nJust prints Logger(logger.name)\n\n\n\n"
 },
 
@@ -684,7 +684,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.warn",
     "page": "Private",
     "title": "Base.warn",
-    "category": "Function",
+    "category": "function",
     "text": "warn(logger::Logger, msg::AbstractString)\n\nLogs the message at the warn level.\n\nwarn(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the warn level.\n\n\n\n"
 },
 
@@ -692,7 +692,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.warn-Tuple{Memento.Logger,Exception}",
     "page": "Private",
     "title": "Base.warn",
-    "category": "Method",
+    "category": "method",
     "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it.\n\n\n\n"
 },
 
@@ -700,7 +700,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.config-Tuple{AbstractString}",
     "page": "Private",
     "title": "Memento.config",
-    "category": "Method",
+    "category": "method",
     "text": "config([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to STDOUT.\n\nArguments\n\n\'logger::Union{Logger, AbstractString}`: The logger to configure (optional)\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to STDOUT should be colorized.\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
 },
 
@@ -708,7 +708,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.getparent-Tuple{Any}",
     "page": "Private",
     "title": "Memento.getparent",
-    "category": "Method",
+    "category": "method",
     "text": "getparent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
 },
 
@@ -716,7 +716,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.register-Tuple{Memento.Logger}",
     "page": "Private",
     "title": "Memento.register",
-    "category": "Method",
+    "category": "method",
     "text": "register(::Logger)\n\nRegister an existing logger with Memento.\n\n\n\n"
 },
 
@@ -724,7 +724,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.reset!-Tuple{}",
     "page": "Private",
     "title": "Memento.reset!",
-    "category": "Method",
+    "category": "method",
     "text": "reset!()\n\nRemoves all registered loggers and reinitializes the root logger without any handlers.\n\n\n\n"
 },
 
@@ -740,7 +740,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.log-Tuple{Memento.Handler,Memento.Record}",
     "page": "Private",
     "title": "Base.log",
-    "category": "Method",
+    "category": "method",
     "text": "log(handler::Handler, rec::Record)\n\nChecks the Handler filters and if they all pass then emit the record.\n\n\n\n"
 },
 
@@ -748,7 +748,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.push!-Tuple{Memento.DefaultHandler,Memento.Filter}",
     "page": "Private",
     "title": "Base.push!",
-    "category": "Method",
+    "category": "method",
     "text": "push!(handler::DefaultHandler, filter::Memento.Filter)\n\nAdds an new Filter to the handler.\n\n\n\n"
 },
 
@@ -756,7 +756,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.setup_opts-Tuple{Any}",
     "page": "Private",
     "title": "Memento.setup_opts",
-    "category": "Method",
+    "category": "method",
     "text": "setup_opts(opts) -> Dict\n\nSets the default :colors if opts[:is_colorized] == true.\n\n\n\n"
 },
 
@@ -780,7 +780,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.Dict-Tuple{Memento.Record}",
     "page": "Private",
     "title": "Base.Dict",
-    "category": "Method",
+    "category": "method",
     "text": "Dict(rec::Record)\n\nExtracts the Record and its Attributes into a Dict NOTE: This may be an expensive operations, so you probably don\'t want to do this for every log record unless you\'re planning on using every Attribute.\n\n\n\n"
 },
 
@@ -788,7 +788,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.Attribute",
     "page": "Private",
     "title": "Memento.Attribute",
-    "category": "Type",
+    "category": "type",
     "text": "Attribute\n\nAn Attribute represents a lazily evaluated field in a log Record.\n\nFields\n\nf::Function: A function to evaluate in order to get a value if one is not set.\nx::Nullable: A value that may or may not exist yet.\n\n\n\n"
 },
 
@@ -796,7 +796,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.Attribute-Tuple{Any}",
     "page": "Private",
     "title": "Memento.Attribute",
-    "category": "Method",
+    "category": "method",
     "text": "Attribute(x)\n\nSimply wraps the value x in a Nullable and sticks that in an Attribute with an empty Function.\n\n\n\n"
 },
 
@@ -804,7 +804,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.Attribute-Tuple{Type,Function}",
     "page": "Private",
     "title": "Memento.Attribute",
-    "category": "Method",
+    "category": "method",
     "text": "Attribute(T::Type, f::Function)\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
 },
 
@@ -812,7 +812,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.get-Tuple{Memento.Attribute}",
     "page": "Private",
     "title": "Base.get",
-    "category": "Method",
+    "category": "method",
     "text": "get(attr::Attribute{T}) -> T\n\nRun set attr.x to the output of attr.f if attr.x is not already set. We then return the value stored in attr.x\n\n\n\n"
 },
 
@@ -820,7 +820,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.get_lookup-Tuple{Memento.Attribute{Array{StackFrame,1}}}",
     "page": "Private",
     "title": "Memento.get_lookup",
-    "category": "Method",
+    "category": "method",
     "text": "get_lookup(trace::Attribute{StackTrace})\n\nReturns the top StackFrame for trace if it isn\'t empty.\n\n\n\n"
 },
 
@@ -828,7 +828,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.get_msg-Tuple{Any}",
     "page": "Private",
     "title": "Memento.get_msg",
-    "category": "Method",
+    "category": "method",
     "text": "get_msg(msg) -> Function\n\nWraps msg in a function if it is a String.\n\n\n\n"
 },
 
@@ -836,7 +836,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.get_trace-Tuple{}",
     "page": "Private",
     "title": "Memento.get_trace",
-    "category": "Method",
+    "category": "method",
     "text": "get_trace()\n\nReturns the StackTrace with StackFrames from the Memento module filtered out.\n\n\n\n"
 },
 
@@ -852,7 +852,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.flush-Tuple{Memento.FileRoller}",
     "page": "Private",
     "title": "Base.flush",
-    "category": "Method",
+    "category": "method",
     "text": "flush(::FileRoller)\n\nFlushes the current open file.\n\n\n\n"
 },
 
@@ -860,7 +860,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Base.println-Tuple{Memento.FileRoller,AbstractString}",
     "page": "Private",
     "title": "Base.println",
-    "category": "Method",
+    "category": "method",
     "text": "println(::FileRoller, ::AbstractString)\n\nWrites the string to a file and creates a new file if we\'ve reached the max file size.\n\n\n\n"
 },
 
@@ -868,7 +868,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.getfile-Tuple{AbstractString,AbstractString}",
     "page": "Private",
     "title": "Memento.getfile",
-    "category": "Method",
+    "category": "method",
     "text": "getfile(folder::AbstractString, prefix::AbstractString) -> String, IO\n\nGrabs the next log file.\n\n\n\n"
 },
 
@@ -876,7 +876,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api/private.html#Memento.getsuffix-Tuple{Integer}",
     "page": "Private",
     "title": "Memento.getsuffix",
-    "category": "Method",
+    "category": "method",
     "text": "getsuffix(::Integer) -> String\n\nFormats the nth file suffix.\n\n\n\n"
 },
 
