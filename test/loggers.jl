@@ -63,6 +63,25 @@
             @test_throws TestError Memento.error(logger, TestError("I failed."))
             @test contains(String(take!(io)), "I failed")
 
+            # CompositeException
+            comp = CompositeException([
+                ErrorException("I am the first error"),
+                ArgumentError("I am the second error"),
+            ])
+            @test_throws CompositeException Memento.error(logger, comp)
+            output = String(take!(io))
+            @test contains(output, "I am the first error")
+            @test contains(output, "I am the second error")
+
+            comp = CompositeException([
+                ArgumentError("Error numero uno"),
+                ErrorException("Error numero dos"),
+            ])
+            Memento.warn(logger, comp)
+            output = String(take!(io))
+            @test contains(output, "Error numero uno")
+            @test contains(output, "Error numero dos")
+
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
             @test contains(String(take!(io)), "[fubar]:Logger.example - $msg")

@@ -410,6 +410,13 @@ for key in keys(_log_levels)
                     log(logger, $key, sprint(io -> showerror(io, exc)))
                     throw(exc)
                 end
+
+                function $level(logger::Logger, exc::CompositeException)
+                    for sub_exc in exc
+                        log(logger, $key, sprint(io -> showerror(io, sub_exc)))
+                    end
+                    throw(exc)
+                end
             end
             f = eval(level)
         end
@@ -444,7 +451,8 @@ Logs the message produced by the provided function at the $level level and throw
 
     $level(logger::Logger, exc::Exception)
 
-Calls `$level(logger, msg)` with the contents of the `Exception`.
+Calls `$level(logger, msg)` with the contents of the `Exception`, then throw the `Exception`.
+If the exception is a `CompositeException`, each contained exception is logged, then the `CompositeException` is thrown.
 """
 
 @doc msg("error") error
@@ -456,7 +464,14 @@ Calls `$level(logger, msg)` with the contents of the `Exception`.
     warn(logger::Logger, exc::Exception)
 
 Takes an exception and logs it.
+If the exception is a `CompositeException`, each contained exception is logged.
 """
 function warn(logger::Logger, exc::Exception)
     log(logger, "warn", sprint(io -> showerror(io, exc)))
+end
+
+function warn(logger::Logger, exc::CompositeException)
+    for sub_exc in exc
+        log(logger, "warn", sprint(io -> showerror(io, sub_exc)))
+    end
 end
