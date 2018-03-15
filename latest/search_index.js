@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Base.error",
     "category": "function",
-    "text": "error(logger::Logger, msg::AbstractString)\n\nLogs the message at the error level and throws an ErrorException with that message\n\nerror(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the error level and throws an ErrorException with that message.\n\nerror(logger::Logger, exc::Exception)\n\nCalls error(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "error(logger::Logger, msg::AbstractString)\n\nLogs the message at the error level and throws an ErrorException with that message\n\nerror(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the error level and throws an ErrorException with that message.\n\nerror(logger::Logger, exc::Exception)\n\nCalls error(logger, msg) with the contents of the Exception, then throw the Exception. If the exception is a CompositeException, each contained exception is logged, then the CompositeException is thrown.\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.alert",
     "category": "function",
-    "text": "alert(logger::Logger, msg::AbstractString)\n\nLogs the message at the alert level and throws an ErrorException with that message\n\nalert(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the alert level and throws an ErrorException with that message.\n\nalert(logger::Logger, exc::Exception)\n\nCalls alert(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "alert(logger::Logger, msg::AbstractString)\n\nLogs the message at the alert level and throws an ErrorException with that message\n\nalert(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the alert level and throws an ErrorException with that message.\n\nalert(logger::Logger, exc::Exception)\n\nCalls alert(logger, msg) with the contents of the Exception, then throw the Exception. If the exception is a CompositeException, each contained exception is logged, then the CompositeException is thrown.\n\n\n\n"
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.critical",
     "category": "function",
-    "text": "critical(logger::Logger, msg::AbstractString)\n\nLogs the message at the critical level and throws an ErrorException with that message\n\ncritical(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the critical level and throws an ErrorException with that message.\n\ncritical(logger::Logger, exc::Exception)\n\nCalls critical(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "critical(logger::Logger, msg::AbstractString)\n\nLogs the message at the critical level and throws an ErrorException with that message\n\ncritical(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the critical level and throws an ErrorException with that message.\n\ncritical(logger::Logger, exc::Exception)\n\nCalls critical(logger, msg) with the contents of the Exception, then throw the Exception. If the exception is a CompositeException, each contained exception is logged, then the CompositeException is thrown.\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.emergency",
     "category": "function",
-    "text": "emergency(logger::Logger, msg::AbstractString)\n\nLogs the message at the emergency level and throws an ErrorException with that message\n\nemergency(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the emergency level and throws an ErrorException with that message.\n\nemergency(logger::Logger, exc::Exception)\n\nCalls emergency(logger, msg) with the contents of the Exception.\n\n\n\n"
+    "text": "emergency(logger::Logger, msg::AbstractString)\n\nLogs the message at the emergency level and throws an ErrorException with that message\n\nemergency(msg::Function, logger::Logger)\n\nLogs the message produced by the provided function at the emergency level and throws an ErrorException with that message.\n\nemergency(logger::Logger, exc::Exception)\n\nCalls emergency(logger, msg) with the contents of the Exception, then throw the Exception. If the exception is a CompositeException, each contained exception is logged, then the CompositeException is thrown.\n\n\n\n"
 },
 
 {
@@ -693,7 +693,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.warn",
     "category": "method",
-    "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it.\n\n\n\n"
+    "text": "warn(logger::Logger, exc::Exception)\n\nTakes an exception and logs it. If the exception is a CompositeException, each contained exception is logged.\n\n\n\n"
 },
 
 {
