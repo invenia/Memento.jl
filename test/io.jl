@@ -32,7 +32,7 @@
         @test ispath(dirname(roller_prefix))
         @test isfile(handler.io.filepath)
         @test dirname(roller_prefix) == dirname(handler.io.filepath)
-        @test contains(handler.io.filepath, roller_prefix)
+        @test occursin(roller_prefix, handler.io.filepath)
         @test handler.io.filepath != roller_prefix
         @test handler.io.filepath != "$(roller_prefix).001"
     end

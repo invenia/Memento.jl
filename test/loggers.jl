@@ -51,21 +51,21 @@
             addlevel!(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(String(take!(io)), "Logger(Logger.example)")
+            @test occursin("Logger(Logger.example)", String(take!(io)))
 
             msg = "It works!"
             Memento.info(logger, msg)
-            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
+            @test occursin("[info]:Logger.example - $msg", String(take!(io)))
 
             Memento.debug(logger, "This shouldn't get logged")
             @test isempty(String(take!(io)))
 
             @test_throws TestError Memento.error(logger, TestError("I failed."))
-            @test contains(String(take!(io)), "I failed")
+            @test occursin("I failed", String(take!(io)))
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
-            @test contains(String(take!(io)), "[fubar]:Logger.example - $msg")
+            @test occursin("[fubar]:Logger.example - $msg", String(take!(io)))
 
             new_logger = Logger("new_logger")
         finally
@@ -110,18 +110,18 @@
             addlevel!(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(String(take!(io)), "Logger(Logger.example)")
+            @test occursin("Logger(Logger.example)", String(take!(io)))
 
             msg = "It works!"
             Memento.info(msg_func(msg), logger)
-            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
+            @test occursin("[info]:Logger.example - $msg", String(take!(io)))
 
             Memento.debug(msg_func("This shouldn't get logged"), logger)
             @test isempty(String(take!(io)))
 
             msg = "Something went very wrong"
             @test_throws ErrorException error(msg_func(msg), logger)
-            @test contains(String(take!(io)), "[error]:Logger.example - $msg")
+            @test occursin("[error]:Logger.example - $msg", String(take!(io)))
 
             new_logger = Logger("new_logger")
         finally

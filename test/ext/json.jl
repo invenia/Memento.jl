@@ -8,10 +8,10 @@ using JSON
     @test isa(JSON.parse(result), Dict)
 
     for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
-        @test contains(result, string(key))
+        @test occursin(string(key), result)
     end
 
-    @test contains(result, "blah")
+    @test occursin("blah", result)
 
     aliases = Dict(
         :logger => :name,
@@ -28,9 +28,9 @@ using JSON
     @test isa(JSON.parse(result), Dict)
 
     for key in [:location, :message, :timestamp, :process_id]
-        @test contains(result, string(key))
-        @test !contains(result, string(aliases[key]))
+        @test occursin(string(key), result)
+        @test !occursin(string(aliases[key]), result)
     end
 
-    @test contains(result, "blah")
+    @test occursin("blah", result)
 end
