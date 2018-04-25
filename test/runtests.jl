@@ -1,3 +1,5 @@
+using Sockets
+
 using Compat
 using Compat.Test
 using Compat.Distributed

@@ -137,7 +137,7 @@ register(logger::Logger) = _loggers[logger.name] = logger
     config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
 
 Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
-that prints to STDOUT.
+that prints to stdout.
 
 # Arguments
 * 'logger::Union{Logger, AbstractString}`: The logger to configure (optional)
@@ -145,7 +145,7 @@ that prints to STDOUT.
 * `fmt::AbstractString`: a format string to pass to the `DefaultFormatter` which describes
     how to log messages (defaults to `Memento.DEFAULT_FMT_STRING`)
 * `levels`: the default logging levels to use (defaults to `Memento._log_levels`).
-* `colorized`: whether or not the message to STDOUT should be colorized.
+* `colorized`: whether or not the message to stdout should be colorized.
 
 # Returns
 * `Logger`: the root logger.
@@ -163,7 +163,7 @@ function config!(
     logger.levels = levels
     setlevel!(logger, level; recursive=recursive)
     handler = DefaultHandler(
-        STDOUT,
+        stdout,
         DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
     )
     logger.handlers["console"] = handler
