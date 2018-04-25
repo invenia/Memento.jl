@@ -31,14 +31,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
+                @test occursin("[info]:$(logger.name) - $msg", String(take!(io)))
 
                 Memento.debug(logger, "This shouldn't get logged")
                 @test isempty(String(take!(io)))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test contains(String(take!(io)), "[fubar]:$(logger.name) - $msg")
+                @test occursin("[fubar]:$(logger.name) - $msg", String(take!(io)))
             finally
                 close(io)
             end
@@ -152,14 +152,14 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
+                @test occursin("[info]:$(logger.name) - $msg", String(take!(io)))
 
                 Memento.debug(logger, "This shouldn't get logged")
                 @test isempty(String(take!(io)))
 
                 msg = "Something went very wrong"
                 log(logger, "fubar", msg)
-                @test contains(String(take!(io)), "[fubar]:$(logger.name) - $msg")
+                @test occursin("[fubar]:$(logger.name) - $msg", String(take!(io)))
             finally
                 close(io)
             end
@@ -185,7 +185,7 @@
 
                 msg = "It works!"
                 Memento.info(logger, msg)
-                @test contains(String(take!(io)), "[info]:$(logger.name) - $msg")
+                @test occursin("[info]:$(logger.name) - $msg", String(take!(io)))
 
                 # Filter out log messages < LEVELS["warn"]
                 setlevel!(handler, "warn")

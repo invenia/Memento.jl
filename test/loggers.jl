@@ -51,17 +51,17 @@
             addlevel!(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(String(take!(io)), "Logger(Logger.example)")
+            @test occursin("Logger(Logger.example)", String(take!(io)))
 
             msg = "It works!"
             Memento.info(logger, msg)
-            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
+            @test occursin("[info]:Logger.example - $msg", String(take!(io)))
 
             Memento.debug(logger, "This shouldn't get logged")
             @test isempty(String(take!(io)))
 
             @test_throws TestError Memento.error(logger, TestError("I failed."))
-            @test contains(String(take!(io)), "I failed")
+            @test occursin("I failed", String(take!(io)))
 
             # CompositeException
             comp = CompositeException([
@@ -70,8 +70,8 @@
             ])
             @test_throws CompositeException Memento.error(logger, comp)
             output = String(take!(io))
-            @test contains(output, "I am the first error")
-            @test contains(output, "I am the second error")
+            @test occursin("I am the first error", output)
+            @test occursin("I am the second error", output)
 
             comp = CompositeException([
                 ArgumentError("Error numero uno"),
@@ -79,12 +79,12 @@
             ])
             Memento.warn(logger, comp)
             output = String(take!(io))
-            @test contains(output, "Error numero uno")
-            @test contains(output, "Error numero dos")
+            @test occursin("Error numero uno", output)
+            @test occursin("Error numero dos", output)
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
-            @test contains(String(take!(io)), "[fubar]:Logger.example - $msg")
+            @test occursin("[fubar]:Logger.example - $msg", String(take!(io)))
 
             new_logger = Logger("new_logger")
         finally
@@ -129,18 +129,18 @@
             addlevel!(logger, "fubar", 50)
 
             show(io, logger)
-            @test contains(String(take!(io)), "Logger(Logger.example)")
+            @test occursin("Logger(Logger.example)", String(take!(io)))
 
             msg = "It works!"
             Memento.info(msg_func(msg), logger)
-            @test contains(String(take!(io)), "[info]:Logger.example - $msg")
+            @test occursin("[info]:Logger.example - $msg", String(take!(io)))
 
             Memento.debug(msg_func("This shouldn't get logged"), logger)
             @test isempty(String(take!(io)))
 
             msg = "Something went very wrong"
             @test_throws ErrorException error(msg_func(msg), logger)
-            @test contains(String(take!(io)), "[error]:Logger.example - $msg")
+            @test occursin("[error]:Logger.example - $msg", String(take!(io)))
 
             new_logger = Logger("new_logger")
         finally

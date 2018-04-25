@@ -67,7 +67,7 @@ end
         expected = "Foo.Car - warn: $msg"
         warn(car, msg)
         result = String(take!(root_io))
-        @test contains(result, expected)
+        @test occursin(expected, result)
 
         msg = "This should not log because info messages don't have high enough importance."
         info(bar, msg)
@@ -79,7 +79,7 @@ end
         info(getlogger(), msg)
         result = String(take!(root_io))
         expected = "root - info: $msg"
-        @test contains(result, expected)
+        @test occursin(expected, result)
 
         msg = "This should not log because `bar` is set too low"
         info(bar, msg)
@@ -99,7 +99,7 @@ end
         info(bar, msg)
         expected = "Foo.Bar - info: $msg"
         result = String(take!(root_io))
-        @test contains(result, expected)
+        @test occursin(expected, result)
 
         # Now we'll test that a child logger can log messages to its handler even if it doesn't
         # propagate to the root logger.
@@ -110,7 +110,7 @@ end
         debug(baz, msg)
         expected = "Foo.Bar.Baz - debug: $msg"
         result = String(take!(baz_io))
-        @test contains(result, expected)
+        @test occursin(expected, result)
 
         result = String(take!(root_io))
         @test result == ""
@@ -119,10 +119,10 @@ end
         info(baz, msg)
         expected = "Foo.Bar.Baz - info: $msg"
         result = String(take!(baz_io))
-        @test contains(result, expected)
+        @test occursin(expected, result)
 
         result = String(take!(root_io))
-        @test contains(result, expected)
+        @test occursin(expected, result)
     end
 
     @testset "Default Levels" begin

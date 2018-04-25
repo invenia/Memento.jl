@@ -16,10 +16,10 @@
         @test parts[2] == "blah"
         @test length(parts[1]) > 0
         @test length(parts[3]) > 0
-        @test contains(parts[3], "formatters")
-        @test !contains(parts[3], "get_trace")
-        @test !contains(parts[3], "DefaultRecord")
-        @test !contains(parts[3], "get")
+        @test occursin("formatters", parts[3])
+        @test !occursin("get_trace", parts[3])
+        @test !occursin("DefaultRecord", parts[3])
+        @test !occursin("get", parts[3])
 
         nl_result = Memento.format(fmt, no_lookup)
         @test startswith(nl_result, "<nothing>")
@@ -29,10 +29,10 @@
         fmt = DictFormatter()
         result = Memento.format(fmt, rec)
         for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
-            @test contains(result, string(key))
+            @test occursin(string(key), result)
         end
 
-        @test contains(result, "blah")
+        @test occursin("blah", result)
 
         aliases = Dict(
             :logger => :name,
@@ -47,13 +47,13 @@
         result = Memento.format(fmt2, rec)
 
         for key in [:location, :message, :timestamp, :process_id]
-            @test contains(result, string(key))
-            @test !contains(result, string(aliases[key]))
+            @test occursin(string(key), result)
+            @test !occursin(string(aliases[key]), result)
         end
 
-        @test contains(result, "blah")
+        @test occursin("blah", result)
 
         nl_result = Memento.format(fmt, no_lookup)
-        @test contains(nl_result, "<nothing>")
+        @test occursin("<nothing>", nl_result)
     end
 end
