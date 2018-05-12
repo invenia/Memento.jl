@@ -34,7 +34,7 @@ end
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
-        Memento.config("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
+        Memento.config!("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
         logger1 = getlogger(@__MODULE__)
         debug(logger1, "Something that won't get logged.")
         info(logger1, "Something you might want to know.")

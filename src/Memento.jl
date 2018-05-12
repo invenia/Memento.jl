@@ -44,6 +44,7 @@ include("handlers.jl")
 include("loggers.jl")
 include("syslog.jl")
 include("test.jl")
+include("deprecated.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to STDOUT.
@@ -52,7 +53,7 @@ const _loggers = Dict{AbstractString, Logger}(
 )
 
 function __init__()
-    Memento.config("warn")
+    Memento.config!("warn")
 end
 
 end

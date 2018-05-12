@@ -19,9 +19,9 @@ Start by `using` Memento
 julia> using Memento
 ```
 
-Now setup basic logging on the root logger with `Memento.config`.
+Now setup basic logging on the root logger with `Memento.config!`.
 ```julia
-julia> logger = Memento.config("debug"; fmt="[{level} | {name}]: {msg}")
+julia> logger = Memento.config!("debug"; fmt="[{level} | {name}]: {msg}")
 Logger(root)
 ```
 Now start logging with the root logger.

@@ -123,7 +123,7 @@ Register an existing logger with Memento.
 register(logger::Logger) = _loggers[logger.name] = logger
 
 """
-    config([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
+    config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
 
 Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
 that prints to STDOUT.
@@ -139,13 +139,13 @@ that prints to STDOUT.
 # Returns
 * `Logger`: the root logger.
 """
-config(level::AbstractString; kwargs...) = config(Logger("root"), level; kwargs...)
+config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
 
-function config(logger::AbstractString, level::AbstractString; kwargs...)
-    config(Logger(logger), level; kwargs...)
+function config!(logger::AbstractString, level::AbstractString; kwargs...)
+    config!(Logger(logger), level; kwargs...)
 end
 
-function config(logger::Logger, level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
+function config!(logger::Logger, level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
     logger.levels = levels
     setlevel!(logger, level)
     handler = DefaultHandler(
