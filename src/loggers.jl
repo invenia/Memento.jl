@@ -156,9 +156,12 @@ function config!(logger::AbstractString, level::AbstractString; kwargs...)
     config!(Logger(logger), level; kwargs...)
 end
 
-function config!(logger::Logger, level::AbstractString; fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true)
+function config!(
+    logger::Logger, level::AbstractString;
+    fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true, recursive=false
+)
     logger.levels = levels
-    setlevel!(logger, level)
+    setlevel!(logger, level; recursive=recursive)
     handler = DefaultHandler(
         STDOUT,
         DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
@@ -186,7 +189,7 @@ end
 Takes a string representing the name of a logger and returns
 its parent. If the logger name has no parent then the root logger is returned.
 Parent loggers are extracted assuming a naming convention of "foo.bar.baz", where
-"foo.bar.baz" is the child of "foo.bar" which is the child of "foo"
+"foo.bar.baz" is the child of "foo.bar" which is the child of "foo".
 
 # Arguments
 * `name::AbstractString`: the name of the logger.
@@ -204,6 +207,27 @@ function getparent(name)
     else
         return getlogger(join(tokenized[1:end-1], '.'))
     end
+end
+
+"""
+    getchildren(name::AbstractString)
+
+Takes a string representing the name of a logger and returns its children.
+Child loggers are extracted assuming a naming convention of "foo.bar.baz", where
+"foo.bar.baz" is the child of "foo.bar" which is the child of "foo".
+
+# Arguments
+* `name::AbstractString`: the name of the logger.
+
+# Returns
+* `Vector{Logger}`
+"""
+function getchildren(name)
+    names = Iterators.filter(keys(_loggers)) do n
+        name == "root" ? n != name : startswith(n, "$name.")
+    end
+
+    return map(n -> _loggers[n], names) # TODO: using `imap`
 end
 
 """
@@ -298,9 +322,16 @@ addlevel!(logger::Logger, level::AbstractString, val::Int) = logger.levels[level
 
 Changes what level this logger should log at.
 """
-function setlevel!(logger::Logger, level::AbstractString)
+function setlevel!(logger::Logger, level::AbstractString; recursive=false)
     logger.levels[level]    # Throw a key error if the levels isn't in levels
     logger.level = level
+
+    # Unfortunately, recursive flag isn't implemented recursively
+    if recursive
+        for l in getchildren(logger.name)
+            setlevel!(l, level)
+        end
+    end
 end
 
 """
@@ -308,13 +339,31 @@ end
 
 Temporarily change the level a logger will log at for the duration of the function `f`.
 """
-function setlevel!(f::Function, logger::Logger, level::AbstractString)
-    original_level = getlevel(logger)
-    setlevel!(logger, level)
-    try
-        f()
-    finally
-        setlevel!(logger, original_level)
+function setlevel!(f::Function, logger::Logger, level::AbstractString; recursive=false)
+    # The recursive condition is less performant, so we'll special case it.
+    if recursive
+        loggers = getchildren(logger.name)
+        push!(loggers, logger)
+
+        originals = getlevel.(loggers)
+
+        try
+            setlevel!.(loggers, level)
+            f()
+        finally
+            for (lo, le) in zip(loggers, originals)
+                setlevel!(lo, le)
+            end
+        end
+    else
+        original = getlevel(logger)
+        setlevel!(logger, level)
+
+        try
+            f()
+        finally
+            setlevel!(logger, original)
+        end
     end
 end
 

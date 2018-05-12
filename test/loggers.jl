@@ -148,6 +148,27 @@
         end
     end
 
+    @testset "Recursive setlevel" begin
+        getlogger.(("foo.bar.baz", "a.b.c"))
+        foo_children = Memento.getchildren("foo")
+        a_children = Memento.getchildren("a")
+
+        @test all(==("warn"), getlevel.(foo_children))
+        setlevel!(getlogger("foo"), "info"; recursive=true)
+
+        @test all(==("info"), getlevel.(foo_children))
+        @test all(==("warn"), getlevel.(a_children))
+
+        setlevel!(getlogger("foo"), "notice"; recursive=true) do
+            info(getlogger("foo"), "I shouldn't be getting printed.")
+        end
+
+        # Check that our child logging levels remain the same after
+        # the above call.
+        @test all(==("info"), getlevel.(foo_children))
+        @test all(==("warn"), getlevel.(a_children))
+    end
+
     @testset "Memento.config" begin
         root_logger = Memento.config!(
             "info";
@@ -169,5 +190,8 @@
         @test length(gethandlers(str_logger)) == 1
 
         @test getlevel(root_logger) == getlevel(my_logger) == getlevel(str_logger)
+
+        Memento.config("notice"; recursive=true)
+        @test all(l -> getlevel(l) == "notice", values(Memento._loggers))
     end
 end
