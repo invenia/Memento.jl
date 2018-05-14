@@ -102,11 +102,22 @@ Returns true or false as to whether the logger is propagating.
 ispropagating(logger::Logger) = logger.propagate
 
 """
-    setpropagating!(::Logger, [::Bool])
+    setpropagating!([::Function], ::Logger, [::Bool])
 
 Sets the logger to be propagating or not (Defaults to true).
 """
 setpropagating!(logger::Logger, val::Bool=true) = logger.propagate = val
+
+function setpropagating!(f::Function, logger::Logger, val::Bool=true)
+    init_val = logger.propagate
+    logger.propagate = val
+
+    try
+        f()
+    finally
+        logger.propagate = init_val
+    end
+end
 
 """
     getlevel(::Logger)

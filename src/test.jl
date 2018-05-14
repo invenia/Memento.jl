@@ -17,12 +17,16 @@ macro test_log(logger, level, msg, expr)
     quote
         handler = TestHandler($(esc(level)), $(esc(msg)))
         handlers = copy(gethandlers($(esc(logger))))
-        push!($(esc(logger)), handler)
 
         try
-            ret = $(esc(expr))
-            @test handler.found == (String($(esc(level))), String($(esc(msg))))
-            ret
+            $(esc(logger)).handlers = Dict{Any, Handler}()
+            push!($(esc(logger)), handler)
+
+            setpropagating!($(esc(logger)), false) do
+                ret = $(esc(expr))
+                @test handler.found == (String($(esc(level))), String($(esc(msg))))
+                ret
+            end
         finally
             $(esc(logger)).handlers = handlers
         end
@@ -48,7 +52,9 @@ Disables the `logger` and calls `@test_throws extype, expr`.
 macro test_throws(logger, extype, expr)
     quote
         setlevel!($(esc(logger)), "not_set") do
-            @test_throws $(esc(extype)) $(esc(expr))
+            setpropagating!($(esc(logger)), false) do
+                @test_throws $(esc(extype)) $(esc(expr))
+            end
         end
     end
 end
