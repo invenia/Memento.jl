@@ -149,17 +149,17 @@
     end
 
     @testset "Memento.config" begin
-        root_logger = Memento.config(
+        root_logger = Memento.config!(
             "info";
             fmt="[{date} | {level} | {name}]: {msg}", colorized=false
         )
 
-        my_logger = Memento.config(
+        my_logger = Memento.config!(
             getlogger("MyLogger"), "info";
             fmt="[{date} | {level} | {name}]: {msg}", colorized=false
         )
 
-        str_logger = Memento.config(
+        str_logger = Memento.config!(
             "StrLogger", "info";
             fmt="[{date} | {level} | {name}]: {msg}", colorized=false
         )
