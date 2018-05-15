@@ -705,11 +705,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/private.html#Memento.getchildren-Tuple{Any}",
+    "page": "Private",
+    "title": "Memento.getchildren",
+    "category": "method",
+    "text": "getchildren(name::AbstractString)\n\nTakes a string representing the name of a logger and returns its children. Child loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\".\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nVector{Logger}\n\n\n\n"
+},
+
+{
     "location": "api/private.html#Memento.getparent-Tuple{Any}",
     "page": "Private",
     "title": "Memento.getparent",
     "category": "method",
-    "text": "getparent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\"\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
+    "text": "getparent(name::AbstractString) -> Logger\n\nTakes a string representing the name of a logger and returns its parent. If the logger name has no parent then the root logger is returned. Parent loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\".\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nLogger: the parent logger.\n\n\n\n"
 },
 
 {
