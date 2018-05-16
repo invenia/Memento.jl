@@ -68,15 +68,15 @@ macro test_throws(logger, extype, expr)
     end
 end
 
-mutable struct TestHandler{F, O, T} <: Handler{F, O}
+mutable struct TestHandler{F, O} <: Handler{F, O}
     level::String
-    msg::T
+    msg
     levels::Ref{Dict{AbstractString, Int}}
     found::Tuple
 end
 
 function TestHandler(level, msg)
-    TestHandler{DefaultFormatter, IOBuffer, typeof(msg)}(
+    TestHandler{DefaultFormatter, IOBuffer}(
         String(level), msg, Ref(Memento._log_levels), ("", "")
     )
 end
