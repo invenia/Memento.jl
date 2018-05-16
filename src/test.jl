@@ -1,11 +1,19 @@
 module Test
 
 using ..Memento
+using Compat
 using Compat.Test
 
 import Compat.Test: @test_warn, @test_throws
 
 export @test_log
+
+# These function are just a copy of `ismatch_warn` on 0.6 or `contains_warn` on 0.7`.
+# contains_msg(output, s) = contains_warn(output, s)
+occursin_msg(s::AbstractString, output) = occursin(s, output)
+occursin_msg(s::Regex, output) = occursin(s, output)
+occursin_msg(s::Function, output) = s(output)
+occursin_msg(S::Union{AbstractArray,Tuple}, output) = all(s -> occursin_msg(s, output), S)
 
 """
     @test_log(logger, level, msg, expr)
@@ -24,7 +32,8 @@ macro test_log(logger, level, msg, expr)
 
             setpropagating!($(esc(logger)), false) do
                 ret = $(esc(expr))
-                @test handler.found == (String($(esc(level))), String($(esc(msg))))
+                @test handler.found[1] == $(esc(level))
+                @test occursin_msg($(esc(msg)), handler.found[2])
                 ret
             end
         finally
@@ -61,23 +70,25 @@ end
 
 mutable struct TestHandler{F, O} <: Handler{F, O}
     level::String
-    msg::String
+    msg
     levels::Ref{Dict{AbstractString, Int}}
     found::Tuple
 end
 
 function TestHandler(level, msg)
     TestHandler{DefaultFormatter, IOBuffer}(
-        String(level),
-        String(msg),
-        Ref(Memento._log_levels),
-        ("", "")
+        String(level), msg, Ref(Memento._log_levels), ("", "")
     )
 end
 
 function Base.log(handler::TestHandler, rec::Record)
-    if String(rec[:level]) == handler.level && String(rec[:msg]) == handler.msg
-        handler.found = (handler.level, handler.msg)
+    # Uncomment the lines below to debug issues with the `TestHandler`
+    # println(string("Record: ", rec[:level], ", ", rec[:msg]))
+    # println(string("Search: ", handler.level, ", ", handler.msg))
+    # println(string("Found: ", String(rec[:level]) == handler.level && occursin_msg(handler.msg, String(rec[:msg]))))
+
+    if String(rec[:level]) == handler.level && occursin_msg(handler.msg, String(rec[:msg]))
+        handler.found = (rec[:level], rec[:msg])
     end
 end
 
