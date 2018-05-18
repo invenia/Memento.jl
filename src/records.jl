@@ -59,14 +59,12 @@ Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
     Dict(rec::Record)
 
 Extracts the `Record` and its `Attribute`s into a `Dict`
-NOTE: This may be an expensive operations, so you probably don't want to do this for every
-log record unless you're planning on using every `Attribute`.
+
+!!! warn
+    This may be an expensive operation, so you probably don't want to do this for every
+    log record unless you're planning on using every `Attribute`.
 """
-function Base.Dict(rec::Record)
-    return map(fieldnames(typeof(rec))) do key
-        key => rec[key]
-    end |> Dict
-end
+Base.Dict(rec::T) where {T<:Record} = Dict(key => rec[key] for key in fieldnames(T))
 
 
 """
