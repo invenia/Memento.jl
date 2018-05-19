@@ -545,6 +545,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/public.html#Memento.Attribute",
+    "page": "Public",
+    "title": "Memento.Attribute",
+    "category": "type",
+    "text": "Attribute\n\nAn Attribute represents a lazily evaluated field in a log Record.\n\nFields\n\nf::Function: A function to evaluate in order to get a value if one is not set.\nx::Nullable: A value that may or may not exist yet.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.Attribute-Union{Tuple{Function}, Tuple{T}} where T",
+    "page": "Public",
+    "title": "Memento.Attribute",
+    "category": "method",
+    "text": "Attribute{T}(f::Function)\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.Attribute-Union{Tuple{T}, Tuple{T}} where T",
+    "page": "Public",
+    "title": "Memento.Attribute",
+    "category": "method",
+    "text": "Attribute(x)\n\nSimply wraps the value x in a Nullable and sticks that in an Attribute with an empty Function.\n\n\n\n"
+},
+
+{
     "location": "api/public.html#Memento.DefaultRecord",
     "page": "Public",
     "title": "Memento.DefaultRecord",
@@ -785,35 +809,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/private.html#Base.Dict-Tuple{Memento.Record}",
+    "location": "api/private.html#Base.Dict-Union{Tuple{T}, Tuple{T}} where T<:Memento.Record",
     "page": "Private",
     "title": "Base.Dict",
     "category": "method",
-    "text": "Dict(rec::Record)\n\nExtracts the Record and its Attributes into a Dict NOTE: This may be an expensive operations, so you probably don\'t want to do this for every log record unless you\'re planning on using every Attribute.\n\n\n\n"
-},
-
-{
-    "location": "api/private.html#Memento.Attribute",
-    "page": "Private",
-    "title": "Memento.Attribute",
-    "category": "type",
-    "text": "Attribute\n\nAn Attribute represents a lazily evaluated field in a log Record.\n\nFields\n\nf::Function: A function to evaluate in order to get a value if one is not set.\nx::Nullable: A value that may or may not exist yet.\n\n\n\n"
-},
-
-{
-    "location": "api/private.html#Memento.Attribute-Tuple{Any}",
-    "page": "Private",
-    "title": "Memento.Attribute",
-    "category": "method",
-    "text": "Attribute(x)\n\nSimply wraps the value x in a Nullable and sticks that in an Attribute with an empty Function.\n\n\n\n"
-},
-
-{
-    "location": "api/private.html#Memento.Attribute-Tuple{Type,Function}",
-    "page": "Private",
-    "title": "Memento.Attribute",
-    "category": "method",
-    "text": "Attribute(T::Type, f::Function)\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
+    "text": "Dict(rec::Record)\n\nExtracts the Record and its Attributes into a Dict\n\nwarn: Warn\nThis may be an expensive operation, so you probably don\'t want to do this for every log record unless you\'re planning on using every Attribute.\n\n\n\n"
 },
 
 {
