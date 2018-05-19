@@ -13,11 +13,11 @@ mutable struct Attribute{T}
 end
 
 """
-    Attribute(T::Type, f::Function)
+    Attribute{T}(f::Function)
 
 Creates an `Attribute` with the function and a `Nullable` of type `T`.
 """
-Attribute(T::Type, f::Function) = Attribute(f, Nullable{T}())
+Attribute{T}(f::Function) where {T} = Attribute{T}(f, Nullable{T}())
 
 """
     Attribute(x)
@@ -25,7 +25,7 @@ Attribute(T::Type, f::Function) = Attribute(f, Nullable{T}())
 Simply wraps the value `x` in a `Nullable` and sticks that in an `Attribute` with an
 empty `Function`.
 """
-Attribute(x) = Attribute(typeof(x), () -> x)
+Attribute(x::T) where {T} = Attribute{T}(() -> x)
 
 """
     get(attr::Attribute{T}) -> T
@@ -59,14 +59,12 @@ Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
     Dict(rec::Record)
 
 Extracts the `Record` and its `Attribute`s into a `Dict`
-NOTE: This may be an expensive operations, so you probably don't want to do this for every
-log record unless you're planning on using every `Attribute`.
+
+!!! warn
+    This may be an expensive operation, so you probably don't want to do this for every
+    log record unless you're planning on using every `Attribute`.
 """
-function Base.Dict(rec::Record)
-    return map(fieldnames(typeof(rec))) do key
-        key => rec[key]
-    end |> Dict
-end
+Base.Dict(rec::T) where {T<:Record} = Dict(key => rec[key] for key in fieldnames(T))
 
 
 """
@@ -111,16 +109,16 @@ Takes a few initial log record arguments and creates a `DefaultRecord`.
 """
 function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
     time = Dates.now()
-    trace = Attribute(StackTrace, get_trace)
+    trace = Attribute{StackTrace}(get_trace)
 
     DefaultRecord(
-        Attribute(DateTime, () -> round(time, Dates.Second)),
+        Attribute{DateTime}(() -> round(time, Dates.Second)),
         Attribute(level),
         Attribute(levelnum),
-        Attribute(AbstractString, get_msg(msg)),
+        Attribute{AbstractString}(get_msg(msg)),
         Attribute(name),
         Attribute(myid()),
-        Attribute(Union{StackFrame, Nothing}, get_lookup(trace)),
+        Attribute{Union{StackFrame, Nothing}}(get_lookup(trace)),
         trace,
     )
 end
