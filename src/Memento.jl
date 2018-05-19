@@ -3,10 +3,10 @@ __precompile__()
 module Memento
 
 using Base: StackTrace, StackFrame
-using Sockets
 using Compat
 using Compat.UUIDs
 using Compat.Dates
+using Compat.Sockets
 
 import Syslogs
 import JSON

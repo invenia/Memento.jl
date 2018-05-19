@@ -1,8 +1,7 @@
-using Sockets
-
 using Compat
 using Compat.Test
 using Compat.Distributed
+using Compat.Sockets
 using Suppressor
 using JSON
 using Syslogs
