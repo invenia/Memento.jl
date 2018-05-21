@@ -7,6 +7,7 @@ using Compat
 using Compat.UUIDs
 using Compat.Dates
 using Compat.Sockets
+using Compat.Distributed
 
 import Syslogs
 import JSON
