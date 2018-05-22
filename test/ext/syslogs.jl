@@ -38,5 +38,5 @@ end
     # We just want to test that our glue code works with Syslogs.jl
     @suppress info(logger, "Hello World!")
     s = fetch(r)
-    @test contains(s, "Hello World!")
+    @test occursin("Hello World!", s)
 end
