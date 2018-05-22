@@ -725,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.config!",
     "category": "method",
-    "text": "config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to STDOUT.\n\nArguments\n\n\'logger::Union{Logger, AbstractString}`: The logger to configure (optional)\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to STDOUT should be colorized.\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
+    "text": "config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to stdout.\n\nArguments\n\n\'logger::Union{Logger, AbstractString}`: The logger to configure (optional)\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to stdout should be colorized.\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
 },
 
 {
