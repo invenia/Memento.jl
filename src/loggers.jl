@@ -150,10 +150,7 @@ that prints to stdout.
 # Returns
 * `Logger`: the root logger.
 """
-function config!(level::AbstractString; kwargs...)
-    DEFAULT_LOG_LEVEL = level
-    config!(Logger("root"), level; kwargs...)
-end
+config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
 
 function config!(logger::AbstractString, level::AbstractString; kwargs...)
     config!(Logger(logger), level; kwargs...)
