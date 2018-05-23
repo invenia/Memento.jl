@@ -55,7 +55,7 @@ const _loggers = Dict{AbstractString, Logger}(
 )
 
 function __init__()
-    Memento.config!("warn")
+    Memento.config!(DEFAULT_LOG_LEVEL)
 end
 
 end
