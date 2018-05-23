@@ -55,7 +55,7 @@ end
 
         for l in (foo, bar, baz, car)
             @test isset(l)
-            @test getlevel(l) == "warn"
+            @test getlevel(l) == "info"
             @test length(gethandlers(l)) == 0
         end
 
@@ -70,35 +70,35 @@ end
         result = String(take!(root_io))
         @test occursin(expected, result)
 
-        msg = "This should not log because info messages don't have high enough importance."
-        info(bar, msg)
+        msg = "This should not log because debug messages don't have high enough importance."
+        debug(bar, msg)
         result = String(take!(root_io))
         @test result == ""
 
-        setlevel!(getlogger(), "info")
+        setlevel!(getlogger(), "debug")
         msg = "This should log to because we've set the root logger to info"
-        info(getlogger(), msg)
+        debug(getlogger(), msg)
         result = String(take!(root_io))
-        expected = "root - info: $msg"
+        expected = "root - debug: $msg"
         @test occursin(expected, result)
 
         msg = "This should not log because `bar` is set too low"
-        info(bar, msg)
+        debug(bar, msg)
         result = String(take!(root_io))
         @test result == ""
 
-        setlevel!(bar, "info")
+        setlevel!(bar, "debug")
         msg = "This should still not log because `foo` is set too low"
-        info(bar, msg)
+        debug(bar, msg)
         result = String(take!(root_io))
         @test result == ""
 
         # Now if we have the chain of root, foo and bar all set to info then the log record
         # will propagate up from the bar logger to be written to the buffer by the root loggers handler.
-        setlevel!(foo, "info")
+        setlevel!(foo, "debug")
         msg = "Now this should log because `bar`, `foo` and the root logger are all set appropriately."
-        info(bar, msg)
-        expected = "Foo.Bar - info: $msg"
+        debug(bar, msg)
+        expected = "Foo.Bar - debug: $msg"
         result = String(take!(root_io))
         @test occursin(expected, result)
 
@@ -106,6 +106,9 @@ end
         # propagate to the root logger.
         setlevel!(baz, "debug")
         push!(baz, DefaultHandler(baz_io, DefaultFormatter("{name} - {level}: {msg}")))
+
+        # Reset the parent loggers
+        setlevel!.((foo, bar), "info")
 
         msg = "This should log to `baz_io`, but not `root_io`"
         debug(baz, msg)

@@ -24,7 +24,7 @@ export debug, notice, error, critical, alert, emergency,
        DefaultFormatter, DictFormatter, DefaultHandler, FileRoller
 
 
-const DEFAULT_LOG_LEVEL = "warn"
+const DEFAULT_LOG_LEVEL = "info"
 
 const _log_levels = Dict{AbstractString, Int}(
     "not_set" => 0,
