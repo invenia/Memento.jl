@@ -9,6 +9,7 @@ using Compat.Dates
 using Compat.Sockets
 using Compat.Distributed
 
+import Compat: @__MODULE__
 import Syslogs
 import JSON
 using Nullables
@@ -46,6 +47,7 @@ include("handlers.jl")
 include("loggers.jl")
 include("syslog.jl")
 include("stdlib.jl")
+include("config.jl")
 include("test.jl")
 include("deprecated.jl")
 

@@ -134,56 +134,6 @@ Register an existing logger with Memento.
 register(logger::Logger) = _loggers[logger.name] = logger
 
 """
-    config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
-
-Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
-that prints to stdout.
-
-# Arguments
-* 'logger::Union{Logger, AbstractString}`: The logger to configure (optional)
-* `level::AbstractString`: the minimum logging level to log message to the root logger (required).
-* `fmt::AbstractString`: a format string to pass to the `DefaultFormatter` which describes
-    how to log messages (defaults to `Memento.DEFAULT_FMT_STRING`)
-* `levels`: the default logging levels to use (defaults to `Memento._log_levels`).
-* `colorized`: whether or not the message to stdout should be colorized.
-
-# Returns
-* `Logger`: the root logger.
-"""
-config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
-
-function config!(logger::AbstractString, level::AbstractString; kwargs...)
-    config!(Logger(logger), level; kwargs...)
-end
-
-function config!(
-    logger::Logger, level::AbstractString;
-    fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true, recursive=false
-)
-    logger.levels = levels
-    setlevel!(logger, level; recursive=recursive)
-    handler = DefaultHandler(
-        stdout,
-        DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
-    )
-    logger.handlers["console"] = handler
-    register(logger)
-    return logger
-end
-
-"""
-    reset!()
-
-Removes all registered loggers and reinitializes the root logger
-without any handlers.
-"""
-function reset!()
-    empty!(_loggers)
-    register(Logger("root"))
-    nothing
-end
-
-"""
     getparent(name::AbstractString) -> Logger
 
 Takes a string representing the name of a logger and returns

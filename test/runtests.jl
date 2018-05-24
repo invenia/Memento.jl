@@ -20,6 +20,7 @@ files = [
     "io.jl",
     "concurrency.jl",
     "test.jl",
+    "stdlib.jl",
     "ext/json.jl",
 ]
 
