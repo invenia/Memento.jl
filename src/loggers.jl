@@ -386,7 +386,8 @@ function log(logger::Logger, rec::Record)
     # If none of the `Filter`s return false we're good to log our record.
     if all(f -> f(rec), getfilters(logger))
         for (name, handler) in logger.handlers
-            @async log(handler, rec)
+            # @async log(handler, rec)
+            log(handler, rec)
         end
 
         if !isroot(logger) && logger.propagate
