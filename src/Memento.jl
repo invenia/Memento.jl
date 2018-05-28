@@ -9,7 +9,6 @@ using Compat.Dates
 using Compat.Sockets
 using Compat.Distributed
 
-import Compat: @__MODULE__
 import Syslogs
 import JSON
 using Nullables
