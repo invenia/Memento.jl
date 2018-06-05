@@ -73,16 +73,16 @@ mutable struct EC2Record <: Record
 
     function EC2Record(args::Dict)
         time = now()
-        trace = Attribute(StackTrace, get_trace)
+        trace = Attribute{StackTrace}(get_trace)
 
         EC2Record(
-            Attribute(DateTime, () -> round(time, Dates.Second)),
+            Attribute{DateTime}(() -> round(time, Dates.Second)),
             Attribute(args[:level]),
             Attribute(args[:levelnum]),
-            Attribute(AbstractString, get_msg(args[:msg])),
+            Attribute{AbstractString}(get_msg(args[:msg])),
             Attribute(args[:name]),
             Attribute(myid()),
-            Attribute(StackFrame, get_lookup(trace)),
+            Attribute{StackFrame}(get_lookup(trace)),
             trace,
             Attribute(ENV["INSTANCE_ID"]),
             Attribute(ENV["PUBLIC_IP"]),
