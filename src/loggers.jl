@@ -134,79 +134,27 @@ Register an existing logger with Memento.
 register(logger::Logger) = _loggers[logger.name] = logger
 
 """
-    config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
+    getpath(logger::Logger) -> Vector{Logger}
 
-Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
-that prints to stdout.
-
-# Arguments
-* 'logger::Union{Logger, AbstractString}`: The logger to configure (optional)
-* `level::AbstractString`: the minimum logging level to log message to the root logger (required).
-* `fmt::AbstractString`: a format string to pass to the `DefaultFormatter` which describes
-    how to log messages (defaults to `Memento.DEFAULT_FMT_STRING`)
-* `levels`: the default logging levels to use (defaults to `Memento._log_levels`).
-* `colorized`: whether or not the message to stdout should be colorized.
-
-# Returns
-* `Logger`: the root logger.
+Returns the path of logger from the root logger.
 """
-config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
+function getpath(logger::Logger)
+    isroot(logger) && return [logger]
 
-function config!(logger::AbstractString, level::AbstractString; kwargs...)
-    config!(Logger(logger), level; kwargs...)
-end
+    tokenized = split(logger.name, '.')
+    results = Vector{Logger}(undef, length(tokenized) + 1)
 
-function config!(
-    logger::Logger, level::AbstractString;
-    fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true, recursive=false
-)
-    logger.levels = levels
-    setlevel!(logger, level; recursive=recursive)
-    handler = DefaultHandler(
-        stdout,
-        DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
-    )
-    logger.handlers["console"] = handler
-    register(logger)
-    return logger
-end
+    # Set the root logger as the first element
+    results[1] = getlogger("root")
+    # Set our input logger as the last logger in case the 
+    # input logger isn't registered.
+    results[end] = logger           
 
-"""
-    reset!()
-
-Removes all registered loggers and reinitializes the root logger
-without any handlers.
-"""
-function reset!()
-    empty!(_loggers)
-    register(Logger("root"))
-    nothing
-end
-
-"""
-    getparent(name::AbstractString) -> Logger
-
-Takes a string representing the name of a logger and returns
-its parent. If the logger name has no parent then the root logger is returned.
-Parent loggers are extracted assuming a naming convention of "foo.bar.baz", where
-"foo.bar.baz" is the child of "foo.bar" which is the child of "foo".
-
-# Arguments
-* `name::AbstractString`: the name of the logger.
-
-# Returns
-* `Logger`: the parent logger.
-"""
-function getparent(name)
-    tokenized = split(name, '.')
-
-    if length(tokenized) == 1
-        return getlogger("root")
-    elseif length(tokenized) == 2
-        return getlogger(tokenized[1])
-    else
-        return getlogger(join(tokenized[1:end-1], '.'))
+    for i in 1:length(tokenized)-1
+        results[i+1] = getlogger(join(tokenized[1:i], '.'))
     end
+
+    return results
 end
 
 """
@@ -261,7 +209,6 @@ function getlogger(name="root")
     logger_name = name == "" ? "root" : name
 
     if !(haskey(_loggers, logger_name))
-        parent = getparent(logger_name)
         register(Logger(logger_name))
     end
 
@@ -383,15 +330,17 @@ method with a `@sync` in order to synchronize all handler tasks.
 * `args::Dict`: a dict of msg fields and values that should be passed to `logger.record`.
 """
 function log(logger::Logger, rec::Record)
-    # If none of the `Filter`s return false we're good to log our record.
-    if all(f -> f(rec), getfilters(logger))
-        for (name, handler) in logger.handlers
+    @sync for l in reverse!(getpath(logger))
+        # If none of the `Filter`s return false we're good to log our record.
+        !all(f -> f(rec), getfilters(l)) && break
+
+        # Log to all of our handlers
+        for (name, handler) in l.handlers
             @async log(handler, rec)
         end
 
-        if !isroot(logger) && logger.propagate
-            log(getparent(logger.name), rec)
-        end
+        # Break if this is the root logger or it's non-propagating
+        isroot(l) || !l.propagate && break
     end
 end
 
@@ -413,7 +362,7 @@ with the created `Dict`).
 """
 function log(logger::Logger, level::AbstractString, msg::AbstractString)
     rec = logger.record(logger.name, level, logger.levels[level], msg)
-    @sync log(logger, rec)
+    log(logger, rec)
 end
 
 """
@@ -433,7 +382,7 @@ be a function that returns the log message string.
 """
 function log(msg::Function, logger::Logger, level::AbstractString)
     rec = logger.record(logger.name, level, logger.levels[level], msg)
-    @sync log(logger, rec)
+    log(logger, rec)
 end
 
 #=

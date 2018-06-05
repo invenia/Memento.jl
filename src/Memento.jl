@@ -45,6 +45,8 @@ include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
 include("syslog.jl")
+include("stdlib.jl")
+include("config.jl")
 include("test.jl")
 include("deprecated.jl")
 
