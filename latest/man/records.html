@@ -15,16 +15,16 @@ mutable struct EC2Record &lt;: Record
 
     function EC2Record(name::AbstractString, level::AbstractString, msg)
         time = now()
-        trace = Attribute(StackTrace, get_trace)
+        trace = Attribute{StackTrace}(get_trace)
 
         EC2Record(
-            Attribute(DateTime, () -&gt; round(time, Dates.Second)),
+            Attribute{DateTime}(() -&gt; round(time, Dates.Second)),
             Attribute(level),
             Attribute(-1),
-            Attribute(AbstractString, get_msg(msg)),
+            Attribute{AbstractString}(get_msg(msg)),
             Attribute(name),
             Attribute(myid()),
-            Attribute(StackFrame, get_lookup(trace)),
+            Attribute{StackFrame})get_lookup(trace)),
             trace,
             Attribute(ENV[&quot;INSTANCE_ID&quot;]),
             Attribute(ENV[&quot;PUBLIC_IP&quot;]),
