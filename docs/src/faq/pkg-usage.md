@@ -8,13 +8,16 @@ __precompile__() # this module is safe to precompile
 module MyModule
 
 using Memento
+using Compat: @__MODULE__  # requires a minimum of Compat 0.26. Not required on Julia 0.7
 
 # Create our module level logger (this will get precompiled)
-const LOGGER = get_logger(current_module())   # or `get_logger(@__MODULE__)` on 0.7
+const LOGGER = get_logger(@__MODULE__)
 
 # Register the module level logger at runtime so that folks can access the logger via `get_logger(MyModule)`
 # NOTE: If this line is not included then the precompiled `MyModule.LOGGER` won't be registered at runtime.
-__init__() = Memento.register(LOGGER)
+function __init__()
+    Memento.register(LOGGER)
+end
 
 end
 ```
