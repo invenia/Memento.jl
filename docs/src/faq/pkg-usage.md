@@ -7,7 +7,7 @@ Specifically, it is important to note that if you want folks be able to configur
 __precompile__() # this module is safe to precompile
 module MyModule
 
-using Memento
+using Memento  # requires a minimum of Memento 0.3.2
 using Compat: @__MODULE__  # requires a minimum of Compat 0.26. Not required on Julia 0.7
 
 # Create our module level logger (this will get precompiled)
