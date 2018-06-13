@@ -3,6 +3,7 @@
 Detailed docs on contributing to Julia packages can be found [here](http://docs.julialang.org/en/stable/manual/packages/#package-development).
 
 ### Code and docs
+
 To start hacking code or writing docs, simply:
 
 1. `julia> Pkg.add("Memento"); Pkg.checkout("Memento")`
@@ -12,6 +13,7 @@ To start hacking code or writing docs, simply:
 5. Make a pull request to [Memento](https://github.com/invenia/Memento.jl) and share your changes with the rest of the community.
 
 ### Bugs, features, and requests
+
 Feel free to [file issues](https://github.com/invenia/Memento.jl/issues) when you encounter bugs, think of interesting features you'd like to see, or when there are important changes not yet included in a release and you'd like us to tag a new version.
 
 ## Submitting your contributions

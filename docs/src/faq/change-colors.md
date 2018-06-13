@@ -1,6 +1,7 @@
 # Changing colors?
 
 Colors can be enabled/disabled and set using via the `is_colorized` and `colors` options to the `DefaultHandler`.
+
 ```julia
 julia> add_handler(logger, DefaultHandler(
     STDOUT, DefaultFormatter(),
@@ -8,9 +9,10 @@ julia> add_handler(logger, DefaultHandler(
     "console"
 )
 ```
-Will create a `DefaultHandler` with colorization
+will create a `DefaultHandler` with colorization.
 
 By default the following colors are used:
+
 ```julia
 Dict{AbstractString, Symbol}(
     "debug" => :blue,
@@ -25,6 +27,7 @@ Dict{AbstractString, Symbol}(
 ```
 
 However, you can specify custom colors/log levels like so:
+
 ```julia
 add_handler(logger, DefaultHandler(
     STDOUT, DefaultFormatter(),
@@ -40,7 +43,9 @@ add_handler(logger, DefaultHandler(
     "console"
 )
 ```
-You can also globally disable colorization when running `Memento.config!`
+
+You can also globally disable colorization when running [`Memento.config!`](@ref)
+
 ```julia
 julia> Memento.config!("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
 ```

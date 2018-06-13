@@ -146,9 +146,9 @@ function getpath(logger::Logger)
 
     # Set the root logger as the first element
     results[1] = getlogger("root")
-    # Set our input logger as the last logger in case the 
+    # Set our input logger as the last logger in case the
     # input logger isn't registered.
-    results[end] = logger           
+    results[end] = logger
 
     for i in 1:length(tokenized)-1
         results[i+1] = getlogger(join(tokenized[1:i], '.'))
@@ -389,45 +389,47 @@ end
 For our DEFAULT_LOG_LEVELS we generate the appropriate `:level(logger, msg)`
 methods.
 =#
-for key in keys(_log_levels)
-    if key != "not_set"
-        level = Symbol(key)
+let
+    for key in keys(_log_levels)
+        if key != "not_set"
+            local level = Symbol(key)
 
-        if _log_levels[key] < _log_levels["error"]
-            @eval begin
-                function $level(logger::Logger, msg::AbstractString)
-                    log(logger, $key, msg)
-                end
-
-                function $level(msg::Function, logger::Logger)
-                    log(msg, logger, $key)
-                end
-            end
-        else
-            @eval begin
-                function $level(logger::Logger, msg::AbstractString)
-                    log(logger, $key, msg)
-                    throw(ErrorException(msg))
-                end
-
-                function $level(msg::Function, logger::Logger)
-                    log(msg, logger, $key)
-                    throw(ErrorException(msg()))
-                end
-
-                function $level(logger::Logger, exc::Exception)
-                    log(logger, $key, sprint(io -> showerror(io, exc)))
-                    throw(exc)
-                end
-
-                function $level(logger::Logger, exc::CompositeException)
-                    for sub_exc in exc
-                        log(logger, $key, sprint(io -> showerror(io, sub_exc)))
+            if _log_levels[key] < _log_levels["error"]
+                @eval begin
+                    function $level(logger::Logger, msg::AbstractString)
+                        log(logger, $key, msg)
                     end
-                    throw(exc)
+
+                    function $level(msg::Function, logger::Logger)
+                        log(msg, logger, $key)
+                    end
                 end
+            else
+                @eval begin
+                    function $level(logger::Logger, msg::AbstractString)
+                        log(logger, $key, msg)
+                        throw(ErrorException(msg))
+                    end
+
+                    function $level(msg::Function, logger::Logger)
+                        log(msg, logger, $key)
+                        throw(ErrorException(msg()))
+                    end
+
+                    function $level(logger::Logger, exc::Exception)
+                        log(logger, $key, sprint(io -> showerror(io, exc)))
+                        throw(exc)
+                    end
+
+                    function $level(logger::Logger, exc::CompositeException)
+                        for sub_exc in exc
+                            log(logger, $key, sprint(io -> showerror(io, sub_exc)))
+                        end
+                        throw(exc)
+                    end
+                end
+                f = eval(level)
             end
-            f = eval(level)
         end
     end
 end

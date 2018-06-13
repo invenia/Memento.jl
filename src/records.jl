@@ -13,11 +13,13 @@ mutable struct Attribute{T}
 end
 
 """
-    Attribute{T}(f::Function)
+    Attribute(f::Function) -> Attribute{Any}
+    Attribute{T}(f::Function) -> Attribute{T}
 
 Creates an `Attribute` with the function and a `Nullable` of type `T`.
 """
 Attribute{T}(f::Function) where {T} = Attribute{T}(f, Nullable{T}())
+Attribute(f::Function) = Attribute{Any}(f, Nullable{Any}())
 
 """
     Attribute(x)
@@ -26,6 +28,7 @@ Simply wraps the value `x` in a `Nullable` and sticks that in an `Attribute` wit
 empty `Function`.
 """
 Attribute(x::T) where {T} = Attribute{T}(() -> x)
+Attribute{T}(x::T) where {T} = Attribute{T}(() -> x)
 
 """
     get(attr::Attribute{T}) -> T
@@ -33,42 +36,83 @@ Attribute(x::T) where {T} = Attribute{T}(() -> x)
 Run set `attr.x` to the output of `attr.f` if `attr.x` is not already set.
 We then return the value stored in `attr.x`
 """
-function Base.get(attr::Attribute)
+function Base.get(attr::Attribute{T}) where T
     if isnull(attr.x)
-        attr.x = Nullable(attr.f())
+        attr.x = Nullable{T}(attr.f())
     end
 
-    return get(attr.x)
+    return get(attr.x)::T
 end
+
+hasfield(T::DataType, name::Symbol) = Base.fieldindex(T, name, false) > 0
 
 """
     Record
 
-Are an `Attribute` container used to store information about a log events including the
-msg, date, level, stacktrace, etc. `Formatter`s use `Records` to format log
+A dictionary-like container with `Symbol` keys used to store information about a log events
+including the msg, date, level, stacktrace, etc. `Formatter`s use `Records` to format log
 message strings.
 
-NOTE: you should access `Attribute`s in a `Record` by using `getindex` (ie: record[:msg])
-as this will correctly extract the value from the `Attribute` container.
-"""
-abstract type Record end
+You can access the properties of a `Record` by using `getindex` (ie: record[:msg]).
 
-Base.getindex(rec::Record, attr::Symbol) = get(getfield(rec, attr))
+Subtypes of `Record` should implement `getindex(::MyRecord, ::Symbol)` and key-value pair
+iteration.
+"""
+abstract type Record <: AbstractDict{Symbol, Any} end
+
+"""
+    AttributeRecord <: Record
+
+A `Record` which stores its properties as `Attribute`s for lazy evaluation.
+
+Calling `getindex` or iterating will evaluate and cache the properties accessed.
+
+Subtypes of `AttributeRecord` should implement `Memento.getattribute(::MyRecord, ::Symbol)`
+instead of `getindex`.
+"""
+abstract type AttributeRecord <: Record end
+
+level(rec::Record) = rec[:level]
+Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
+Base.haskey(rec::Record, attr::Symbol) = hasfield(rec, attr)
+Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:nfields(rec))
+
+Base.start(rec::Record) = 0
+Base.done(rec::T, state) where {T <: Record} = state >= nfields(T)
+
+function Base.next(rec::T, state::Int) where T <: Record
+    new_state = state + 1
+    return (fieldname(T, new_state) => getfield(rec, new_state), new_state)
+end
+
+function Base.next(rec::T, state::Int) where T <: AttributeRecord
+    new_state = state + 1
+    return (fieldname(T, new_state) => get(getfield(rec, new_state)), new_state)
+end
+
+"""
+    getattribute(rec::AttributeRecord, attr::Symbol)
+"""
+getattribute(rec::AttributeRecord, attr::Symbol) = getfield(rec, attr)
+
+Base.getindex(rec::AttributeRecord, attr::Symbol) = get(getattribute(rec, attr))
+
 
 """
     Dict(rec::Record)
 
-Extracts the `Record` and its `Attribute`s into a `Dict`
+Extracts the `Record` and its properties into a `Dict`
 
 !!! warn
-    This may be an expensive operation, so you probably don't want to do this for every
-    log record unless you're planning on using every `Attribute`.
+
+    On `AttributeRecord`s this may be an expensive operation, so you probably don't want to
+    do this for every log record unless you're planning on using every `Attribute`.
 """
-Base.Dict(rec::T) where {T<:Record} = Dict(key => rec[key] for key in fieldnames(T))
+Base.Dict(::Record)
 
 
 """
-    DefaultRecord
+    DefaultRecord <: AttributeRecord
 
 Stores the most common logging event information.
 NOTE: if you'd like more logging attributes you can:
@@ -86,7 +130,7 @@ NOTE: if you'd like more logging attributes you can:
 * `lookup::Attribute{StackFrame}`: the top StackFrame
 * `stacktrace::Attribute{StackTrace}`: a stacktrace
 """
-struct DefaultRecord <: Record
+struct DefaultRecord <: AttributeRecord
     date::Attribute
     level::Attribute
     levelnum::Attribute
@@ -98,7 +142,7 @@ struct DefaultRecord <: Record
 end
 
 """
-    DefaultRecord(name::AbstractString, level::AbstractString, msg::AbstractString)
+    DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg::AbstractString)
 
 Takes a few initial log record arguments and creates a `DefaultRecord`.
 
@@ -115,7 +159,7 @@ function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::In
         Attribute{DateTime}(() -> round(time, Dates.Second)),
         Attribute(level),
         Attribute(levelnum),
-        Attribute{AbstractString}(get_msg(msg)),
+        Attribute{AbstractString}(msg),
         Attribute(name),
         Attribute(myid()),
         Attribute{Union{StackFrame, Nothing}}(get_lookup(trace)),
@@ -143,17 +187,4 @@ Returns the top `StackFrame` for `trace` if it isn't empty.
 function get_lookup(trace::Attribute{StackTrace})
     inner() = isempty(get(trace)) ? nothing : first(get(trace))
     return inner
-end
-
-"""
-    get_msg(msg) -> Function
-
-Wraps `msg` in a function if it is a String.
-"""
-function get_msg(msg)
-    if isa(msg, AbstractString)
-        return () -> msg
-    else
-        return msg
-    end
 end
