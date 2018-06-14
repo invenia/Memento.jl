@@ -75,10 +75,10 @@ abstract type AttributeRecord <: Record end
 level(rec::Record) = rec[:level]
 Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
 Base.haskey(rec::Record, attr::Symbol) = hasfield(rec, attr)
-Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:nfields(rec))
+Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
 Base.start(rec::Record) = 0
-Base.done(rec::T, state) where {T <: Record} = state >= nfields(T)
+Base.done(rec::T, state) where {T <: Record} = state >= fieldcount(T)
 
 function Base.next(rec::T, state::Int) where T <: Record
     new_state = state + 1
