@@ -72,9 +72,8 @@ instead of `getindex`.
 """
 abstract type AttributeRecord <: Record end
 
-level(rec::Record) = rec[:level]
 Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
-Base.haskey(rec::Record, attr::Symbol) = hasfield(rec, attr)
+Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
 Base.start(rec::Record) = 0

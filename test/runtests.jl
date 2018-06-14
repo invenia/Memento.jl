@@ -32,6 +32,31 @@ struct TestError <: Exception
     msg
 end
 
+# for records.jl
+struct SimpleRecord <: Record
+    level::String
+    msg::String
+end
+
+struct ConstRecord <: AttributeRecord
+end
+
+function Memento.getattribute(::ConstRecord, attr::Symbol)
+    if attr === :level
+        return Attribute(() -> "error")
+    elseif attr === :msg
+        return Attribute(() -> "It's a ConstRecord")
+    else
+        throw(KeyError(attr))
+    end
+end
+
+_props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
+
+Base.start(cr::ConstRecord) = start(_props(cr))
+Base.next(cr::ConstRecord, state) = next(_props(cr), state)
+Base.done(cr::ConstRecord, state) = done(_props(cr), state)
+
 @testset ExtendedTestSet "Memento" begin
 
 @testset "Logging" begin

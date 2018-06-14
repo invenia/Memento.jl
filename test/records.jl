@@ -1,11 +1,36 @@
 @testset "Records" begin
-    @testset "DefaultRecord" begin
-        rec = DefaultRecord("Logger.example", "info", 20, "blah")
+    @testset "Record" begin
+        @testset "SimpleRecord (test)" begin
+            rec = SimpleRecord("info", "blah")
 
-        @test rec[:date] == get(rec.date)
-        @test get(rec.date) == get(rec.date.x)
+            @test rec[:level] == "info"
+            @test rec[:msg] == "blah"
 
-        dict = Dict(rec)
-        @test rec[:date] == dict[:date]
+            dict = Dict(rec)
+            @test rec[:msg] == dict[:msg]
+        end
+    end
+
+    @testset "AttributeRecord" begin
+        @testset "ConstRecord (test)" begin
+            rec = ConstRecord()
+
+            @test rec[:level] == "error"
+            @test rec[:msg] == "It's a ConstRecord"
+
+            dict = Dict(rec)
+            @test rec[:msg] == dict[:msg]
+        end
+
+        @testset "DefaultRecord" begin
+            rec = DefaultRecord("Logger.example", "info", 20, "blah")
+
+            @test haskey(rec, :date)
+            @test rec[:date] == get(rec.date)
+            @test get(rec.date) == get(rec.date.x)
+
+            dict = Dict(rec)
+            @test rec[:date] == dict[:date]
+        end
     end
 end
