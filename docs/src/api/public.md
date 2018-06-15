@@ -1,5 +1,11 @@
 # Public
 
+## Configuration
+
+```@docs
+Memento.config!
+```
+
 ## Loggers
 
 ```@autodocs

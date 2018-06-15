@@ -20,7 +20,7 @@ export debug, notice, error, critical, alert, emergency,
        getlevel, setlevel!, addlevel!, setrecord!,
        getlogger, gethandlers, getfilters, format, emit,
 
-       Logger, Record, DefaultRecord, Formatter, Handler,
+       Logger, Record, AttributeRecord, DefaultRecord, Formatter, Handler,
        DefaultFormatter, DictFormatter, DefaultHandler, FileRoller
 
 

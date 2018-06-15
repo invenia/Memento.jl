@@ -1,4 +1,4 @@
-# Handlers
+# [Handlers](@id man_handlers)
 
 As we've already seen, `Handler`s can be used to write log messages to different IO types. More specifically, handlers are parameterized types that describe the relationship of how `Formatter` and `IO` types are used to take a `Record` (a kind of specified `Dict`) -> convert it to a `String` with the `Formatter` and write that to an `IO` type.
 

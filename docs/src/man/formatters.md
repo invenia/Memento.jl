@@ -1,4 +1,4 @@
-# Formatters
+# [Formatters](@id man_formatters)
 
 `Formatter`s describe how to take a `Record` and convert it into properly formatted string. Currently, there are two types of `Formatters`.
 
@@ -11,7 +11,8 @@ For example, we may want a `CSVFormatter` which always writes logs in a CSV Form
 
 If you just need to customize the behaviour of an existing `Formatter` to a specific `Record` type then you should simply overload the `format` method for that `Formatter`.
 
-Example)
+## Example
+
 ```julia
 function Memento.format(fmt::DefaultFormatter, rec::MyRecord)
     ...

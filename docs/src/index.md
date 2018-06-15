@@ -1,5 +1,4 @@
-Memento.jl
-=============
+# Memento.jl
 
 [![Build Status](https://travis-ci.org/invenia/Memento.jl.svg?branch=master)](https://travis-ci.org/invenia/Memento.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/1agvguwqkae06qr9/branch/master?svg=true)](https://ci.appveyor.com/project/Rory-Finnegan/memento-jl/branch/master)
@@ -14,17 +13,22 @@ julia> Pkg.add("Memento")
 ```
 
 ## Quick Start
+
 Start by `using` Memento
+
 ```julia
 julia> using Memento
 ```
 
-Now setup basic logging on the root logger with `Memento.config!`.
+Now setup basic logging on the root logger with [`Memento.config!`](@ref).
+
 ```julia
 julia> logger = Memento.config!("debug"; fmt="[{level} | {name}]: {msg}")
 Logger(root)
 ```
+
 Now start logging with the root logger.
+
 ```julia
 julia> debug(logger, "Something to help you track down a bug.")
 [debug | root]: Something to help you track down a bug.
@@ -49,6 +53,7 @@ ERROR: Something that should throw an error.
 
 Now maybe you want to have a different logger for each module/submodule.
 This allows you to have custom logging behaviour and handlers for different modules and provides easier to parse logging output.
+
 ```julia
 julia> child_logger = getlogger("Foo.bar")
 Logger(Foo.bar)
@@ -66,4 +71,5 @@ julia> debug(child_logger, "Something that should only be printed to STDOUT on t
 julia> warn(child_logger, "Warning to STDOUT and the log file.")
 [warn | Foo.bar]: Warning to STDOUT and the log file.
 ```
+
 NOTE: We used `getlogger("Foo.bar")`, but you can also do `getlogger(current_module())` which allows us to avoid hard coding in logger names.

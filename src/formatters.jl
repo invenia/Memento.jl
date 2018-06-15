@@ -109,8 +109,7 @@ and dicts respectively.
 """
 function format(fmt::DictFormatter, rec::Record)
     aliases = if isnull(fmt.aliases)
-        names = fieldnames(typeof(rec))
-        Dict(zip(names, names))
+        Dict(key => key for key in keys(rec))
     else
         get(fmt.aliases)
     end

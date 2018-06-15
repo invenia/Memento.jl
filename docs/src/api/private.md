@@ -4,6 +4,7 @@
 
 ```@autodocs
 Modules = [Memento]
+Public = false
 Private = true
 Pages = ["loggers.jl"]
 ```
@@ -12,6 +13,7 @@ Pages = ["loggers.jl"]
 
 ```@autodocs
 Modules = [Memento]
+Public = false
 Private = true
 Pages = ["handlers.jl"]
 ```
@@ -19,6 +21,7 @@ Pages = ["handlers.jl"]
 
 ```@autodocs
 Modules = [Memento]
+Public = false
 Private = true
 Pages = ["formatters.jl"]
 ```
@@ -27,6 +30,7 @@ Pages = ["formatters.jl"]
 
 ```@autodocs
 Modules = [Memento]
+Public = false
 Private = true
 Pages = ["records.jl"]
 ```
@@ -35,6 +39,7 @@ Pages = ["records.jl"]
 
 ```@autodocs
 Modules = [Memento]
+Public = false
 Private = true
 Pages = ["io.jl"]
 ```

@@ -6,6 +6,7 @@ Let's work through a sample use case that uses all of the components we've discu
 NOTE: The example provided is a bit contrived for simplicity.
 
 First, let's start with a julia Pkg called `Wrapper` that runs a function wrapped in some Memento logging.
+
 ```julia
 # Wrapper.jl
 module Wrapper
@@ -43,11 +44,12 @@ Okay, so how do we address all of those requirements using Memento's API?
 
 Steps:
 
-1. Create a custom `Record` type called `EC2Record` that stores the Amazon EC2 information to address the first requirement.
+1. Create a custom [`Record`](@ref) type called `EC2Record` that stores the Amazon EC2 information to address the first requirement.
 2. Create a custom `IO` type called `REST` that writes log strings to the REST endpoint to partly address the second requirement.
-3. Create a custom `Formatter` type called `CSVFormatter` that converts `Record`s to (comma, tab, etc) delimited strings.
+3. Create a custom [`Formatter`](@ref) type called `CSVFormatter` that converts `Record`s to (comma, tab, etc) delimited strings.
 
 NOTE: The code below is not intended to be a working example because it assumes a fake REST service.
+
 ```julia
 # myapp.jl
 using Wrapper
