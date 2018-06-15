@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "Logging levels",
     "category": "section",
-    "text": "You can globally set the minimum logging level with Memento.config!.julia>Memento.config!(\"debug\")Will log all messages for all loggers at or above \"debug\".julia>Memento.config!(\"warn\")Will only log message at or above the \"warn\" level.We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.julia>setlevel!(getlogger(\"Main\"), \"info\")Will only set the logging level to \"info\" for the \"Main\" logger and any future children of the \"Main\" logger.By default Memento has 9 logging levels.Level Number Description\nnot_set 0 Will not log anything, but may still propagate messages to its parents.\ndebug 10 Log verbose message used for debugging.\ninfo 20 Log general information about a program.\nnotice 30 Log important events that are still part of normal execution.\nwarn 40 Log warning that may cause the program to fail.\nerror 50 Log errors and throw or rethrow an error.\ncritical 60 Entire application has crashed.\nalert 70 The entire application crashed and is not recoverable. Probably need to wake up the sysadmin.\nemergency 80 System is unusable. Applications shouldn\'t need to call this so it may be removed in the future."
+    "text": "You can globally set the minimum logging level with Memento.config!.julia> Memento.config!(\"debug\")Will log all messages for all loggers at or above \"debug\".julia>Memento.config!(\"warn\")Will only log message at or above the \"warn\" level.We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.julia>setlevel!(getlogger(\"Main\"), \"info\")Will only set the logging level to \"info\" for the \"Main\" logger and any future children of the \"Main\" logger.By default Memento has 9 logging levels.Level Number Description\nnot_set 0 Will not log anything, but may still propagate messages to its parents.\ndebug 10 Log verbose message used for debugging.\ninfo 20 Log general information about a program.\nnotice 30 Log important events that are still part of normal execution.\nwarn 40 Log warning that may cause the program to fail.\nerror 50 Log errors and throw or rethrow an error.\ncritical 60 Entire application has crashed.\nalert 70 The entire application crashed and is not recoverable. Probably need to wake up the sysadmin.\nemergency 80 System is unusable. Applications shouldn\'t need to call this so it may be removed in the future."
 },
 
 {
@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "Formatting logs",
     "category": "section",
-    "text": "Unless explicitly changed Memento will use a DefaultFormatter for handlers. This Formatter takes a format string for mapping log record fields into each log message. Desired fields are wrapped in curly brackets (ie: \"{msg}\")The default format string is \"[{level} | {name}]: {msg}\", which produces messages that look like[info | root]: my info message.\n[warn | root]: my warning message.\n...However, you could change this string to just \"{level}: {msg}\", which would produce messages that look likeinfo: my info message.\nwarn: my warning message.\n...The simplest way to globally change the log format is with Memento.config!julia> Memento.config!(\"debug\"; fmt=\"[{level} | {name}]: {msg}\")The following fields are available via the DefaultRecord.Field Description\ndate The log event date rounded to seconds\nlevel The log event level as a string\nlevelnum The integer value for the log event level\nmsg The source log event message\nname The name of the source logger\npid The pid where the log event occured\nlookup The top StackFrame of the stacktrace for the log event\nstacktrace A StackTrace for the log eventFor more details on the DefaultFormatter and DefaultRecord please see the API docs. More general information on Formatters and Records will be discussed later in this manual."
+    "text": "Unless explicitly changed Memento will use a DefaultFormatter for handlers. This Formatter takes a format string for mapping log record fields into each log message. Desired fields are wrapped in curly brackets (ie: \"{msg}\")The default format string is \"[{level} | {name}]: {msg}\", which produces messages that look like[info | root]: my info message.\n[warn | root]: my warning message.\n...However, you could change this string to just \"{level}: {msg}\", which would produce messages that look likeinfo: my info message.\nwarn: my warning message.\n...The simplest way to globally change the log format is with Memento.config!:julia> Memento.config!(\"debug\"; fmt=\"[{level} | {name}]: {msg}\")The following fields are available via the DefaultRecord.Field Description\ndate The log event date rounded to seconds\nlevel The log event level as a string\nlevelnum The integer value for the log event level\nmsg The source log event message\nname The name of the source logger\npid The pid where the log event occured\nlookup The top StackFrame of the stacktrace for the log event\nstacktrace A StackTrace for the log eventFor more details on the DefaultFormatter and DefaultRecord please see the API docs. More general information on Formatters and Records will be discussed later in this manual."
 },
 
 {
@@ -81,11 +81,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/loggers.html#Loggers-1",
+    "location": "man/loggers.html#man_loggers-1",
     "page": "Loggers",
     "title": "Loggers",
     "category": "section",
-    "text": "A Logger is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default \"root\" logger stored in global _loggers inside the Memento module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code. To create a new logger for you code it is recommended to do getlogger(current_module()).julia> logger = getlogger(current_module())Log messages are brought to different output streams by Handlers. From here you can add and remove handlers. To add a handler that writes to rotating log files, simply:julia> push!(logger, DefaultHandler(\"mylogfile.log\"))Now there is a handler named \"file-logging\", and it will write all of your logs to mylogfile.log. Your logs will still show up in the console, however, because -by default- there is a handler named \"console\" already hard at work.The operations presented here will only apply to the current logger, leaving existing loggers (e.g., Logger(root)) unaffected. However, any child loggers of Logger(Main) (e.g., Logger(Main.Foo) will have both the \"console\" and \"file-logging\" handlers available to it.We can also set the level and Record type for our logger.julia> setlevel!(logger, \"warn\")Now we won\'t log any messages with this logger unless they are at least warning messages.julia> setrecord!(logger, MyRecord)Now our logger will call create MyRecords instead of DefaultRecords"
+    "text": "A Logger is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default \"root\" logger stored in global _loggers inside the Memento module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code. To create a new logger for you code it is recommended to do getlogger(current_module()).julia> logger = getlogger(current_module())Log messages are brought to different output streams by Handlers. From here you can add and remove handlers. To add a handler that writes to rotating log files, simply:julia> push!(logger, DefaultHandler(\"mylogfile.log\"))Now there is a handler named \"file-logging\", and it will write all of your logs to mylogfile.log. Your logs will still show up in the console, however, because _by default_ there is a handler named \"console\" already hard at work.The operations presented here will only apply to the current logger, leaving existing loggers (e.g., Logger(root)) unaffected. However, any child loggers of Logger(Main) (e.g., Logger(Main.Foo) will have both the \"console\" and \"file-logging\" handlers available to it.We can also set the level and Record type for our logger.julia> setlevel!(logger, \"warn\")Now we won\'t log any messages with this logger unless they are at least warning messages.julia> setrecord!(logger, MyRecord)Now our logger will call create MyRecords instead of DefaultRecords"
 },
 
 {
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/handlers.html#Handlers-1",
+    "location": "man/handlers.html#man_handlers-1",
     "page": "Handlers",
     "title": "Handlers",
     "category": "section",
@@ -113,11 +113,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/formatters.html#Formatters-1",
+    "location": "man/formatters.html#man_formatters-1",
     "page": "Formatters",
     "title": "Formatters",
     "category": "section",
-    "text": "Formatters describe how to take a Record and convert it into properly formatted string. Currently, there are two types of Formatters.DefaultFormatter: use a simple template string format to map keys in the Record to places in the resulting string. (ie: DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\")\nDictFormatter: builds an appropriately formatted Dict from the Record so that it can be serialized to a string with various formats. (e.g., string, JSON.json).You should only need to write a custom Formatter type if you\'re needing to produce very specific string formats regardless of the Record type being used. For example, we may want a CSVFormatter which always writes logs in a CSV Format.If you just need to customize the behaviour of an existing Formatter to a specific Record type then you should simply overload the format method for that Formatter.Example)function Memento.format(fmt::DefaultFormatter, rec::MyRecord)\n    ...\nend"
+    "text": "Formatters describe how to take a Record and convert it into properly formatted string. Currently, there are two types of Formatters.DefaultFormatter: use a simple template string format to map keys in the Record to places in the resulting string. (ie: DefaultFormatter(\"[{date} | {level} | {name}]: {msg}\")\nDictFormatter: builds an appropriately formatted Dict from the Record so that it can be serialized to a string with various formats. (e.g., string, JSON.json).You should only need to write a custom Formatter type if you\'re needing to produce very specific string formats regardless of the Record type being used. For example, we may want a CSVFormatter which always writes logs in a CSV Format.If you just need to customize the behaviour of an existing Formatter to a specific Record type then you should simply overload the format method for that Formatter."
+},
+
+{
+    "location": "man/formatters.html#Example-1",
+    "page": "Formatters",
+    "title": "Example",
+    "category": "section",
+    "text": "function Memento.format(fmt::DefaultFormatter, rec::MyRecord)\n    ...\nend"
 },
 
 {
@@ -129,11 +137,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/records.html#Records-1",
+    "location": "man/records.html#man_records-1",
     "page": "Records",
     "title": "Records",
     "category": "section",
-    "text": "Records describe a set of log Attributes that should be available to a Formatter on every log message.NOTE: The Attribute type is used as a way to provide lazy evaluation of log record elements.While the DefaultRecord in Memento provides many of the keys and values needed for most logging applications, you may need to implement your own Record type. For example, if you\'re running a julia application on a cloud service provider like Amazon\'s EC2 you might want to include some general information about the resource your code is running on, which might result in a custom Record type that looks like:# TODO: Fix this example.\nmutable struct EC2Record <: Record\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(name::AbstractString, level::AbstractString, msg)\n        time = now()\n        trace = Attribute{StackTrace}(get_trace)\n\n        EC2Record(\n            Attribute{DateTime}(() -> round(time, Dates.Second)),\n            Attribute(level),\n            Attribute(-1),\n            Attribute{AbstractString}(get_msg(msg)),\n            Attribute(name),\n            Attribute(myid()),\n            Attribute{StackFrame})get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nendNOTE: The above example simply assumes that you have some relevant environment variables set on the machine, but you could also query Amazon for that information."
+    "text": "Records store information about log events (e.g., message, timestamp, log level) that is used by Formatters to format log messages. A record behaves as a dictionary-like container with Symbol keys, and you can access the properties of a Record by using getindex (i.e., record[:msg]).By default, any subtypes of Record will treat its fields as keys. Non-standard subtypes of Record should implement getindex(::MyRecord, ::Symbol) and key-value pair iteration."
+},
+
+{
+    "location": "man/records.html#AttributeRecords-1",
+    "page": "Records",
+    "title": "AttributeRecords",
+    "category": "section",
+    "text": "An AttributeRecord is an abstract subtype of Record that lazily evaluates its properties. Fields are stored as Attributes, which will evaluate a function and cache the result the first time it is read.By default, any subtypes of AttributeRecord will expect its fields to be Attributes. Non-standard subtypes of AttributeRecord should implement Memento.getattribute(::MyRecord, ::Symbol) and key-value pair iteration, where the values have been extracted from Attributes using get."
+},
+
+{
+    "location": "man/records.html#Custom-Record-Types-1",
+    "page": "Records",
+    "title": "Custom Record Types",
+    "category": "section",
+    "text": "While the DefaultRecord in Memento (a standard AttributeRecord) provides many of the keys and values needed for most logging applications, you may need to implement your own Record type. For example, if you\'re running a julia application on a cloud service provider like Amazon\'s EC2 you might want to include some general information about the resource your code is running on, which might result in a custom Record type that looks like:# TODO: Fix this example.\nmutable struct EC2Record <: AttributeRecord\n    date::Attribute\n    level::Attribute\n    levelnum::Attribute\n    msg::Attribute\n    name::Attribute\n    pid::Attribute\n    lookup::Attribute\n    stacktrace::Attribute\n    instance_id::Attribute\n    public_ip::Attribute\n    iam_user::Attribute\n\n    function EC2Record(name::AbstractString, level::AbstractString, levelnum::Int, msg)\n        time = now()\n        trace = Attribute{StackTrace}(get_trace)\n\n        EC2Record(\n            Attribute{DateTime}(() -> round(time, Dates.Second)),\n            Attribute(level),\n            Attribute(levelnum),\n            Attribute{AbstractString}(msg),\n            Attribute(name),\n            Attribute(myid()),\n            Attribute{StackFrame}(get_lookup(trace)),\n            trace,\n            Attribute(ENV[\"INSTANCE_ID\"]),\n            Attribute(ENV[\"PUBLIC_IP\"]),\n            Attribute(ENV[\"IAM_USER\"]),\n        )\n    end\nendNOTE: The above example simply assumes that you have some relevant environment variables set on the machine, but you could also query Amazon for that information."
 },
 
 {
@@ -145,11 +169,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/io.html#IO-1",
+    "location": "man/io.html#man_io-1",
     "page": "IO",
     "title": "IO",
     "category": "section",
-    "text": "Memento writes all logs to any subtype of IO including IOBuffers, LibuvStreams, Pipes, Files, etc. Memento also comes with 2 logging specific IO types.FileRoller: Does automatic log file rotation.\nSyslog: Write to syslog using the logger command. Please note that syslog output is only available on systems that have logger utility installed. (This should include both Linux and OS X, but typically excludes Windows.) Note that BSD\'s logger (used on OS X) will append a second process ID, which is the PID of the logger tool itself.To create your own IO types you need to subtype IO and implement the println and flush methods."
+    "text": "Memento writes all logs to any subtype of IO including IOBuffers, LibuvStreams, Pipes, Files, etc. Memento also comes with a logging-specific IO type, FileRoller, which does automatic log file rotation.The Syslogs package provides the Syslog IO type to write to syslog using the logger command. Please note that syslog output is only available on systems that have logger utility installed (this should include both Linux and macOS, but typically excludes Windows). Note that BSD\'s logger (used on macOS) will append a second process ID, which is the PID of the logger tool itself.To create your own IO types for use with Memento you need to subtype IO and implement the println and flush methods."
 },
 
 {
@@ -197,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Changing colors?",
     "title": "Changing colors?",
     "category": "section",
-    "text": "Colors can be enabled/disabled and set using via the is_colorized and colors options to the DefaultHandler.julia> add_handler(logger, DefaultHandler(\n    STDOUT, DefaultFormatter(),\n    Dict{Symbol, Any}(:is_colorized => true)),\n    \"console\"\n)Will create a DefaultHandler with colorizationBy default the following colors are used:Dict{AbstractString, Symbol}(\n    \"debug\" => :blue,\n    \"info\" => :green,\n    \"notice\" => :cyan,\n    \"warn\" => :magenta,\n    \"error\" => :red,\n    \"critical\" => :yellow,\n    \"alert\" => :white,\n    \"emergency\" => :black,\n)However, you can specify custom colors/log levels like so:add_handler(logger, DefaultHandler(\n    STDOUT, DefaultFormatter(),\n    Dict{Symbol, Any}(\n        :colors => Dict{AbstractString, Symbol}(\n            \"debug\" => :black,\n            \"info\" => :blue,\n            \"warn\" => :yellow,\n            \"error\" => :red,\n            \"crazy\" => :green\n        )\n    ),\n    \"console\"\n)You can also globally disable colorization when running Memento.config!julia> Memento.config!(\"info\"; fmt=\"[{date} | {level} | {name}]: {msg}\", colorized=false)"
+    "text": "Colors can be enabled/disabled and set using via the is_colorized and colors options to the DefaultHandler.julia> add_handler(logger, DefaultHandler(\n    STDOUT, DefaultFormatter(),\n    Dict{Symbol, Any}(:is_colorized => true)),\n    \"console\"\n)will create a DefaultHandler with colorization.By default the following colors are used:Dict{AbstractString, Symbol}(\n    \"debug\" => :blue,\n    \"info\" => :green,\n    \"notice\" => :cyan,\n    \"warn\" => :magenta,\n    \"error\" => :red,\n    \"critical\" => :yellow,\n    \"alert\" => :white,\n    \"emergency\" => :black,\n)However, you can specify custom colors/log levels like so:add_handler(logger, DefaultHandler(\n    STDOUT, DefaultFormatter(),\n    Dict{Symbol, Any}(\n        :colors => Dict{AbstractString, Symbol}(\n            \"debug\" => :black,\n            \"info\" => :blue,\n            \"warn\" => :yellow,\n            \"error\" => :red,\n            \"crazy\" => :green\n        )\n    ),\n    \"console\"\n)You can also globally disable colorization when running Memento.config!julia> Memento.config!(\"info\"; fmt=\"[{date} | {level} | {name}]: {msg}\", colorized=false)"
 },
 
 {
@@ -262,6 +286,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Public",
     "category": "section",
     "text": ""
+},
+
+{
+    "location": "api/public.html#Memento.config!",
+    "page": "Public",
+    "title": "Memento.config!",
+    "category": "function",
+    "text": "config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger\n\nSets the Memento._log_levels, creates a default root logger with a DefaultHandler that prints to stdout.\n\nArguments\n\n\'logger::Union{Logger, AbstractString}`: The logger to configure (optional)\nlevel::AbstractString: the minimum logging level to log message to the root logger (required).\n\nKeywords\n\nfmt::AbstractString: a format string to pass to the DefaultFormatter which describes   how to log messages (defaults to Memento.DEFAULT_FMT_STRING)\nlevels: the default logging levels to use (defaults to Memento._log_levels).\ncolorized: whether or not the message to stdout should be colorized.\nrecursive: whether or not to recursive set the level of all child loggers.\nsubstitute: whether or not to substitute the global logger with Memento (only supported on julia 0.7).\n\nReturns\n\nLogger: the root logger.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Configuration-1",
+    "page": "Public",
+    "title": "Configuration",
+    "category": "section",
+    "text": "Memento.config!"
 },
 
 {
@@ -557,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Attribute",
     "category": "method",
-    "text": "Attribute{T}(f::Function)\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
+    "text": "Attribute(f::Function) -> Attribute{Any}\nAttribute{T}(f::Function) -> Attribute{T}\n\nCreates an Attribute with the function and a Nullable of type T.\n\n\n\n"
 },
 
 {
@@ -569,11 +609,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/public.html#Memento.AttributeRecord",
+    "page": "Public",
+    "title": "Memento.AttributeRecord",
+    "category": "type",
+    "text": "AttributeRecord <: Record\n\nA Record which stores its properties as Attributes for lazy evaluation.\n\nCalling getindex or iterating will evaluate and cache the properties accessed.\n\nSubtypes of AttributeRecord should implement Memento.getattribute(::MyRecord, ::Symbol) instead of getindex.\n\n\n\n"
+},
+
+{
     "location": "api/public.html#Memento.DefaultRecord",
     "page": "Public",
     "title": "Memento.DefaultRecord",
     "category": "type",
-    "text": "DefaultRecord\n\nStores the most common logging event information. NOTE: if you\'d like more logging attributes you can:\n\nadd them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nmake a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{Symbol}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
+    "text": "DefaultRecord <: AttributeRecord\n\nStores the most common logging event information. NOTE: if you\'d like more logging attributes you can:\n\nadd them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nmake a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{Symbol}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
 },
 
 {
@@ -581,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultRecord",
     "category": "method",
-    "text": "DefaultRecord(name::AbstractString, level::AbstractString, msg::AbstractString)\n\nTakes a few initial log record arguments and creates a DefaultRecord.\n\nArguments\n\nname::AbstractString: the name of the source logger.\nlevel::AbstractString: the log level.\nmsg::AbstractString: the message being logged.\n\n\n\n"
+    "text": "DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg::AbstractString)\n\nTakes a few initial log record arguments and creates a DefaultRecord.\n\nArguments\n\nname::AbstractString: the name of the source logger.\nlevel::AbstractString: the log level.\nmsg::AbstractString: the message being logged.\n\n\n\n"
 },
 
 {
@@ -589,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.Record",
     "category": "type",
-    "text": "Record\n\nAre an Attribute container used to store information about a log events including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\nNOTE: you should access Attributes in a Record by using getindex (ie: record[:msg]) as this will correctly extract the value from the Attribute container.\n\n\n\n"
+    "text": "Record\n\nA dictionary-like container with Symbol keys used to store information about a log events including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\nYou can access the properties of a Record by using getindex (ie: record[:msg]).\n\nSubtypes of Record should implement getindex(::MyRecord, ::Symbol) and key-value pair iteration.\n\n\n\n"
 },
 
 {
@@ -749,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Loggers",
     "category": "section",
-    "text": "Modules = [Memento]\nPrivate = true\nPages = [\"loggers.jl\"]"
+    "text": "Modules = [Memento]\nPublic = false\nPrivate = true\nPages = [\"loggers.jl\"]"
 },
 
 {
@@ -781,7 +829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Handlers",
     "category": "section",
-    "text": "Modules = [Memento]\nPrivate = true\nPages = [\"handlers.jl\"]"
+    "text": "Modules = [Memento]\nPublic = false\nPrivate = true\nPages = [\"handlers.jl\"]"
 },
 
 {
@@ -789,19 +837,19 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Formatters",
     "category": "section",
-    "text": "Modules = [Memento]\nPrivate = true\nPages = [\"formatters.jl\"]"
+    "text": "Modules = [Memento]\nPublic = false\nPrivate = true\nPages = [\"formatters.jl\"]"
 },
 
 {
-    "location": "api/private.html#Base.Dict-Union{Tuple{T}, Tuple{T}} where T<:Memento.Record",
+    "location": "api/private.html#Base.Dict-Tuple{Memento.Record}",
     "page": "Private",
     "title": "Base.Dict",
     "category": "method",
-    "text": "Dict(rec::Record)\n\nExtracts the Record and its Attributes into a Dict\n\nwarn: Warn\nThis may be an expensive operation, so you probably don\'t want to do this for every log record unless you\'re planning on using every Attribute.\n\n\n\n"
+    "text": "Dict(rec::Record)\n\nExtracts the Record and its properties into a Dict\n\nwarn: Warn\nOn AttributeRecords this may be an expensive operation, so you probably don\'t want to do this for every log record unless you\'re planning on using every Attribute.\n\n\n\n"
 },
 
 {
-    "location": "api/private.html#Base.get-Tuple{Memento.Attribute}",
+    "location": "api/private.html#Base.get-Union{Tuple{Memento.Attribute{T}}, Tuple{T}} where T",
     "page": "Private",
     "title": "Base.get",
     "category": "method",
@@ -817,14 +865,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/private.html#Memento.get_msg-Tuple{Any}",
-    "page": "Private",
-    "title": "Memento.get_msg",
-    "category": "method",
-    "text": "get_msg(msg) -> Function\n\nWraps msg in a function if it is a String.\n\n\n\n"
-},
-
-{
     "location": "api/private.html#Memento.get_trace-Tuple{}",
     "page": "Private",
     "title": "Memento.get_trace",
@@ -833,11 +873,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/private.html#Memento.getattribute-Tuple{Memento.AttributeRecord,Symbol}",
+    "page": "Private",
+    "title": "Memento.getattribute",
+    "category": "method",
+    "text": "getattribute(rec::AttributeRecord, attr::Symbol)\n\n\n\n"
+},
+
+{
     "location": "api/private.html#Records-1",
     "page": "Private",
     "title": "Records",
     "category": "section",
-    "text": "Modules = [Memento]\nPrivate = true\nPages = [\"records.jl\"]"
+    "text": "Modules = [Memento]\nPublic = false\nPrivate = true\nPages = [\"records.jl\"]"
 },
 
 {
@@ -877,7 +925,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "IO",
     "category": "section",
-    "text": "Modules = [Memento]\nPrivate = true\nPages = [\"io.jl\"]"
+    "text": "Modules = [Memento]\nPublic = false\nPrivate = true\nPages = [\"io.jl\"]"
 },
 
 {

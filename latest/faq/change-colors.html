@@ -3,7 +3,7 @@
     STDOUT, DefaultFormatter(),
     Dict{Symbol, Any}(:is_colorized =&gt; true)),
     &quot;console&quot;
-)</code></pre><p>Will create a <code>DefaultHandler</code> with colorization</p><p>By default the following colors are used:</p><pre><code class="language-julia">Dict{AbstractString, Symbol}(
+)</code></pre><p>will create a <code>DefaultHandler</code> with colorization.</p><p>By default the following colors are used:</p><pre><code class="language-julia">Dict{AbstractString, Symbol}(
     &quot;debug&quot; =&gt; :blue,
     &quot;info&quot; =&gt; :green,
     &quot;notice&quot; =&gt; :cyan,
@@ -24,4 +24,4 @@
         )
     ),
     &quot;console&quot;
-)</code></pre><p>You can also globally disable colorization when running <code>Memento.config!</code></p><pre><code class="language-julia">julia&gt; Memento.config!(&quot;info&quot;; fmt=&quot;[{date} | {level} | {name}]: {msg}&quot;, colorized=false)</code></pre><footer><hr/><a class="previous" href="another-logging-lib.html"><span class="direction">Previous</span><span class="title">Another logging library?</span></a><a class="next" href="logging-to-syslog.html"><span class="direction">Next</span><span class="title">Logging to Syslog?</span></a></footer></article></body></html>
+)</code></pre><p>You can also globally disable colorization when running <a href="../api/public.html#Memento.config!"><code>Memento.config!</code></a></p><pre><code class="language-julia">julia&gt; Memento.config!(&quot;info&quot;; fmt=&quot;[{date} | {level} | {name}]: {msg}&quot;, colorized=false)</code></pre><footer><hr/><a class="previous" href="another-logging-lib.html"><span class="direction">Previous</span><span class="title">Another logging library?</span></a><a class="next" href="logging-to-syslog.html"><span class="direction">Next</span><span class="title">Logging to Syslog?</span></a></footer></article></body></html>
