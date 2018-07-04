@@ -2,7 +2,7 @@ using Documenter
 using Memento
 
 makedocs(
-    modules=[Memento],
+    modules=[Memento, Memento.Test],
     format=:html,
     repo="https://github.com/invenia/Memento.jl/blob/{commit}{path}#L{line}",
     sitename="Memento.jl",

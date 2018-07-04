@@ -44,3 +44,11 @@ Modules = [Memento]
 Private = false
 Pages = ["io.jl"]
 ```
+
+## Memento.Test
+
+```@docs
+Memento.Test.@test_log
+Memento.Test.@test_warn
+Memento.Test.@test_throws
+```
