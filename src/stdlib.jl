@@ -17,7 +17,7 @@ if VERSION > v"0.7.0-DEV.2980"
     function handle_message(::CoreLogger, cl_level, msg, mod, group, id, filepath, line; kwargs...)
         logger = getlogger(mod)
         level = lowercase(string(cl_level))
-        log(logger, logger.record(logger.name, level, logger.levels[level], msg))
+        log(logger, logger.record(logger.name, level, getlevels(logger)[level], msg))
     end
 
     function substitute!()

@@ -61,6 +61,13 @@ iteration.
 abstract type Record <: AbstractDict{Symbol, Any} end
 
 """
+    getlevel(::Record) -> AbstractString
+
+Returns the record level.
+"""
+getlevel(rec::Record) = rec[:level]
+
+"""
     AttributeRecord <: Record
 
 A `Record` which stores its properties as `Attribute`s for lazy evaluation.
@@ -121,7 +128,7 @@ NOTE: if you'd like more logging attributes you can:
 
 # Fields
 * `date::Attribute{DateTime}`: timestamp of log event
-* `level::Attribute{Symbol}`: log level
+* `level::Attribute{AbstractString}`: log level
 * `levelnum::Attribute{Int}`: integer value for log level
 * `msg::Attribute{AbstractString}`: the log message itself
 * `name::Attribute{AbstractString}`: the name of the source logger

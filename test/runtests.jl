@@ -51,6 +51,23 @@ function Memento.getattribute(::ConstRecord, attr::Symbol)
     end
 end
 
+struct SimplestHandler <: Handler{Union{}, IOBuffer}
+    buf::IOBuffer
+end
+
+struct FilterHandler <: Handler{Union{}, IOBuffer}
+    buf::IOBuffer
+    filters::Vector{Memento.Filter}
+end
+
+FilterHandler(buf::IOBuffer) = FilterHandler(buf, Memento.Filter[])
+Base.push!(handler::FilterHandler, filter::Memento.Filter) = push!(handler.filters, filter)
+Memento.getfilters(handler::FilterHandler) = handler.filters
+
+function Memento.emit(handler::Union{SimplestHandler, FilterHandler}, record::Record)
+    println(handler.buf, record[:msg])
+end
+
 _props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
 
 Base.start(cr::ConstRecord) = start(_props(cr))

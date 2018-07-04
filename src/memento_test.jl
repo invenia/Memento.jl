@@ -71,24 +71,25 @@ end
 mutable struct TestHandler{F, O} <: Handler{F, O}
     level::String
     msg
-    levels::Ref{Dict{AbstractString, Int}}
     found::Tuple
 end
 
 function TestHandler(level, msg)
     TestHandler{DefaultFormatter, IOBuffer}(
-        String(level), msg, Ref(Memento._log_levels), ("", "")
+        String(level), msg, ("", "")
     )
 end
 
 function Base.log(handler::TestHandler, rec::Record)
-    # Uncomment the lines below to debug issues with the `TestHandler`
-    # println(string("Record: ", rec[:level], ", ", rec[:msg]))
-    # println(string("Search: ", handler.level, ", ", handler.msg))
-    # println(string("Found: ", String(rec[:level]) == handler.level && occursin_msg(handler.msg, String(rec[:msg]))))
+    level = getlevel(rec)
 
-    if String(rec[:level]) == handler.level && occursin_msg(handler.msg, String(rec[:msg]))
-        handler.found = (rec[:level], rec[:msg])
+    # Uncomment the lines below to debug issues with the `TestHandler`
+    # println(string("Record: ", level, ", ", rec[:msg]))
+    # println(string("Search: ", handler.level, ", ", handler.msg))
+    # println(string("Found: ", level == handler.level && occursin_msg(handler.msg, String(rec[:msg]))))
+
+    if level == handler.level && occursin_msg(handler.msg, String(rec[:msg]))
+        handler.found = (level, rec[:msg])
     end
 end
 
