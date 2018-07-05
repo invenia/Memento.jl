@@ -43,9 +43,9 @@ end
 
 function Memento.getattribute(::ConstRecord, attr::Symbol)
     if attr === :level
-        return Attribute(() -> "error")
+        return Memento.Attribute(() -> "error")
     elseif attr === :msg
-        return Attribute(() -> "It's a ConstRecord")
+        return Memento.Attribute(() -> "It's a ConstRecord")
     else
         throw(KeyError(attr))
     end
