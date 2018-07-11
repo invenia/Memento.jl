@@ -48,6 +48,7 @@ include("syslog.jl")
 include("stdlib.jl")
 include("config.jl")
 include("memento_test.jl")
+include("deprecated.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to STDOUT.
