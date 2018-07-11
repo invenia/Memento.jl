@@ -6,6 +6,6 @@
 Handles printing any records with any `Formatter` and a `Syslog` `IO` type.
 """
 function Memento.emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslogs.Syslog}
-    println(handler.io, rec[:level], format(handler.fmt, rec))
+    println(handler.io, getlevel(rec), format(handler.fmt, rec))
     flush(handler.io)
 end

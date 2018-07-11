@@ -10,6 +10,66 @@
         "fubar" => 50
     )
 
+    @testset "Custom Handlers" begin
+        @testset "SimplestHandler" begin
+            io = IOBuffer()
+
+            try
+                handler = SimplestHandler(io)
+                logger = Logger(
+                    "SimplestHandler",
+                    Dict("Buffer" => handler),
+                    "info",
+                    LEVELS,
+                    DefaultRecord,
+                    true
+                )
+
+                @test getlevel(handler) == "not_set"
+                @test isempty(getfilters(handler))
+
+                msg = "It works!"
+                Memento.info(logger, msg)
+                @test occursin(msg, String(take!(io)))
+
+                Memento.debug(logger, "This shouldn't get logged")
+                @test isempty(String(take!(io)))
+            finally
+                close(io)
+            end
+        end
+
+        @testset "FilterHandler" begin
+            io = IOBuffer()
+
+            try
+                handler = FilterHandler(io)
+                handler_filter = Memento.Filter(handler)
+                push!(handler, handler_filter)
+                logger = Logger(
+                    "FilterHandler",
+                    Dict("Buffer" => handler),
+                    "info",
+                    LEVELS,
+                    DefaultRecord,
+                    true
+                )
+
+                @test getlevel(handler) == "not_set"
+                @test getfilters(handler) == [handler_filter]
+
+                msg = "It works!"
+                Memento.info(logger, msg)
+                @test occursin(msg, String(take!(io)))
+
+                Memento.debug(logger, "This shouldn't get logged")
+                @test isempty(String(take!(io)))
+            finally
+                close(io)
+            end
+        end
+    end
+
     @testset "DefaultHandler" begin
         @testset "Sample Usage w/ IO" begin
             io = IOBuffer()

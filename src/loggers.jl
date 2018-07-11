@@ -41,10 +41,6 @@ mutable struct Logger
             propagate
         )
 
-        for (name, handler) in logger.handlers
-            handler.levels = Ref(logger.levels)
-        end
-
         push!(logger, Memento.Filter(rec -> isset(logger)))
         push!(logger, Memento.Filter(logger))
 
@@ -66,8 +62,9 @@ end
 
 function Memento.Filter(l::Logger)
     function level_filter(rec::Record)
-        level = rec[:level]
-        return haskey(l.levels, level) && l.levels[level] >= l.levels[l.level]
+        level = getlevel(rec)
+        levels = getlevels(l)
+        return haskey(levels, level) && levels[level] >= levels[getlevel(l)]
     end
 
     Memento.Filter(level_filter)
@@ -92,7 +89,7 @@ isroot(logger::Logger) = logger.name == "root" || logger.name == ""
 
 Returns true or false as to whether the logger is set. (ie: logger.level != "not_set")
 """
-isset(logger::Logger) = logger.level != "not_set"
+isset(logger::Logger) = getlevel(logger) != "not_set"
 
 """
     ispropagating(::Logger)
@@ -120,11 +117,18 @@ function setpropagating!(f::Function, logger::Logger, val::Bool=true)
 end
 
 """
-    getlevel(::Logger)
+    getlevel(::Logger) -> AbstractString
 
 Returns the current logger level.
 """
 getlevel(logger::Logger) = logger.level
+
+"""
+    getlevels(::Logger) -> Dict
+
+Get the available log levels for a logger and their associated priorities.
+"""
+getlevels(logger::Logger) = logger.levels
 
 """
     register(::Logger)
@@ -253,7 +257,6 @@ gethandlers(logger::Logger) = logger.handlers
 Adds a new `Handler` to the logger.
 """
 function Base.push!(logger::Logger, handler::Handler)
-    handler.levels.x = logger.levels
     logger.handlers[string(uuid4())] = handler
 end
 
@@ -270,7 +273,7 @@ addlevel!(logger::Logger, level::AbstractString, val::Int) = logger.levels[level
 Changes what level this logger should log at.
 """
 function setlevel!(logger::Logger, level::AbstractString; recursive=false)
-    logger.levels[level]    # Throw a key error if the levels isn't in levels
+    getlevels(logger)[level]    # Throw a key error if the levels isn't in levels
     logger.level = level
 
     # Unfortunately, recursive flag isn't implemented recursively
@@ -360,10 +363,7 @@ with the created `Dict`).
 * `CompositeException`: may be thrown if an error occurs in one of the handlers
    (which are run with `@async`)
 """
-function log(logger::Logger, level::AbstractString, msg::AbstractString)
-    rec = logger.record(logger.name, level, logger.levels[level], msg)
-    log(logger, rec)
-end
+log(logger::Logger, level::AbstractString, msg::AbstractString) = _log(logger, level, msg)
 
 """
     log(::Function, ::Logger, ::AbstractString)
@@ -380,8 +380,10 @@ be a function that returns the log message string.
 * `CompositeException`: may be thrown if an error occurs in one of the handlers
    (which are run with `@async`)
 """
-function log(msg::Function, logger::Logger, level::AbstractString)
-    rec = logger.record(logger.name, level, logger.levels[level], msg)
+log(msg::Function, logger::Logger, level::AbstractString) = _log(logger, level, msg)
+
+function _log(logger::Logger, level::AbstractString, msg)
+    rec = logger.record(logger.name, level, getlevels(logger)[level], msg)
     log(logger, rec)
 end
 

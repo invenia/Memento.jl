@@ -12,6 +12,30 @@ based on the `Formatter`, `IO` and/or `Record` types.
 abstract type Handler{F<:Formatter, O<:IO} end
 
 """
+    getlevel(::Handler) -> AbstractString
+
+Returns the current handler level.
+The default is "not_set".
+"""
+getlevel(handler::Handler) = "not_set"
+
+"""
+    getlevels(::Handler) -> Union{Dict, Nothing}
+
+Get the available log levels for a handler and their associated priorities.
+The default is `nothing`, for handlers which do not perform level-based filtering.
+"""
+getlevels(handler::Handler) = nothing
+
+"""
+    getfilters(handler::Handler) -> Array{Memento.Filter}
+
+Returns the filters for the handler.
+The default is the standard level-based filter.
+"""
+getfilters(handler::Handler) = Memento.Filter[]
+
+"""
     log(handler::Handler, rec::Record)
 
 Checks the `Handler` filters and if they all pass then
@@ -21,6 +45,17 @@ function log(handler::Handler, rec::Record)
     if all(f -> f(rec), getfilters(handler))
         emit(handler, rec)
     end
+end
+
+function Memento.Filter(h::Handler)
+    function level_filter(rec::Record)
+        level = getlevel(rec)
+        levels = getlevels(h)
+
+        return levels === nothing || levels[level] >= levels[getlevel(h)]
+    end
+
+    Memento.Filter(level_filter)
 end
 
 """
@@ -46,7 +81,7 @@ mutable struct DefaultHandler{F, O} <: Handler{F, O}
     io::O
     opts::Dict{Symbol, Any}
     filters::Array{Memento.Filter}
-    levels::Ref{Dict{AbstractString, Int}}
+    levels::Union{Dict{AbstractString, Int}, Nothing}
     level::AbstractString
 end
 
@@ -60,9 +95,9 @@ Creates a DefaultHandler with the specified IO type.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter, O<:IO}
+function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}(); levels=nothing) where {F<:Formatter, O<:IO}
     setup_opts(opts)
-    handler = DefaultHandler(fmt, io, opts, Memento.Filter[], Ref(_log_levels), "not_set")
+    handler = DefaultHandler(fmt, io, opts, Memento.Filter[], levels, "not_set")
     push!(handler, Memento.Filter(handler))
     return handler
 end
@@ -77,10 +112,10 @@ Creates a DefaultHandler with a IO handle to the specified filename.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}()) where {F<:Formatter}
+function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}(); levels=nothing) where {F<:Formatter}
     file = open(filename, "a")
     setup_opts(opts)
-    handler = DefaultHandler(fmt, file, opts, Memento.Filter[], Ref(_log_levels), "not_set")
+    handler = DefaultHandler(fmt, file, opts, Memento.Filter[], levels, "not_set")
     push!(handler, Memento.Filter(handler))
     @compat finalizer(h -> close(h.io), handler)
     handler
@@ -113,20 +148,6 @@ function setup_opts(opts)
     opts
 end
 
-function Memento.Filter(h::DefaultHandler)
-    function level_filter(rec::Record)
-        level = rec[:level]
-        return h.levels.x[level] >= h.levels.x[h.level]
-    end
-
-    Memento.Filter(level_filter)
-end
-
-"""
-    getfilters(handler::DefaultHandler) -> Array{Filter}
-
-Returns the filters for the handler.
-"""
 getfilters(handler::DefaultHandler) = handler.filters
 
 """
@@ -138,13 +159,21 @@ function Base.push!(handler::DefaultHandler, filter::Memento.Filter)
     push!(handler.filters, filter)
 end
 
+getlevels(handler::DefaultHandler) = handler.levels
+
+getlevel(handler::DefaultHandler) = handler.level
+
 """
     setlevel!(handler::DefaultHandler, level::AbstractString)
 
 Sets the minimum level required to `emit` the record from the handler.
 """
 function setlevel!(handler::DefaultHandler, level::AbstractString)
-    handler.levels.x[level]     # Throw a key error if the levels isn't in levels
+    if handler.levels === nothing
+        handler.levels = _log_levels
+    end
+
+    handler.levels[level]     # Throw a key error if the levels isn't in levels
     handler.level = level
 end
 
@@ -154,7 +183,7 @@ end
 Handles printing any `Record` with any `Formatter` and `IO` types.
 """
 function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:IO}
-    level = rec[:level]
+    level = getlevel(rec)
     str = format(handler.fmt, rec)
 
     if handler.opts[:is_colorized] && haskey(handler.opts[:colors], level)
