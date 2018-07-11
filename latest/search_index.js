@@ -381,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.getlevel",
     "category": "method",
-    "text": "getlevel(::Logger)\n\nReturns the current logger level.\n\n\n\n"
+    "text": "getlevel(::Logger) -> AbstractString\n\nReturns the current logger level.\n\n\n\n"
 },
 
 {
@@ -513,11 +513,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public.html#Memento.getfilters-Tuple{Memento.DefaultHandler}",
+    "location": "api/public.html#Memento.getfilters-Tuple{Memento.Handler}",
     "page": "Public",
     "title": "Memento.getfilters",
     "category": "method",
-    "text": "getfilters(handler::DefaultHandler) -> Array{Filter}\n\nReturns the filters for the handler.\n\n\n\n"
+    "text": "getfilters(handler::Handler) -> Array{Memento.Filter}\n\nReturns the filters for the handler. The default is the standard level-based filter.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.getlevel-Tuple{Memento.Handler}",
+    "page": "Public",
+    "title": "Memento.getlevel",
+    "category": "method",
+    "text": "getlevel(::Handler) -> AbstractString\n\nReturns the current handler level. The default is \"not_set\".\n\n\n\n"
 },
 
 {
@@ -597,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultRecord",
     "category": "type",
-    "text": "DefaultRecord <: AttributeRecord\n\nStores the most common logging event information. NOTE: if you\'d like more logging attributes you can:\n\nadd them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nmake a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{Symbol}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
+    "text": "DefaultRecord <: AttributeRecord\n\nStores the most common logging event information. NOTE: if you\'d like more logging attributes you can:\n\nadd them to DefaultRecord and open a pull request if the new attributes are applicable to most applications.\nmake a custom Record type.\n\nFields\n\ndate::Attribute{DateTime}: timestamp of log event\nlevel::Attribute{AbstractString}: log level\nlevelnum::Attribute{Int}: integer value for log level\nmsg::Attribute{AbstractString}: the log message itself\nname::Attribute{AbstractString}: the name of the source logger\npid::Attribute{Int}: the pid of where the log event occured\nlookup::Attribute{StackFrame}: the top StackFrame\nstacktrace::Attribute{StackTrace}: a stacktrace\n\n\n\n"
 },
 
 {
@@ -614,6 +622,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Memento.Record",
     "category": "type",
     "text": "Record\n\nA dictionary-like container with Symbol keys used to store information about a log events including the msg, date, level, stacktrace, etc. Formatters use Records to format log message strings.\n\nYou can access the properties of a Record by using getindex (ie: record[:msg]).\n\nSubtypes of Record should implement getindex(::MyRecord, ::Symbol) and key-value pair iteration.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.getlevel-Tuple{Memento.Record}",
+    "page": "Public",
+    "title": "Memento.getlevel",
+    "category": "method",
+    "text": "getlevel(::Record) -> AbstractString\n\nReturns the record level.\n\n\n\n"
 },
 
 {
@@ -654,6 +670,38 @@ var documenterSearchIndex = {"docs": [
     "title": "IO",
     "category": "section",
     "text": "Modules = [Memento]\nPrivate = false\nPages = [\"io.jl\"]"
+},
+
+{
+    "location": "api/public.html#Memento.Test.@test_log",
+    "page": "Public",
+    "title": "Memento.Test.@test_log",
+    "category": "macro",
+    "text": "@test_log(logger, level, msg, expr)\n\nAdds a temporary test handler to the logger that checks for a record with the level and msg before executing the expr. The handler is always removed after executing expr.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Base.Test.@test_warn",
+    "page": "Public",
+    "title": "Base.Test.@test_warn",
+    "category": "macro",
+    "text": "@test_warn(logger, msg, expr)\n\nConvenience macro that calls Memento.Test.@test_log(logger, \"warn\", msg, expr).\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Base.Test.@test_throws",
+    "page": "Public",
+    "title": "Base.Test.@test_throws",
+    "category": "macro",
+    "text": "@test_throws(logger, extype, expr)\n\nDisables the logger and calls @test_throws extype, expr.\n\n\n\n"
+},
+
+{
+    "location": "api/public.html#Memento.Test-1",
+    "page": "Public",
+    "title": "Memento.Test",
+    "category": "section",
+    "text": "Memento.Test.@test_log\nMemento.Test.@test_warn\nMemento.Test.@test_throws"
 },
 
 {
@@ -753,6 +801,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/private.html#Memento.getlevels-Tuple{Memento.Logger}",
+    "page": "Private",
+    "title": "Memento.getlevels",
+    "category": "method",
+    "text": "getlevels(::Logger) -> Dict\n\nGet the available log levels for a logger and their associated priorities.\n\n\n\n"
+},
+
+{
     "location": "api/private.html#Memento.getpath-Tuple{Memento.Logger}",
     "page": "Private",
     "title": "Memento.getpath",
@@ -790,6 +846,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Base.push!",
     "category": "method",
     "text": "push!(handler::DefaultHandler, filter::Memento.Filter)\n\nAdds an new Filter to the handler.\n\n\n\n"
+},
+
+{
+    "location": "api/private.html#Memento.getlevels-Tuple{Memento.Handler}",
+    "page": "Private",
+    "title": "Memento.getlevels",
+    "category": "method",
+    "text": "getlevels(::Handler) -> Union{Dict, Nothing}\n\nGet the available log levels for a handler and their associated priorities. The default is nothing, for handlers which do not perform level-based filtering.\n\n\n\n"
 },
 
 {
