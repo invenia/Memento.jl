@@ -191,7 +191,7 @@
 
         @test getlevel(root_logger) == getlevel(my_logger) == getlevel(str_logger)
 
-        Memento.config!("notice"; recursive=true)
+        Memento.config("notice"; recursive=true)
         @test all(l -> getlevel(l) == "notice", values(Memento._loggers))
     end
 end
