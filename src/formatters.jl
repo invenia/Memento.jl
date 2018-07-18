@@ -8,6 +8,7 @@ log `Record`.
 abstract type Formatter end
 
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
+const DATE_FMT_STRING = "yyyy-mm-dd HH:MM:SS"
 
 """
     DefaultFormatter
@@ -24,8 +25,12 @@ Ex) "[{level} | {name}]: {msg}" will print message of the form
 struct DefaultFormatter <: Formatter
     fmt_str::AbstractString
     tokens::Vector{Pair{Symbol, Bool}}
+    output_tz::Dates.TimeZone
 
-    function DefaultFormatter(fmt_str::AbstractString=DEFAULT_FMT_STRING)
+    function DefaultFormatter(
+        fmt_str::AbstractString=DEFAULT_FMT_STRING,
+        output_tz=localzone(),
+    )
         #r"(?<={).+?(?=})
         tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
             #println(dump(m))
@@ -36,7 +41,7 @@ struct DefaultFormatter <: Formatter
             end
         end
 
-        new(fmt_str, tokens)
+        new(fmt_str, tokens, output_tz)
     end
 end
 
@@ -70,6 +75,14 @@ function format(fmt::DefaultFormatter, rec::Record)
                 end
 
                 value = string(" stack:[", join(str_frames, ", "), "]")
+            elseif content === :date
+                value = if tmp_val isa ZonedDateTime
+                        Dates.format(astimezone(tmp_val, fmt.output_tz), DATE_FMT_STRING)
+                    elseif tmp_val isa DateTime
+                        Dates.format(tmp_val, DATE_FMT_STRING)
+                    else
+                        tmp_val
+                    end
             else
                 value = tmp_val
             end

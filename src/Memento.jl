@@ -12,6 +12,7 @@ using Compat.Distributed
 import Syslogs
 import JSON
 using Nullables
+using TimeZones
 
 import Base: show, info, warn, error, log
 
