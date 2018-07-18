@@ -8,6 +8,7 @@ using Syslogs
 using Memento
 using Memento.Test
 using TestSetExtensions
+using TimeZones
 
 import Compat.Dates
 import Compat.Sys
@@ -33,10 +34,13 @@ struct TestError <: Exception
 end
 
 # for records.jl
-struct SimpleRecord <: Record
+struct SimpleRecord{T} <: Record
     level::String
     msg::String
+    date::T
 end
+
+SimpleRecord(level, msg) = SimpleRecord(level, msg, Dates.now(tz"UTC"))
 
 struct ConstRecord <: AttributeRecord
 end
