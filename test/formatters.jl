@@ -23,6 +23,34 @@
 
         nl_result = Memento.format(fmt, no_lookup)
         @test startswith(nl_result, "<nothing>")
+
+        @testset "Date handling" begin
+            withenv("TZ" => "UTC+02") do
+                local_date = ZonedDateTime(2012, 1, 1, 3, 1, 1, 123, localzone())
+                local_datestr = "2012-01-01 03:01:01"
+                utc_date = astimezone(local_date, tz"UTC")
+                utc_datestr = Dates.format(utc_date, "yyyy-mm-dd HH:MM:SS")
+
+                fmt = DefaultFormatter("{date}")
+                tz_rec = SimpleRecord("info", "blah", local_date)
+                @test Memento.format(fmt, tz_rec) == local_datestr
+
+                utc_rec = SimpleRecord("info", "blah", utc_date)
+                @test Memento.format(fmt, utc_rec) == local_datestr
+
+                utc_fmt = DefaultFormatter("{date}", tz"UTC")
+                @test Memento.format(utc_fmt, tz_rec) == utc_datestr
+                @test Memento.format(utc_fmt, utc_rec) == utc_datestr
+
+                date = DateTime(2012, 1, 1, 3, 1, 1)
+                notz_rec = SimpleRecord("info", "blah", date)
+                @test Memento.format(fmt, notz_rec) == local_datestr
+
+                ts = 1531949014
+                ts_rec = SimpleRecord("info", "blah", ts)
+                @test Memento.format(fmt, ts_rec) == string(ts)
+            end
+        end
     end
 
     @testset "DictFormatter" begin

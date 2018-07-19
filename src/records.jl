@@ -127,7 +127,7 @@ NOTE: if you'd like more logging attributes you can:
 2. make a custom `Record` type.
 
 # Fields
-* `date::Attribute{DateTime}`: timestamp of log event
+* `date::Attribute{ZonedDateTime}`: timestamp of log event
 * `level::Attribute{AbstractString}`: log level
 * `levelnum::Attribute{Int}`: integer value for log level
 * `msg::Attribute{AbstractString}`: the log message itself
@@ -158,11 +158,10 @@ Takes a few initial log record arguments and creates a `DefaultRecord`.
 * `msg::AbstractString`: the message being logged.
 """
 function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
-    time = Dates.now()
     trace = Attribute{StackTrace}(get_trace)
 
     DefaultRecord(
-        Attribute{DateTime}(() -> round(time, Dates.Second)),
+        Attribute{ZonedDateTime}(() -> Dates.now(tz"UTC")),
         Attribute(level),
         Attribute(levelnum),
         Attribute{AbstractString}(msg),
