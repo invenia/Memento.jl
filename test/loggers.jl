@@ -189,7 +189,15 @@
         @test length(gethandlers(my_logger)) == 1
         @test length(gethandlers(str_logger)) == 1
 
+        @test ispropagating(my_logger)
+        @test ispropagating(str_logger)
+
         @test getlevel(root_logger) == getlevel(my_logger) == getlevel(str_logger)
+
+        non_prop_logger = Memento.config!(
+            getlogger("NonPropLogger"), "info"; propagate=false
+        )
+        @test !ispropagating(non_prop_logger)
 
         Memento.config("notice"; recursive=true)
         @test all(l -> getlevel(l) == "notice", values(Memento._loggers))

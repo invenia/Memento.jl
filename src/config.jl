@@ -17,9 +17,10 @@ that prints to stdout.
 * `recursive`: whether or not to recursive set the level of all child loggers.
 * `substitute`: whether or not to substitute the global logger with Memento
   (only supported on julia 0.7).
+* `propagate`: whether the logger should also send messages to parent loggers (default: true)
 
 # Returns
-* `Logger`: the root logger.
+* `Logger`: the logger passed in, or the root logger.
 """
 config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
 
@@ -30,10 +31,11 @@ end
 function config!(
     logger::Logger, level::AbstractString;
     fmt::AbstractString=DEFAULT_FMT_STRING, levels=_log_levels, colorized=true,
-    recursive=false, substitute=false
+    recursive=false, substitute=false, propagate=true
 )
     logger.levels = levels
     setlevel!(logger, level; recursive=recursive)
+    setpropagating!(logger, propagate)
     handler = DefaultHandler(
         stdout,
         DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
