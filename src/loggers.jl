@@ -333,13 +333,13 @@ method with a `@sync` in order to synchronize all handler tasks.
 * `args::Dict`: a dict of msg fields and values that should be passed to `logger.record`.
 """
 function log(logger::Logger, rec::Record)
-    @sync for l in reverse!(getpath(logger))
+    for l in reverse!(getpath(logger))
         # If none of the `Filter`s return false we're good to log our record.
         !all(f -> f(rec), getfilters(l)) && break
 
         # Log to all of our handlers
         for (name, handler) in l.handlers
-            @async log(handler, rec)
+            log(handler, rec)
         end
 
         # Break if this is the root logger or it's non-propagating
