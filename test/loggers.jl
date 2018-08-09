@@ -202,4 +202,34 @@
         Memento.config("notice"; recursive=true)
         @test all(l -> getlevel(l) == "notice", values(Memento._loggers))
     end
+
+    @testset "Stacktraces" begin
+        io = IOBuffer()
+
+        try
+            handler = DefaultHandler(
+                io,
+                DefaultFormatter(string(FMT_STR, " | {stacktrace}"))
+            )
+
+            logger = Logger(
+                "Logger.example",
+                Dict("Buffer" => handler),
+                "info",
+                LEVELS,
+                DefaultRecord,
+                true
+            )
+
+            # Define a test function that logs a message
+            test_func() = info(logger, "Hello")
+            test_func()
+
+            msg = String(take!(io))
+            @test !isempty(msg)
+            @test occursin("test_func", msg)
+        finally
+            close(io)
+        end
+    end
 end
