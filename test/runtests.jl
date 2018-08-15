@@ -13,6 +13,8 @@ using TimeZones
 import Compat.Dates
 import Compat.Sys
 
+using Compat: @info
+
 files = [
     "records.jl",
     "formatters.jl",
