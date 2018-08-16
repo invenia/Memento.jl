@@ -5,7 +5,7 @@ function udp_srv(port::Int)
     sock = UDPSocket()
     bind(sock, ip"127.0.0.1", port)
 
-    @schedule begin
+    @async begin
         put!(r, String(recv(sock)))
         close(sock)
     end
