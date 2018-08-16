@@ -7,7 +7,6 @@ using JSON
 using Syslogs
 using Memento
 using Memento.Test
-using TestSetExtensions
 using TimeZones
 
 import Compat.Dates
@@ -84,7 +83,7 @@ else
     Base.done(cr::ConstRecord, state) = done(_props(cr), state)
 end
 
-@testset ExtendedTestSet "Memento" begin
+@testset "Memento" begin
 
 @testset "Logging" begin
     @testset "Sample Usage" begin
