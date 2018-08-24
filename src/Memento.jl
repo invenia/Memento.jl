@@ -14,7 +14,13 @@ import JSON
 using Nullables
 using TimeZones
 
-import Base: show, info, warn, error, log
+import Base: show, error, log
+
+if isdefined(Base, :info) # Turned into macros in 0.7
+    import Base: info, warn
+else
+    export info, warn
+end
 
 export debug, notice, error, critical, alert, emergency,
        isset, isroot, ispropagating, setpropagating!,

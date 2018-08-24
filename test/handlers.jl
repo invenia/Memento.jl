@@ -106,7 +106,7 @@
 
         @testset "Sample Usage w/ File" begin
             filename = tempname()
-            info("Path to log file: $filename")
+            @info("Path to log file: $filename")
 
             handler = DefaultHandler(filename)
 
@@ -158,7 +158,7 @@
 
         @testset "Filename Construction" begin
             filename = tempname()
-            info("Path to log file: $filename")
+            @info("Path to log file: $filename")
             handler1 = DefaultHandler(filename)
 
             @test handler1.fmt.fmt_str == Memento.DEFAULT_FMT_STRING

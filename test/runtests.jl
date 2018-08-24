@@ -7,11 +7,12 @@ using JSON
 using Syslogs
 using Memento
 using Memento.Test
-using TestSetExtensions
 using TimeZones
 
 import Compat.Dates
 import Compat.Sys
+
+using Compat: @info
 
 files = [
     "records.jl",
@@ -74,11 +75,15 @@ end
 
 _props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
 
-Base.start(cr::ConstRecord) = start(_props(cr))
-Base.next(cr::ConstRecord, state) = next(_props(cr), state)
-Base.done(cr::ConstRecord, state) = done(_props(cr), state)
+if isdefined(Base, :iterate)
+    Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
+else
+    Base.start(cr::ConstRecord) = start(_props(cr))
+    Base.next(cr::ConstRecord, state) = next(_props(cr), state)
+    Base.done(cr::ConstRecord, state) = done(_props(cr), state)
+end
 
-@testset ExtendedTestSet "Memento" begin
+@testset "Memento" begin
 
 @testset "Logging" begin
     @testset "Sample Usage" begin

@@ -9,7 +9,7 @@
             "fubar" => 50
         )
         roller_prefix = tempname()
-        info("Path to roller_prefix: $roller_prefix")
+        @info("Path to roller_prefix: $roller_prefix")
         handler = DefaultHandler(FileRoller(roller_prefix; max_sz=1024))
 
         logger = Logger(
