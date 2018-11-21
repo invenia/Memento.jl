@@ -201,6 +201,12 @@
 
         Memento.config("notice"; recursive=true)
         @test all(l -> getlevel(l) == "notice", values(Memento._loggers))
+
+        # reconfig
+        logger = getlogger("NoReplace")
+        new_logger = Memento.config("NoReplace", "info")
+        @test new_logger === getlogger("NoReplace")
+        @test new_logger === logger
     end
 
     @testset "Stacktraces" begin
