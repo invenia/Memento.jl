@@ -22,10 +22,10 @@ that prints to stdout.
 # Returns
 * `Logger`: the logger passed in, or the root logger.
 """
-config!(level::AbstractString; kwargs...) = config!(Logger("root"), level; kwargs...)
+config!(level::AbstractString; kwargs...) = config!("root", level; kwargs...)
 
 function config!(logger::AbstractString, level::AbstractString; kwargs...)
-    config!(Logger(logger), level; kwargs...)
+    config!(getlogger(logger), level; kwargs...)
 end
 
 function config!(
