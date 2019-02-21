@@ -1,6 +1,7 @@
 .DS_Store
 docs/build/
 docs/site/
+Manifest.toml
 *.jl.*.cov
 benchmark/.results/*.jld
 benchmark/.tune.jld

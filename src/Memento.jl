@@ -1,28 +1,18 @@
-__precompile__()
-
 module Memento
 
 using Base: StackTrace, StackFrame
-using Compat
-using Compat.UUIDs
-using Compat.Dates
-using Compat.Sockets
-using Compat.Distributed
+using UUIDs
+using Dates
+using Sockets
+using Distributed
 
 import Syslogs
 import JSON
-using Nullables
 using TimeZones
 
 import Base: show, error, log
 
-if isdefined(Base, :info) # Turned into macros in 0.7
-    import Base: info, warn
-else
-    export info, warn
-end
-
-export debug, notice, error, critical, alert, emergency,
+export info, warn, debug, notice, error, critical, alert, emergency,
        isset, isroot, ispropagating, setpropagating!,
        getlevel, setlevel!, addlevel!, setrecord!,
        getlogger, gethandlers, getfilters, format, emit,

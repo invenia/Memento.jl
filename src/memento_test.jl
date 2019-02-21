@@ -1,10 +1,9 @@
 module Test
 
 using ..Memento
-using Compat
-using Compat.Test
+using Test
 
-import Compat.Test: @test_warn, @test_throws
+import Test: @test_warn, @test_throws
 
 export @test_log
 

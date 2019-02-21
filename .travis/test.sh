@@ -8,62 +8,30 @@ set -ev
 if [[ -a .git/shallow ]]; then
     git fetch --unshallow
 fi
-if [[ -f Project.toml || -f JuliaProject.toml ]]; then
-    # Run build step
-    julia --color=yes -e '
-        if VERSION < v"0.7.0-DEV.5183"
-            Pkg.clone(pwd())
-            Pkg.build("Memento")
-        else
-            using Pkg
-            Pkg.build()
-        end
-    '
-    # Set up test step (run below)
-    TESTCMD='
-        if VERSION < v"0.7.0-DEV.5183"
-            Pkg.test("Memento", coverage=true)
-        else
-            using Pkg
-            Pkg.test(coverage=true)
-        end
-    '
-else
-    # Run build step
-    julia --color=yes -e '
-        VERSION >= v"0.7.0-DEV.5183" && using Pkg
-        Pkg.clone(pwd())
-        Pkg.build("Memento")
-    '
-    # Set up test step (run below)
-    TESTCMD='
-        VERSION >= v"0.7.0-DEV.5183" && using Pkg
-        Pkg.test("Memento", coverage=true)
-    '
-fi
+# Run build step
+julia --color=yes --project=. -e 'using Pkg; Pkg.build()'
+# Set up test step (run below)
+TESTCMD='using Pkg; Pkg.test(coverage=true)'
 
 if [[ "$TEST_TYPE" == "basic" ]]; then
     # Run parallel tests
-    julia --color=yes --check-bounds=yes -e "$TESTCMD"
+    julia --color=yes --check-bounds=yes --project=. -e "$TESTCMD"
 elif [[ "$TEST_TYPE" == "bench" ]]; then
     # Run benchmark tests
     export MEMENTO_BENCHMARK="true"
     export MEMENTO_CURR_COMMIT="HEAD"
     export MEMENTO_BASE_COMMIT="origin/master"
-    julia --color=yes --check-bounds=yes -e "$TESTCMD"
+    julia --color=yes --check-bounds=yes --project=. -e "$TESTCMD"
 elif [[ "$TEST_TYPE" == "userimage" ]]; then
     # Create a user image which includes Memento to make sure that _loggers is assigned at compile-time
     # See: https://github.com/invenia/Memento.jl/pull/21
-    julia --color=yes -e '
-        VERSION >= v"0.7.0-DEV.3382" && using Libdl
-        BINDIR = VERSION < v"0.7.0-DEV.3073" ? Base.JULIA_HOME : Sys.BINDIR
-        LIB_PATH = abspath(BINDIR, Base.LIBDIR)
+    julia --color=yes --project=. -e '
+        using Libdl
+        LIB_PATH = abspath(Sys.BINDIR, Base.LIBDIR)
         sysimg_lib = joinpath(LIB_PATH, "julia", "sys.$(Libdl.dlext)")
         userimg_o = "userimg.o"
         userimg_lib = "userimg.$(Libdl.dlext)"
-        code = "Base.reinit_stdio(); using Memento; "
-        VERSION >= v"0.7.0-DEV.2005" && (code *= "using Test; ")
-        code *= "logger = getlogger(\"Test\")"
+        code = "Base.reinit_stdio(); using Memento; using Test; logger = getlogger(\"Test\")"
         run(`$(Base.julia_cmd()) --output-o $userimg_o --sysimage $sysimg_lib --startup-file=no -e "$code"`)
         run(`cc -shared -o $userimg_lib $userimg_o -ljulia -L$LIB_PATH`)
     '

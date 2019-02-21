@@ -3,7 +3,7 @@ using Memento
 
 makedocs(
     modules=[Memento, Memento.Test],
-    format=:html,
+    format=Documenter.HTML(prettyurls=(get(ENV, "CI", nothing) == "true")),
     repo="https://github.com/invenia/Memento.jl/blob/{commit}{path}#L{line}",
     sitename="Memento.jl",
     authors="Invenia Technical Computing Corporation and contributors.",
@@ -34,10 +34,4 @@ makedocs(
     ],
 )
 
-deploydocs(
-    repo   = "github.com/invenia/Memento.jl.git",
-    julia  = "0.6",
-    target = "build",
-    deps = nothing,
-    make = nothing,
-)
+deploydocs(repo="github.com/invenia/Memento.jl.git", target="build")

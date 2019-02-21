@@ -27,7 +27,7 @@
 
             @test haskey(rec, :date)
             @test rec[:date] == get(rec.date)
-            @test get(rec.date) == get(rec.date.x)
+            @test get(rec.date) == something(rec.date.x)
 
             dict = Dict(rec)
             @test rec[:date] == dict[:date]

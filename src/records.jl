@@ -5,26 +5,26 @@ An `Attribute` represents a lazily evaluated field in a log `Record`.
 
 # Fields
 * `f::Function`: A function to evaluate in order to get a value if one is not set.
-* `x::Nullable`: A value that may or may not exist yet.
+* `x::Union{Some{T}, Nothing}`: A value that may or may not exist yet.
 """
 mutable struct Attribute{T}
     f::Function
-    x::Nullable{T}
+    x::Union{Some{T}, Nothing}
 end
 
 """
     Attribute(f::Function) -> Attribute{Any}
     Attribute{T}(f::Function) -> Attribute{T}
 
-Creates an `Attribute` with the function and a `Nullable` of type `T`.
+Creates an `Attribute` with the given function.
 """
-Attribute{T}(f::Function) where {T} = Attribute{T}(f, Nullable{T}())
-Attribute(f::Function) = Attribute{Any}(f, Nullable{Any}())
+Attribute{T}(f::Function) where {T} = Attribute{T}(f, nothing)
+Attribute(f::Function) = Attribute{Any}(f, nothing)
 
 """
     Attribute(x)
 
-Simply wraps the value `x` in a `Nullable` and sticks that in an `Attribute` with an
+Simply wraps the value `x` in `Some` and sticks that in an `Attribute` with an
 empty `Function`.
 """
 Attribute(x::T) where {T} = Attribute{T}(() -> x)
@@ -37,14 +37,16 @@ Run set `attr.x` to the output of `attr.f` if `attr.x` is not already set.
 We then return the value stored in `attr.x`
 """
 function Base.get(attr::Attribute{T}) where T
-    if isnull(attr.x)
-        attr.x = Nullable{T}(attr.f())
+    if attr.x === nothing
+        attr.x = Some{T}(attr.f())
     end
 
-    return get(attr.x)::T
+    return something(attr.x)::T
 end
 
-hasfield(T::DataType, name::Symbol) = Base.fieldindex(T, name, false) > 0
+if VERSION < v"1.2.0-DEV.272"
+    hasfield(T::DataType, name::Symbol) = Base.fieldindex(T, name, false) > 0
+end
 
 """
     Record
@@ -83,31 +85,16 @@ Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
 Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
-if isdefined(Base, :iterate)
-    function Base.iterate(rec::T, state=0) where T <: Record
-        state >= fieldcount(T) && return nothing
-        state += 1
-        return (fieldname(T, state) => getfield(rec, state), state)
-    end
+function Base.iterate(rec::T, state=0) where T <: Record
+    state >= fieldcount(T) && return nothing
+    state += 1
+    return (fieldname(T, state) => getfield(rec, state), state)
+end
 
-    function Base.iterate(rec::T, state=0) where T <: AttributeRecord
-        state >= fieldcount(T) && return nothing
-        state += 1
-        return (fieldname(T, state) => get(getfield(rec, state)), state)
-    end
-else
-    Base.start(rec::Record) = 0
-    Base.done(rec::T, state) where {T <: Record} = state >= fieldcount(T)
-
-    function Base.next(rec::T, state::Int) where T <: Record
-        state += 1
-        return (fieldname(T, state) => getfield(rec, state), state)
-    end
-
-    function Base.next(rec::T, state::Int) where T <: AttributeRecord
-        state += 1
-        return (fieldname(T, state) => get(getfield(rec, state)), state)
-    end
+function Base.iterate(rec::T, state=0) where T <: AttributeRecord
+    state >= fieldcount(T) && return nothing
+    state += 1
+    return (fieldname(T, state) => get(getfield(rec, state)), state)
 end
 
 """

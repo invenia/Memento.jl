@@ -95,7 +95,7 @@ function format(fmt::DefaultFormatter, rec::Record)
 end
 
 struct DictFormatter <: Formatter
-    aliases::Nullable{Dict{Symbol, Symbol}}
+    aliases::Union{Dict{Symbol, Symbol}, Nothing}
     serializer::Function
 end
 
@@ -110,9 +110,9 @@ the serializer function on the produced dictionary.
   existing record attributes to include in the dictionary (defaults to all attributes).
 - `serializer::Function`: A function that takes a Dictionary and returns a string. Defaults to `string(dict)`.
 """
-DictFormatter() = DictFormatter(Nullable(), string)
+DictFormatter() = DictFormatter(nothing, string)
 DictFormatter(aliases::Dict{Symbol, Symbol}) = DictFormatter(aliases, string)
-DictFormatter(serializer::Function) = DictFormatter(Nullable(), serializer)
+DictFormatter(serializer::Function) = DictFormatter(nothing, serializer)
 
 """
     format(::DictFormatter, ::Record) -> Dict
@@ -121,10 +121,10 @@ Converts :date, :lookup and :stacktrace to strings
 and dicts respectively.
 """
 function format(fmt::DictFormatter, rec::Record)
-    aliases = if isnull(fmt.aliases)
+    aliases = if fmt.aliases === nothing
         Dict(key => key for key in keys(rec))
     else
-        get(fmt.aliases)
+        fmt.aliases
     end
 
     dict = Dict{Symbol, Any}()
