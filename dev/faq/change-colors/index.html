@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Changing colors? · Memento.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../../assets/invenia.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>Memento.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Manual</span><ul><li><a class="toctext" href="../../man/intro/">Introduction</a></li><li><a class="toctext" href="../../man/loggers/">Loggers</a></li><li><a class="toctext" href="../../man/handlers/">Handlers</a></li><li><a class="toctext" href="../../man/formatters/">Formatters</a></li><li><a class="toctext" href="../../man/records/">Records</a></li><li><a class="toctext" href="../../man/io/">IO</a></li><li><a class="toctext" href="../../man/conclusion/">Conclusion</a></li></ul></li><li><span class="toctext">FAQ</span><ul><li><a class="toctext" href="../another-logging-lib/">Another logging library?</a></li><li class="current"><a class="toctext" href>Changing colors?</a><ul class="internal"></ul></li><li><a class="toctext" href="../logging-to-syslog/">Logging to Syslog?</a></li><li><a class="toctext" href="../json-formatting/">Producing JSON logs?</a></li><li><a class="toctext" href="../pkg-usage/">Using Memento in Julia packages?</a></li></ul></li><li><span class="toctext">API</span><ul><li><a class="toctext" href="../../api/public/">Public</a></li><li><a class="toctext" href="../../api/private/">Private</a></li></ul></li><li><a class="toctext" href="../../contributing/">Contributing</a></li></ul></nav><article id="docs"><header><nav><ul><li>FAQ</li><li><a href>Changing colors?</a></li></ul><a class="edit-page" href="https://github.com/invenia/Memento.jl/blob/master/docs/src/faq/change-colors.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Changing colors?</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Changing-colors?-1" href="#Changing-colors?-1">Changing colors?</a></h1><p>Colors can be enabled/disabled and set using via the <code>is_colorized</code> and <code>colors</code> options to the <code>DefaultHandler</code>.</p><pre><code class="language-julia">julia&gt; add_handler(logger, DefaultHandler(
+    STDOUT, DefaultFormatter(),
+    Dict{Symbol, Any}(:is_colorized =&gt; true)),
+    &quot;console&quot;
+)</code></pre><p>will create a <code>DefaultHandler</code> with colorization.</p><p>By default the following colors are used:</p><pre><code class="language-julia">Dict{AbstractString, Symbol}(
+    &quot;debug&quot; =&gt; :blue,
+    &quot;info&quot; =&gt; :green,
+    &quot;notice&quot; =&gt; :cyan,
+    &quot;warn&quot; =&gt; :magenta,
+    &quot;error&quot; =&gt; :red,
+    &quot;critical&quot; =&gt; :yellow,
+    &quot;alert&quot; =&gt; :white,
+    &quot;emergency&quot; =&gt; :black,
+)</code></pre><p>However, you can specify custom colors/log levels like so:</p><pre><code class="language-julia">add_handler(logger, DefaultHandler(
+    STDOUT, DefaultFormatter(),
+    Dict{Symbol, Any}(
+        :colors =&gt; Dict{AbstractString, Symbol}(
+            &quot;debug&quot; =&gt; :black,
+            &quot;info&quot; =&gt; :blue,
+            &quot;warn&quot; =&gt; :yellow,
+            &quot;error&quot; =&gt; :red,
+            &quot;crazy&quot; =&gt; :green
+        )
+    ),
+    &quot;console&quot;
+)</code></pre><p>You can also globally disable colorization when running <a href="../../api/public/#Memento.config!"><code>Memento.config!</code></a></p><pre><code class="language-julia">julia&gt; Memento.config!(&quot;info&quot;; fmt=&quot;[{date} | {level} | {name}]: {msg}&quot;, colorized=false)</code></pre><footer><hr/><a class="previous" href="../another-logging-lib/"><span class="direction">Previous</span><span class="title">Another logging library?</span></a><a class="next" href="../logging-to-syslog/"><span class="direction">Next</span><span class="title">Logging to Syslog?</span></a></footer></article></body></html>
