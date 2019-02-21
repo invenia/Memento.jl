@@ -1,18 +1,13 @@
-using Compat
-using Compat.Test
-using Compat.Distributed
-using Compat.Sockets
+using Test
+using Distributed
+using Sockets
 using Suppressor
 using JSON
 using Syslogs
 using Memento
 using Memento.Test
 using TimeZones
-
-import Compat.Dates
-import Compat.Sys
-
-using Compat: @info
+using Dates
 
 files = [
     "records.jl",
@@ -75,13 +70,7 @@ end
 
 _props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
 
-if isdefined(Base, :iterate)
-    Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
-else
-    Base.start(cr::ConstRecord) = start(_props(cr))
-    Base.next(cr::ConstRecord, state) = next(_props(cr), state)
-    Base.done(cr::ConstRecord, state) = done(_props(cr), state)
-end
+Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
 
 @testset "Memento" begin
 

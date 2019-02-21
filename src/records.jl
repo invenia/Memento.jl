@@ -44,7 +44,9 @@ function Base.get(attr::Attribute{T}) where T
     return get(attr.x)::T
 end
 
-hasfield(T::DataType, name::Symbol) = Base.fieldindex(T, name, false) > 0
+if VERSION < v"1.2.0-DEV.272"
+    hasfield(T::DataType, name::Symbol) = Base.fieldindex(T, name, false) > 0
+end
 
 """
     Record
@@ -83,31 +85,16 @@ Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
 Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
-if isdefined(Base, :iterate)
-    function Base.iterate(rec::T, state=0) where T <: Record
-        state >= fieldcount(T) && return nothing
-        state += 1
-        return (fieldname(T, state) => getfield(rec, state), state)
-    end
+function Base.iterate(rec::T, state=0) where T <: Record
+    state >= fieldcount(T) && return nothing
+    state += 1
+    return (fieldname(T, state) => getfield(rec, state), state)
+end
 
-    function Base.iterate(rec::T, state=0) where T <: AttributeRecord
-        state >= fieldcount(T) && return nothing
-        state += 1
-        return (fieldname(T, state) => get(getfield(rec, state)), state)
-    end
-else
-    Base.start(rec::Record) = 0
-    Base.done(rec::T, state) where {T <: Record} = state >= fieldcount(T)
-
-    function Base.next(rec::T, state::Int) where T <: Record
-        state += 1
-        return (fieldname(T, state) => getfield(rec, state), state)
-    end
-
-    function Base.next(rec::T, state::Int) where T <: AttributeRecord
-        state += 1
-        return (fieldname(T, state) => get(getfield(rec, state)), state)
-    end
+function Base.iterate(rec::T, state=0) where T <: AttributeRecord
+    state >= fieldcount(T) && return nothing
+    state += 1
+    return (fieldname(T, state) => get(getfield(rec, state)), state)
 end
 
 """

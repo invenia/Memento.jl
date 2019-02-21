@@ -2,9 +2,8 @@ language: julia
 os:
   - linux
 julia:
-  - 0.6
-  - 0.7
   - 1.0
+  - 1.1
   - nightly
 env:
   - TEST_TYPE=basic
@@ -15,13 +14,13 @@ matrix:
   allow_failures:
     - julia: nightly
     - env: TEST_TYPE=bench
-    - julia: 0.7
-      env: TEST_TYPE=userimage
     - julia: 1.0
+      env: TEST_TYPE=userimage
+    - julia: 1.1
       env: TEST_TYPE=userimage
   include:
     - if: branch = master
-      julia: 0.6
+      julia: 1.0
       os: osx
       env: TEST_TYPE=basic
   exclude:
@@ -33,18 +32,13 @@ notifications:
 script:
   - ./.travis/test.sh
 after_success:
-  - |
-      julia -e '
-        VERSION >= v"0.7.0-DEV.3656" && using Pkg
-        VERSION >= v"0.7.0-DEV.5183" || cd(Pkg.dir("Memento"))
-        Pkg.add("Coverage")
-        using Coverage
-        Codecov.submit(Codecov.process_folder())
-      '
-  - |
-      julia -e '
-        VERSION >= v"0.7.0-DEV.3656" && using Pkg
-        VERSION >= v"0.7.0-DEV.5183" || cd(Pkg.dir("Memento"))
-        Pkg.add("Documenter")
-        include(joinpath("docs", "make.jl"))
-      '
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.0
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip

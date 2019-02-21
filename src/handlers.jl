@@ -117,7 +117,7 @@ function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opt
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], levels, "not_set")
     push!(handler, Memento.Filter(handler))
-    @compat finalizer(h -> close(h.io), handler)
+    finalizer(h -> close(h.io), handler)
     handler
 end
 
