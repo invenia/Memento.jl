@@ -8,7 +8,6 @@ using Distributed
 
 import Syslogs
 import JSON
-using Nullables
 using TimeZones
 
 import Base: show, error, log

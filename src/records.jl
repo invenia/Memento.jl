@@ -5,26 +5,26 @@ An `Attribute` represents a lazily evaluated field in a log `Record`.
 
 # Fields
 * `f::Function`: A function to evaluate in order to get a value if one is not set.
-* `x::Nullable`: A value that may or may not exist yet.
+* `x::Union{Some{T}, Nothing}`: A value that may or may not exist yet.
 """
 mutable struct Attribute{T}
     f::Function
-    x::Nullable{T}
+    x::Union{Some{T}, Nothing}
 end
 
 """
     Attribute(f::Function) -> Attribute{Any}
     Attribute{T}(f::Function) -> Attribute{T}
 
-Creates an `Attribute` with the function and a `Nullable` of type `T`.
+Creates an `Attribute` with the given function.
 """
-Attribute{T}(f::Function) where {T} = Attribute{T}(f, Nullable{T}())
-Attribute(f::Function) = Attribute{Any}(f, Nullable{Any}())
+Attribute{T}(f::Function) where {T} = Attribute{T}(f, nothing)
+Attribute(f::Function) = Attribute{Any}(f, nothing)
 
 """
     Attribute(x)
 
-Simply wraps the value `x` in a `Nullable` and sticks that in an `Attribute` with an
+Simply wraps the value `x` in `Some` and sticks that in an `Attribute` with an
 empty `Function`.
 """
 Attribute(x::T) where {T} = Attribute{T}(() -> x)
@@ -37,11 +37,11 @@ Run set `attr.x` to the output of `attr.f` if `attr.x` is not already set.
 We then return the value stored in `attr.x`
 """
 function Base.get(attr::Attribute{T}) where T
-    if isnull(attr.x)
-        attr.x = Nullable{T}(attr.f())
+    if attr.x === nothing
+        attr.x = Some{T}(attr.f())
     end
 
-    return get(attr.x)::T
+    return something(attr.x)::T
 end
 
 if VERSION < v"1.2.0-DEV.272"
