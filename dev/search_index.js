@@ -697,9 +697,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public/#Memento.Test.@test_log",
+    "location": "api/public/#Memento.TestUtils.@test_log",
     "page": "Public",
-    "title": "Memento.Test.@test_log",
+    "title": "Memento.TestUtils.@test_log",
     "category": "macro",
     "text": "@test_log(logger, level, msg, expr)\n\nAdds a temporary test handler to the logger that checks for a record with the level and msg before executing the expr. The handler is always removed after executing expr.\n\n\n\n\n\n"
 },
@@ -709,7 +709,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Test.@test_warn",
     "category": "macro",
-    "text": "@test_warn(logger, msg, expr)\n\nConvenience macro that calls Memento.Test.@test_log(logger, \"warn\", msg, expr).\n\n\n\n\n\n"
+    "text": "@test_warn(logger, msg, expr)\n\nConvenience macro that calls Memento.TestUtils.@test_log(logger, \"warn\", msg, expr).\n\n\n\n\n\n"
 },
 
 {
@@ -721,11 +721,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/public/#Memento.Test-1",
+    "location": "api/public/#Memento.TestUtils-1",
     "page": "Public",
-    "title": "Memento.Test",
+    "title": "Memento.TestUtils",
     "category": "section",
-    "text": "Memento.Test.@test_log\nMemento.Test.@test_warn\nMemento.Test.@test_throws"
+    "text": "Memento.TestUtils.@test_log\nMemento.TestUtils.@test_warn\nMemento.TestUtils.@test_throws"
 },
 
 {
