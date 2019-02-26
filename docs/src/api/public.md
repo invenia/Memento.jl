@@ -45,10 +45,10 @@ Private = false
 Pages = ["io.jl"]
 ```
 
-## Memento.Test
+## Memento.TestUtils
 
 ```@docs
-Memento.Test.@test_log
-Memento.Test.@test_warn
-Memento.Test.@test_throws
+Memento.TestUtils.@test_log
+Memento.TestUtils.@test_warn
+Memento.TestUtils.@test_throws
 ```
