@@ -1,4 +1,4 @@
-module Test
+module TestUtils
 
 using ..Memento
 using Test
@@ -44,7 +44,7 @@ end
 """
     @test_warn(logger, msg, expr)
 
-Convenience macro that calls `Memento.Test.@test_log(logger, "warn", msg, expr)`.
+Convenience macro that calls `Memento.TestUtils.@test_log(logger, "warn", msg, expr)`.
 """
 macro test_warn(logger, msg, expr)
     quote

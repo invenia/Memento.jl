@@ -5,7 +5,7 @@ using Suppressor
 using JSON
 using Syslogs
 using Memento
-using Memento.Test
+using Memento.TestUtils
 using TimeZones
 using Dates
 

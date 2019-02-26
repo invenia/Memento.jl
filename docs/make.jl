@@ -2,7 +2,7 @@ using Documenter
 using Memento
 
 makedocs(
-    modules=[Memento, Memento.Test],
+    modules=[Memento, Memento.TestUtils],
     format=Documenter.HTML(prettyurls=(get(ENV, "CI", nothing) == "true")),
     repo="https://github.com/invenia/Memento.jl/blob/{commit}{path}#L{line}",
     sitename="Memento.jl",

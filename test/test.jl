@@ -1,4 +1,4 @@
-@testset "Memento.Test" begin
+@testset "Memento.TestUtils" begin
     @testset "@test_log" begin
         logger = getlogger("test_log")
         msg = "Hello!"
