@@ -122,14 +122,7 @@
                     @test e.msg == "cannot serialize a running Task"
                 end
 
-                try
-                    # Emits a warning of: "Logger(AsyncHandler) was unable to be serialized"
-                    serialize(io, logger)
-                    @test false
-                catch e
-                    @test e isa ErrorException
-                    @test e.msg == "cannot serialize a running Task"
-                end
+                @test_throws LoggerSerializationError serialize(io, logger)
             finally
                 close(io)
             end
