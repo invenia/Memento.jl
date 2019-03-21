@@ -166,7 +166,7 @@ function Serialization.serialize(s::AbstractSerializer, logger::Logger)
         invoke(serialize, Tuple{AbstractSerializer, Any}, s, logger)
     catch e
         if e isa ErrorException && e.msg == "cannot serialize a running Task"
-            throw(LoggerSerializationError(logger))
+            rethrow(LoggerSerializationError(logger))
         else
             rethrow()
         end
