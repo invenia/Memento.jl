@@ -161,6 +161,18 @@ function getpath(logger::Logger)
     return results
 end
 
+function Serialization.serialize(s::AbstractSerializer, logger::Logger)
+    try
+        invoke(serialize, Tuple{AbstractSerializer, Any}, s, logger)
+    catch e
+        if e isa ErrorException && e.msg == "cannot serialize a running Task"
+            rethrow(LoggerSerializationError(logger))
+        else
+            rethrow()
+        end
+    end
+end
+
 """
     getchildren(name::AbstractString)
 

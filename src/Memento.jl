@@ -5,6 +5,7 @@ using UUIDs
 using Dates
 using Sockets
 using Distributed
+using Serialization
 
 import Syslogs
 import JSON
@@ -18,7 +19,8 @@ export info, warn, debug, notice, error, critical, alert, emergency,
        getlogger, gethandlers, getfilters, format, emit,
 
        Logger, Record, AttributeRecord, DefaultRecord, Formatter, Handler,
-       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller
+       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller,
+       LoggerSerializationError
 
 
 const DEFAULT_LOG_LEVEL = "info"
@@ -44,6 +46,7 @@ include("loggers.jl")
 include("syslog.jl")
 include("stdlib.jl")
 include("config.jl")
+include("exceptions.jl")
 include("memento_test.jl")
 include("deprecated.jl")
 
