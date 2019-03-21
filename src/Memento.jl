@@ -5,6 +5,7 @@ using UUIDs
 using Dates
 using Sockets
 using Distributed
+using Serialization
 
 import Syslogs
 import JSON

@@ -161,6 +161,18 @@ function getpath(logger::Logger)
     return results
 end
 
+function Serialization.serialize(s::AbstractSerializer, logger::Logger)
+    try
+        invoke(serialize, Tuple{AbstractSerializer, Any}, s, logger)
+    catch e
+        @warn(string(
+            "$logger was unable to be serialized. ",
+            "Perhaps try not using shared loggers between processes?",
+        ))
+        throw(e)
+    end
+end
+
 """
     getchildren(name::AbstractString)
 

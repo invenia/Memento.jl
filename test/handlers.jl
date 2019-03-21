@@ -68,6 +68,72 @@
                 close(io)
             end
         end
+
+        @testset "AsyncHandler" begin
+            io = IOBuffer()
+
+            function wait_for_empty(c::Channel)
+                while isready(c)
+                    sleep(1)
+                end
+            end
+
+            try
+                handler = AsyncHandler(io)
+                logger = Logger(
+                    "AsyncHandler",
+                    Dict("Buffer" => handler),
+                    "info",
+                    LEVELS,
+                    DefaultRecord,
+                    true
+                )
+
+                @test getlevel(handler) == "not_set"
+                @test isempty(getfilters(handler))
+
+                msg = "It works!"
+                Memento.info(logger, msg)
+                wait_for_empty(handler.channel)
+                @test occursin(msg, String(take!(io)))
+
+                Memento.debug(logger, "This shouldn't get logged")
+                wait_for_empty(handler.channel)
+                @test isempty(String(take!(io)))
+
+                # Asynchronous handlers can cause issues when loggers are used across
+                # multiple processes. We'll emulate the following issue:
+                #=
+                using Distributed, Memento
+                const LOGGER = getlogger()
+                addprocs(1)
+                @everywhere using Memento
+                # Note: Define AsyncHandler on all processes
+                @everywhere push!(getlogger(), AsyncHandler(IOBuffer()))
+                pmap(1:3) do i
+                    info(LOGGER, i)  # ERROR: cannot serialize a running Task
+                end
+                =#
+                try
+                    serialize(io, handler)
+                    @test false
+                catch e
+                    @test e isa ErrorException
+                    @test e.msg == "cannot serialize a running Task"
+                end
+
+                try
+                    # Emits a warning of: "Logger(AsyncHandler) was unable to be serialized"
+                    serialize(io, logger)
+                    @test false
+                catch e
+                    @test e isa ErrorException
+                    @test e.msg == "cannot serialize a running Task"
+                end
+            finally
+                close(io)
+            end
+        end
     end
 
     @testset "DefaultHandler" begin

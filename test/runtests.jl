@@ -8,6 +8,7 @@ using Memento
 using Memento.TestUtils
 using TimeZones
 using Dates
+using Serialization
 
 files = [
     "records.jl",
@@ -66,6 +67,32 @@ Memento.getfilters(handler::FilterHandler) = handler.filters
 
 function Memento.emit(handler::Union{SimplestHandler, FilterHandler}, record::Record)
     println(handler.buf, record[:msg])
+end
+
+struct AsyncHandler <: Handler{Union{}, IOBuffer}
+    buf::IOBuffer
+    channel::Channel{Record}
+
+    function AsyncHandler(buf::IOBuffer)
+        channel = Channel{Record}(Inf)
+        handler = new(buf, channel)
+
+        task = @async process_record!(handler)
+        bind(channel, task)
+
+        return handler
+    end
+end
+
+function process_record!(handler::AsyncHandler)
+    while isopen(handler.channel)
+        record = take!(handler.channel)
+        println(handler.buf, record[:msg])
+    end
+end
+
+function Memento.emit(handler::AsyncHandler, record::Record)
+    put!(handler.channel, record)
 end
 
 _props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
