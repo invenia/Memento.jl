@@ -238,4 +238,17 @@
             close(io)
         end
     end
+
+    @testset "Don't overwrite registered logger" begin
+        original_logger = Logger("new_logger")
+        Memento.register(original_logger)
+
+        logger = getlogger("new_logger")
+        @test logger == original_logger
+
+        # Makre sure registration doesn't overwrite the original registered logger
+        Memento.register(Logger("new_logger"))
+        logger = getlogger("new_logger")
+        @test logger == original_logger
+    end
 end
