@@ -2,6 +2,7 @@ language: julia
 os:
   - linux
 julia:
+  - 0.7  # Replace Memento.x(...) with x(...) where x is `info` or `warn` when dropping 0.7
   - 1.0
   - 1.1
   - nightly
@@ -14,6 +15,8 @@ matrix:
   allow_failures:
     - julia: nightly
     - env: TEST_TYPE=bench
+    - julia: 0.7
+      env: TEST_TYPE=userimage
     - julia: 1.0
       env: TEST_TYPE=userimage
     - julia: 1.1

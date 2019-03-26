@@ -36,7 +36,7 @@ end
     )
 
     # We just want to test that our glue code works with Syslogs.jl
-    @suppress info(logger, "Hello World!")
+    @suppress Memento.info(logger, "Hello World!")
     s = fetch(r)
     @test occursin("Hello World!", s)
 end
