@@ -14,7 +14,7 @@
                 DefaultHandler(io, DefaultFormatter("{name} - {level}: {msg}"))
             )
 
-            asyncmap(x -> warn(getlogger(), "message"), 1:10)
+            asyncmap(x -> Memento.warn(getlogger(), "message"), 1:10)
             all_msgs = split(String(take!(io)), '\n')
 
             @test !isempty(all_msgs)
@@ -38,7 +38,7 @@
                 DefaultHandler(parallel_test_filename, DefaultFormatter("{name} - {level}: {msg}"))
             )
 
-            pmap(x -> warn(getlogger(), "message"), 1:10)
+            pmap(x -> Memento.warn(getlogger(), "message"), 1:10)
 
             open(parallel_test_filename) do f
                 all_msgs = readlines(f)

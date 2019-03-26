@@ -42,7 +42,7 @@
 
             setlevel!(logger, "error") do
                 @test getlevel(logger) == "error"
-                warn(logger, "silenced message should not be displayed")
+                Memento.warn(logger, "silenced message should not be displayed")
             end
             @test getlevel(logger) == "info"
 
@@ -160,7 +160,7 @@
         @test all(==("info"), getlevel.(a_children))
 
         setlevel!(getlogger("foo"), "notice"; recursive=true) do
-            info(getlogger("foo"), "I shouldn't be getting printed.")
+            Memento.info(getlogger("foo"), "I shouldn't be getting printed.")
         end
 
         # Check that our child logging levels remain the same after
@@ -228,7 +228,7 @@
             )
 
             # Define a test function that logs a message
-            test_func() = info(logger, "Hello")
+            test_func() = Memento.info(logger, "Hello")
             test_func()
 
             msg = String(take!(io))

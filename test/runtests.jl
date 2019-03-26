@@ -106,9 +106,9 @@ Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
         Memento.config!("info"; fmt="[{date} | {level} | {name}]: {msg}", colorized=false)
         logger1 = getlogger(@__MODULE__)
         debug(logger1, "Something that won't get logged.")
-        info(logger1, "Something you might want to know.")
-        warn(logger1, "This might cause an error.")
-        warn(logger1, ErrorException("A caught exception that we want to log as a warning."))
+        Memento.info(logger1, "Something you might want to know.")
+        Memento.warn(logger1, "This might cause an error.")
+        Memento.warn(logger1, ErrorException("A caught exception that we want to log as a warning."))
         @test_throws ErrorException error(logger1, "Something that should throw an error.")
         @test_throws ErrorException error(logger1, ErrorException("A caught exception that we should log and rethrow"))
         logger2 = getlogger("Pkg.Foo.Bar")
@@ -134,7 +134,7 @@ Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
 
         msg = "This should propagate and log because all loggers are set to :warn by default."
         expected = "Foo.Car - warn: $msg"
-        warn(car, msg)
+        Memento.warn(car, msg)
         result = String(take!(root_io))
         @test occursin(expected, result)
 
@@ -188,7 +188,7 @@ Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
         @test result == ""
 
         msg = "This should be logged to both `root_io` and `baz_io`"
-        info(baz, msg)
+        Memento.info(baz, msg)
         expected = "Foo.Bar.Baz - info: $msg"
         result = String(take!(baz_io))
         @test occursin(expected, result)

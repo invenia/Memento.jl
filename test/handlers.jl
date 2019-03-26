@@ -111,7 +111,7 @@
                 # Note: Define AsyncHandler on all processes
                 @everywhere push!(getlogger(), AsyncHandler(IOBuffer()))
                 pmap(1:3) do i
-                    info(LOGGER, i)  # ERROR: cannot serialize a running Task
+                    Memento.info(LOGGER, i)  # ERROR: cannot serialize a running Task
                 end
                 =#
                 try
