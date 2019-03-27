@@ -13,6 +13,19 @@
         @test_log(logger, "info", x -> x == msg, Memento.info(logger, msg))
     end
 
+    @testset "@test_nolog" begin
+        logger = getlogger("test_nolog")
+        setlevel!(logger, "info")
+
+        msg = "Hello!"
+        different_msg = "Goodbye"
+
+        @test_nolog(logger, "info", msg, nothing)
+        @test_nolog(logger, "info", msg, Memento.debug(logger, msg))
+        @test_nolog(logger, "info", msg, Memento.info(logger, different_msg))
+        @test_nolog(logger, "info", msg, Memento.warn(logger, different_msg))
+    end
+
     @testset "@test_warn" begin
         logger = getlogger("test_warn")
         msg = "Hello!"
