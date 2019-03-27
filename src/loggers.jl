@@ -136,7 +136,7 @@ getlevels(logger::Logger) = logger.levels
 Register an existing logger with Memento if it has not already been registered.
 """
 function register(logger::Logger)
-    if !in(logger.name, keys(_loggers))
+    if !haskey(_loggers, logger.name)
         _loggers[logger.name] = logger
     end
 end
