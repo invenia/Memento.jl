@@ -56,8 +56,11 @@ const _loggers = Dict{AbstractString, Logger}(
     "root" => Logger("root"),
 )
 
+const LOGGER = getlogger(@__MODULE__)
+
 function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)
+    Memento.register(LOGGER)
 end
 
 end

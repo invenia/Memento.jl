@@ -133,9 +133,15 @@ getlevels(logger::Logger) = logger.levels
 """
     register(::Logger)
 
-Register an existing logger with Memento.
+Register an existing logger with Memento if it has not already been registered.
 """
-register(logger::Logger) = _loggers[logger.name] = logger
+function register(logger::Logger)
+    if !haskey(_loggers, logger.name)
+        _loggers[logger.name] = logger
+    else
+        debug(LOGGER, "$logger is already registered.")
+    end
+end
 
 """
     getpath(logger::Logger) -> Vector{Logger}

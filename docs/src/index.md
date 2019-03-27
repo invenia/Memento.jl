@@ -73,3 +73,25 @@ julia> warn(child_logger, "Warning to STDOUT and the log file.")
 ```
 
 NOTE: We used `getlogger("Foo.bar")`, but you can also do `getlogger(current_module())` which allows us to avoid hard coding in logger names.
+
+## Piggybacking onto another package's logger
+
+To add logging events using another package's logger in your own module/package you can do:
+
+```julia
+module MyModule
+
+using OtherPackage
+using Memento
+
+# Set package logger to be available for configuration at runtime
+function __init__()
+    global LOGGER = getlogger("OtherPackage")
+end
+
+function my_func()
+    warn(LOGGER, "MyModule warning")
+end
+
+end  # MyModule
+```
