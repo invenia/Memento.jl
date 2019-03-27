@@ -33,6 +33,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "#Piggybacking-onto-another-package\'s-logger-1",
+    "page": "Home",
+    "title": "Piggybacking onto another package\'s logger",
+    "category": "section",
+    "text": "To add logging events using another package\'s logger in your own module/package you can do:module MyModule\n\nusing OtherPackage\nusing Memento\n\n# Set package logger to be available for configuration at runtime\nfunction __init__()\n    global LOGGER = getlogger(\"OtherPackage\")\nend\n\nfunction my_func()\n    warn(LOGGER, \"MyModule warning\")\nend\n\nend  # MyModule"
+},
+
+{
     "location": "man/intro/#",
     "page": "Introduction",
     "title": "Introduction",
@@ -821,7 +829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.register",
     "category": "method",
-    "text": "register(::Logger)\n\nRegister an existing logger with Memento.\n\n\n\n\n\n"
+    "text": "register(::Logger)\n\nRegister an existing logger with Memento if it has not already been registered.\n\n\n\n\n\n"
 },
 
 {
