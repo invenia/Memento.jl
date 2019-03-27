@@ -7,6 +7,8 @@ import Test: @test_warn, @test_throws
 
 export @test_log
 
+const EMPTY_MATCH = nothing
+
 # These function are just a copy of `ismatch_warn` on 0.6 or `contains_warn` on 0.7`.
 # contains_msg(output, s) = contains_warn(output, s)
 occursin_msg(s::AbstractString, output) = occursin(s, output)
@@ -75,7 +77,7 @@ end
 
 function TestHandler(level, msg)
     TestHandler{DefaultFormatter, IOBuffer}(
-        String(level), msg, ("", "")
+        String(level), msg, (EMPTY_MATCH, EMPTY_MATCH)
     )
 end
 
