@@ -138,6 +138,8 @@ Register an existing logger with Memento if it has not already been registered.
 function register(logger::Logger)
     if !haskey(_loggers, logger.name)
         _loggers[logger.name] = logger
+    else
+        debug(LOGGER, "$logger is already registered.")
     end
 end
 
