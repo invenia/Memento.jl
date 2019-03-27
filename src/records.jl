@@ -76,7 +76,7 @@ A `Record` which stores its properties as `Attribute`s for lazy evaluation.
 
 Calling `getindex` or iterating will evaluate and cache the properties accessed.
 
-Subtypes of `AttributeRecord` should implement `Memento.getattribute(::MyRecord, ::Symbol)`
+Subtypes of `AttributeRecord` should implement `Base.getproperty(::MyRecord, ::Symbol)`
 instead of `getindex`.
 """
 abstract type AttributeRecord <: Record end
@@ -97,13 +97,21 @@ function Base.iterate(rec::T, state=0) where T <: AttributeRecord
     return (fieldname(T, state) => get(getfield(rec, state)), state)
 end
 
-"""
-    getattribute(rec::AttributeRecord, attr::Symbol)
-"""
-getattribute(rec::AttributeRecord, attr::Symbol) = getfield(rec, attr)
+function getattribute end  # Remove when depwarn in `getindex` is removed
 
-Base.getindex(rec::AttributeRecord, attr::Symbol) = get(getattribute(rec, attr))
+function Base.getindex(rec::AttributeRecord, attr::Symbol)
+    if hasmethod(Memento.getattribute, (typeof(rec), Symbol))
+        Base.depwarn(
+            "Memento.getattribute is deprecated. Subtypes of `AttributeRecord` should " *
+            "implement Base.getproperty(::MyRecord, ::Symbol) instead.",
+            :getattribute
+        )
+        return get(getattribute(rec, attr))
+    end
+    return get(getproperty(rec, attr))
+end
 
+Base.getproperty(rec::AttributeRecord, attr::Symbol) = getfield(rec, attr)
 
 """
     Dict(rec::Record)
