@@ -48,8 +48,8 @@ end
 """
     format(::DefaultFormatter, ::Record) -> String
 
-Iteratively replaces entries in the
-format string with the appropriate fields in the `Record`
+Iteratively replaces entries in the format string with the appropriate fields in the
+`Record`.
 """
 function format(fmt::DefaultFormatter, rec::Record)
     parts = map(fmt.tokens) do token
@@ -77,12 +77,12 @@ function format(fmt::DefaultFormatter, rec::Record)
                 value = string(" stack:[", join(str_frames, ", "), "]")
             elseif content === :date
                 value = if tmp_val isa ZonedDateTime
-                        Dates.format(astimezone(tmp_val, fmt.output_tz), DATE_FMT_STRING)
-                    elseif tmp_val isa DateTime
-                        Dates.format(tmp_val, DATE_FMT_STRING)
-                    else
-                        tmp_val
-                    end
+                    Dates.format(astimezone(tmp_val, fmt.output_tz), DATE_FMT_STRING)
+                elseif tmp_val isa DateTime
+                    Dates.format(tmp_val, DATE_FMT_STRING)
+                else
+                    tmp_val
+                end
             else
                 value = tmp_val
             end
@@ -102,13 +102,15 @@ end
 """
     DictFormatter([aliases, serializer])
 
-Formats the record to Dict that is amenable to serialization formats such as JSON and then runs
-the serializer function on the produced dictionary.
+Formats the record to Dict that is amenable to serialization formats such as JSON and then
+runs the serializer function on the produced dictionary.
 
 # Arguments
-- `aliases::Dict{Symbol, Symbol}`: Mapping where the keys represent aliases and values represent
-  existing record attributes to include in the dictionary (defaults to all attributes).
-- `serializer::Function`: A function that takes a Dictionary and returns a string. Defaults to `string(dict)`.
+- `aliases::Dict{Symbol, Symbol}`: Mapping where the keys represent aliases and values
+represent existing record attributes to include in the dictionary (defaults to all
+attributes).
+- `serializer::Function`: A function that takes a Dictionary and returns a string. Defaults
+to `string(dict)`.
 """
 DictFormatter() = DictFormatter(nothing, string)
 DictFormatter(aliases::Dict{Symbol, Symbol}) = DictFormatter(aliases, string)
@@ -117,8 +119,7 @@ DictFormatter(serializer::Function) = DictFormatter(nothing, serializer)
 """
     format(::DictFormatter, ::Record) -> Dict
 
-Converts :date, :lookup and :stacktrace to strings
-and dicts respectively.
+Converts :date, :lookup and :stacktrace to strings and dicts respectively.
 """
 function format(fmt::DictFormatter, rec::Record)
     aliases = if fmt.aliases === nothing

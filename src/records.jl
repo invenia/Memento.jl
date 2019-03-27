@@ -149,14 +149,15 @@ struct DefaultRecord <: AttributeRecord
 end
 
 """
-    DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg::AbstractString)
+    DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
 
 Takes a few initial log record arguments and creates a `DefaultRecord`.
 
 # Arguments
 * `name::AbstractString`: the name of the source logger.
 * `level::AbstractString`: the log level.
-* `msg::AbstractString`: the message being logged.
+* `levelnum`::Int: the log level number.
+* `msg`: the message being logged.
 """
 function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)
     trace = Attribute{StackTrace}(get_trace)

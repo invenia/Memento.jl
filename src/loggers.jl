@@ -180,14 +180,14 @@ function Serialization.serialize(s::AbstractSerializer, logger::Logger)
 end
 
 """
-    getchildren(name::AbstractString)
+    getchildren(name)
 
 Takes a string representing the name of a logger and returns its children.
 Child loggers are extracted assuming a naming convention of "foo.bar.baz", where
 "foo.bar.baz" is the child of "foo.bar" which is the child of "foo".
 
 # Arguments
-* `name::AbstractString`: the name of the logger.
+* `name`: the name of the logger.
 
 # Returns
 * `Vector{Logger}`
@@ -216,13 +216,13 @@ Returns the logger.
 getlogger(name::Module) = getlogger("$name")
 
 """
-    getlogger(name::AbstractString) -> Logger
+    getlogger(name="root") -> Logger
 
 If the logger or its parents do not exist then they are initialized
 with no handlers and not set.
 
 # Arguments
-* `name::AbstractString`: the name of the logger (defaults to "root")
+* `name`: the name of the logger (defaults to "root")
 
 # Returns
 * `Logger`: the logger.
@@ -238,7 +238,7 @@ function getlogger(name="root")
 end
 
 """
-    setrecord!{R<:Record}(logger::Logger, rec::Type{R})
+    setrecord!(logger::Logger, rec::Type{R}) where {R<:Record}
 
 Sets the record type for the logger.
 
@@ -286,7 +286,7 @@ Adds a new `level::String` and `priority::Int` to the `logger.levels`
 addlevel!(logger::Logger, level::AbstractString, val::Int) = logger.levels[level] = val
 
 """
-    setlevel!(logger::Logger, level::AbstractString)
+    setlevel!(logger::Logger, level::AbstractString; recursive=false)
 
 Changes what level this logger should log at.
 """
@@ -303,7 +303,7 @@ function setlevel!(logger::Logger, level::AbstractString; recursive=false)
 end
 
 """
-    setlevel!(f::Function, logger::Logger, level::AbstractString)
+    setlevel!(f::Function, logger::Logger, level::AbstractString; recursive=false)
 
 Temporarily change the level a logger will log at for the duration of the function `f`.
 """
@@ -336,19 +336,17 @@ function setlevel!(f::Function, logger::Logger, level::AbstractString; recursive
 end
 
 """
-    log(logger::Logger, args::Dict{Symbol, Any})
+    log(logger::Logger, rec::Record)
 
-Logs `logger.record(args)` to its handlers if it has the appropriate `args[:level]`
-and `args[:level]` is above the priority of `logger.level`.
-If this logger is not the root logger and `logger.propagate` is `true` then the
-parent logger is called.
+Logs `rec` to all its logger handlers. If this logger is not the root logger and
+`logger.propagate` is `true` then the parent logger is called.
 
-NOTE: This method calls all handlers asynchronously and is recursive, so you should call this
-method with a `@sync` in order to synchronize all handler tasks.
+NOTE: This method calls all handlers asynchronously and is recursive, so you should call
+it with a `@sync` in order to synchronize all handler tasks.
 
 # Arguments
 * `logger::Logger`: the logger to log `args` to.
-* `args::Dict`: a dict of msg fields and values that should be passed to `logger.record`.
+* `rec::Record`: a `Record` to log
 """
 function log(logger::Logger, rec::Record)
     for l in reverse!(getpath(logger))
@@ -368,9 +366,9 @@ end
 """
     log(logger::Logger, level::AbstractString, msg::AbstractString)
 
-Creates a `Dict` with the logger name, level, levelnum and message and
+Creates a `Record` with the logger name, level, levelnum and message and
 calls the other `log` method (which may recursively call itself on parent loggers
-with the created `Dict`).
+with the created `Record`).
 
 # Arguments
 * `logger::Logger`: the logger to log to.
@@ -391,7 +389,7 @@ be a function that returns the log message string.
 
 # Arguments
 * `msg::Function`: a function that returns a message `String`
-* `logger::Logger`: the logger to log to.
+* `logger::Logger`: the logger to log to
 * `level::AbstractString`: the log level as a `String`
 
 # Throws
