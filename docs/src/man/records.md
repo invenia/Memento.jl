@@ -39,7 +39,7 @@ mutable struct EC2Record <: AttributeRecord
         trace = Attribute{StackTrace}(get_trace)
 
         EC2Record(
-            Attribute{DateTime}(() -> round(time, Dates.Second)),
+            Attribute{DateTime}(() -> round(time, digits=Dates.Second)),
             Attribute(level),
             Attribute(levelnum),
             Attribute{AbstractString}(msg),

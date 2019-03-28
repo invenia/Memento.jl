@@ -78,7 +78,7 @@ mutable struct EC2Record <: Record
         trace = Attribute{StackTrace}(get_trace)
 
         EC2Record(
-            Attribute{DateTime}(() -> round(time, Dates.Second)),
+            Attribute{DateTime}(() -> round(time, digits=Dates.Second)),
             Attribute(args[:level]),
             Attribute(args[:levelnum]),
             Attribute{AbstractString}(get_msg(args[:msg])),
@@ -98,7 +98,7 @@ mutable struct CSVFormatter <: Formatter
     delim::Char
     vals::Array{Symbol}
 
-    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)
+    CSVFormatter(delim=',', vals=Array{Symbol}(undef)) = new(delim, vals)
 end
 
 function format(fmt::CSVFormatter, rec::Record)
