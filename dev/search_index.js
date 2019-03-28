@@ -713,6 +713,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/public/#Memento.TestUtils.@test_nolog",
+    "page": "Public",
+    "title": "Memento.TestUtils.@test_nolog",
+    "category": "macro",
+    "text": "@test_nolog(logger, level, msg, expr)\n\nAdds a temporary test handler to the logger that checks that there was no log record with the expected level and msg before executing the expr. The handler is always removed after executing expr.\n\n\n\n\n\n"
+},
+
+{
     "location": "api/public/#Test.@test_warn",
     "page": "Public",
     "title": "Test.@test_warn",
@@ -733,7 +741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.TestUtils",
     "category": "section",
-    "text": "Memento.TestUtils.@test_log\nMemento.TestUtils.@test_warn\nMemento.TestUtils.@test_throws"
+    "text": "Memento.TestUtils.@test_log\nMemento.TestUtils.@test_nolog\nMemento.TestUtils.@test_warn\nMemento.TestUtils.@test_throws"
 },
 
 {
