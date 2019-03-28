@@ -49,6 +49,7 @@ Pages = ["io.jl"]
 
 ```@docs
 Memento.TestUtils.@test_log
+Memento.TestUtils.@test_nolog
 Memento.TestUtils.@test_warn
 Memento.TestUtils.@test_throws
 ```

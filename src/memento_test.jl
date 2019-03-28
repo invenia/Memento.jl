@@ -5,7 +5,7 @@ using Test
 
 import Test: @test_warn, @test_throws
 
-export @test_log
+export @test_log, @test_nolog
 
 const EMPTY_MATCH = nothing
 
@@ -42,6 +42,34 @@ macro test_log(logger, level, msg, expr)
         end
     end
 end
+
+"""
+    @test_nolog(logger, level, msg, expr)
+
+Adds a temporary test handler to the `logger` that checks that there was no log record with
+the expected `level` and `msg` before executing the `expr`. The handler is always removed
+after executing `expr`.
+"""
+macro test_nolog(logger, level, msg, expr)
+    quote
+        handler = TestHandler($(esc(level)), $(esc(msg)))
+        handlers = copy(gethandlers($(esc(logger))))
+
+        try
+            $(esc(logger)).handlers = Dict{Any, Handler}()
+            push!($(esc(logger)), handler)
+
+            setpropagating!($(esc(logger)), false) do
+                ret = $(esc(expr))
+                @test handler.found[1] == EMPTY_MATCH && handler.found[2] == EMPTY_MATCH
+                ret
+            end
+        finally
+            $(esc(logger)).handlers = handlers
+        end
+    end
+end
+
 
 """
     @test_warn(logger, msg, expr)
