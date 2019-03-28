@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.getlogger",
     "category": "function",
-    "text": "getlogger(name::AbstractString) -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname::AbstractString: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n\n\n"
+    "text": "getlogger(name=\"root\") -> Logger\n\nIf the logger or its parents do not exist then they are initialized with no handlers and not set.\n\nArguments\n\nname: the name of the logger (defaults to \"root\")\n\nReturns\n\nLogger: the logger.\n\n\n\n\n\n"
 },
 
 {
@@ -453,7 +453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.setlevel!",
     "category": "method",
-    "text": "setlevel!(f::Function, logger::Logger, level::AbstractString)\n\nTemporarily change the level a logger will log at for the duration of the function f.\n\n\n\n\n\n"
+    "text": "setlevel!(f::Function, logger::Logger, level::AbstractString; recursive=false)\n\nTemporarily change the level a logger will log at for the duration of the function f.\n\n\n\n\n\n"
 },
 
 {
@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.setlevel!",
     "category": "method",
-    "text": "setlevel!(logger::Logger, level::AbstractString)\n\nChanges what level this logger should log at.\n\n\n\n\n\n"
+    "text": "setlevel!(logger::Logger, level::AbstractString; recursive=false)\n\nChanges what level this logger should log at.\n\n\n\n\n\n"
 },
 
 {
@@ -477,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.setrecord!",
     "category": "method",
-    "text": "setrecord!{R<:Record}(logger::Logger, rec::Type{R})\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n\n\n"
+    "text": "setrecord!(logger::Logger, rec::Type{R}) where {R<:Record}\n\nSets the record type for the logger.\n\nArguments\n\nlogger::Logger: the logger to set.\nrec::Record: A Record type to use for logging messages (ie: DefaultRecord).\n\n\n\n\n\n"
 },
 
 {
@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "method",
-    "text": "DefaultHandler{F}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter}\n\nCreates a DefaultHandler with a IO handle to the specified filename.\n\nArguments\n\nfilename::AbstractString: the filename of a log file to write to\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n\n\n"
+    "text": "DefaultHandler(\n    filename::AbstractString,\n    fmt::F=DefaultFormatter(),\n    opts=Dict{Symbol, Any}();\n    levels=nothing,\n) where {F<:Formatter}\n\nCreates a DefaultHandler with a IO handle to the specified filename.\n\nArguments\n\nfilename::AbstractString: the filename of a log file to write to\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n\n\n"
 },
 
 {
@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultHandler",
     "category": "method",
-    "text": "DefaultHandler{F, O}(io::O, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter, O<:IO}\n\nCreates a DefaultHandler with the specified IO type.\n\nArguments\n\nio::IO: the IO type\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n\n\n"
+    "text": "DefaultHandler(\n    io::O,\n    fmt::F=DefaultFormatter(),\n    opts=Dict{Symbol, Any}();\n    levels=nothing,\n) where {F<:Formatter, O<:IO}\n\nCreates a DefaultHandler with the specified IO type.\n\nArguments\n\nio::IO: the IO type\nfmt::Formatter: the Formatter to use (default to DefaultFormatter())\nopts::Dict: the optional arguments (defaults to Dict{Symbol, Any}())\n\n\n\n\n\n"
 },
 
 {
@@ -589,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DictFormatter",
     "category": "method",
-    "text": "DictFormatter([aliases, serializer])\n\nFormats the record to Dict that is amenable to serialization formats such as JSON and then runs the serializer function on the produced dictionary.\n\nArguments\n\naliases::Dict{Symbol, Symbol}: Mapping where the keys represent aliases and values represent existing record attributes to include in the dictionary (defaults to all attributes).\nserializer::Function: A function that takes a Dictionary and returns a string. Defaults to string(dict).\n\n\n\n\n\n"
+    "text": "DictFormatter([aliases, serializer])\n\nFormats the record to Dict that is amenable to serialization formats such as JSON and then runs the serializer function on the produced dictionary.\n\nArguments\n\naliases::Dict{Symbol, Symbol}: Mapping where the keys represent aliases and values\n\nrepresent existing record attributes to include in the dictionary (defaults to all attributes).\n\nserializer::Function: A function that takes a Dictionary and returns a string. Defaults\n\nto string(dict).\n\n\n\n\n\n"
 },
 
 {
@@ -605,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.format",
     "category": "method",
-    "text": "format(::DefaultFormatter, ::Record) -> String\n\nIteratively replaces entries in the format string with the appropriate fields in the Record\n\n\n\n\n\n"
+    "text": "format(::DefaultFormatter, ::Record) -> String\n\nIteratively replaces entries in the format string with the appropriate fields in the Record.\n\n\n\n\n\n"
 },
 
 {
@@ -645,7 +645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.DefaultRecord",
     "category": "method",
-    "text": "DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg::AbstractString)\n\nTakes a few initial log record arguments and creates a DefaultRecord.\n\nArguments\n\nname::AbstractString: the name of the source logger.\nlevel::AbstractString: the log level.\nmsg::AbstractString: the message being logged.\n\n\n\n\n\n"
+    "text": "DefaultRecord(name::AbstractString, level::AbstractString, levelnum::Int, msg)\n\nTakes a few initial log record arguments and creates a DefaultRecord.\n\nArguments\n\nname::AbstractString: the name of the source logger.\nlevel::AbstractString: the log level.\nlevelnum::Int: the log level number.\nmsg: the message being logged.\n\n\n\n\n\n"
 },
 
 {
@@ -677,7 +677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.FileRoller",
     "category": "type",
-    "text": "FileRoller <: IO\n\nIs responsible for managing a rolling log file.\n\nFields\n\nprefix::AbstractString: filename prefix for the log.\nfolder::AbstractString: directory where the log should be written.\nfile::AbstractString: the current file IO handle\nbyteswritten::Int64: keeps track of how many bytes have been written to the current file.\nmax_sz::Int: the maximum number of bytes written to a file before rolling over to another.\n\n\n\n\n\n"
+    "text": "FileRoller <: IO\n\nIs responsible for managing a rolling log file.\n\nFields\n\nprefix::AbstractString: filename prefix for the log.\nfolder::AbstractString: directory where the log should be written.\nfilepath::AbstractString: the full filepath for the log\nfile::IO: the current file IO handle\nbyteswritten::Int64: keeps track of how many bytes have been written to the current file.\nmax_sz::Int: the maximum number of bytes written to a file before rolling over to another.\n\n\n\n\n\n"
 },
 
 {
@@ -765,7 +765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.log",
     "category": "method",
-    "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n\n\n"
+    "text": "log(::Function, ::Logger, ::AbstractString)\n\nSame as log(logger, level, msg), but in this case the message can be a function that returns the log message string.\n\nArguments\n\nmsg::Function: a function that returns a message String\nlogger::Logger: the logger to log to\nlevel::AbstractString: the log level as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n\n\n"
 },
 
 {
@@ -773,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.log",
     "category": "method",
-    "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Dict with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Dict).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n\n\n"
+    "text": "log(logger::Logger, level::AbstractString, msg::AbstractString)\n\nCreates a Record with the logger name, level, levelnum and message and calls the other log method (which may recursively call itself on parent loggers with the created Record).\n\nArguments\n\nlogger::Logger: the logger to log to.\nlevel::AbstractString: the log level as a String\nmsg::AbstractString: the msg to log as a String\n\nThrows\n\nCompositeException: may be thrown if an error occurs in one of the handlers  (which are run with @async)\n\n\n\n\n\n"
 },
 
 {
@@ -781,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Base.log",
     "category": "method",
-    "text": "log(logger::Logger, args::Dict{Symbol, Any})\n\nLogs logger.record(args) to its handlers if it has the appropriate args[:level] and args[:level] is above the priority of logger.level. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nNOTE: This method calls all handlers asynchronously and is recursive, so you should call this method with a @sync in order to synchronize all handler tasks.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nargs::Dict: a dict of msg fields and values that should be passed to logger.record.\n\n\n\n\n\n"
+    "text": "log(logger::Logger, rec::Record)\n\nLogs rec to all its logger handlers. If this logger is not the root logger and logger.propagate is true then the parent logger is called.\n\nNOTE: This method calls all handlers asynchronously and is recursive, so you should call it with a @sync in order to synchronize all handler tasks.\n\nArguments\n\nlogger::Logger: the logger to log args to.\nrec::Record: a Record to log\n\n\n\n\n\n"
 },
 
 {
@@ -813,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Private",
     "title": "Memento.getchildren",
     "category": "method",
-    "text": "getchildren(name::AbstractString)\n\nTakes a string representing the name of a logger and returns its children. Child loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\".\n\nArguments\n\nname::AbstractString: the name of the logger.\n\nReturns\n\nVector{Logger}\n\n\n\n\n\n"
+    "text": "getchildren(name)\n\nTakes a string representing the name of a logger and returns its children. Child loggers are extracted assuming a naming convention of \"foo.bar.baz\", where \"foo.bar.baz\" is the child of \"foo.bar\" which is the child of \"foo\".\n\nArguments\n\nname: the name of the logger.\n\nReturns\n\nVector{Logger}\n\n\n\n\n\n"
 },
 
 {
