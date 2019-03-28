@@ -9,10 +9,10 @@ Non-standard subtypes of [`Record`](@ref) should implement `getindex(::MyRecord,
 ## AttributeRecords
 
 An [`AttributeRecord`](@ref Memento.AttributeRecord) is an abstract subtype of [`Record`](@ref) that lazily evaluates its properties.
-Fields are stored as [`Attribute`](@ref)s, which will evaluate a function and cache the result the first time it is read.
+Fields are stored as [`Attribute`](@ref Memento.Attribute)s, which will evaluate a function and cache the result the first time it is read.
 
-By default, any subtypes of [`AttributeRecord`](@ref Memento.AttributeRecord) will expect its fields to be [`Attribute`](@ref)s.
-Non-standard subtypes of [`AttributeRecord`](@ref Memento.AttributeRecord) should implement `Memento.getattribute(::MyRecord, ::Symbol)` and key-value pair iteration, where the values have been extracted from [`Attribute`](@ref)s using [`get`](@ref).
+By default, any subtypes of [`AttributeRecord`](@ref Memento.AttributeRecord) will expect its fields to be [`Attribute`](@ref Memento.Attribute)s.
+Non-standard subtypes of [`AttributeRecord`](@ref Memento.AttributeRecord) should implement `Memento.getattribute(::MyRecord, ::Symbol)` and key-value pair iteration, where the values have been extracted from [`Attribute`](@ref Memento.Attribute)s using [`get`](@ref).
 
 ## Custom Record Types
 

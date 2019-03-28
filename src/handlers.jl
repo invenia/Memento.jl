@@ -86,7 +86,12 @@ mutable struct DefaultHandler{F, O} <: Handler{F, O}
 end
 
 """
-    DefaultHandler{F, O}(io::O, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter, O<:IO}
+    DefaultHandler(
+        io::O,
+        fmt::F=DefaultFormatter(),
+        opts=Dict{Symbol, Any}();
+        levels=nothing,
+    ) where {F<:Formatter, O<:IO}
 
 Creates a DefaultHandler with the specified IO type.
 
@@ -95,7 +100,13 @@ Creates a DefaultHandler with the specified IO type.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}(); levels=nothing) where {F<:Formatter, O<:IO}
+function DefaultHandler(
+    io::O,
+    fmt::F=DefaultFormatter(),
+    opts=Dict{Symbol, Any}();
+    levels=nothing,
+) where {F<:Formatter, O<:IO}
+
     setup_opts(opts)
     handler = DefaultHandler(fmt, io, opts, Memento.Filter[], levels, "not_set")
     push!(handler, Memento.Filter(handler))
@@ -103,7 +114,12 @@ function DefaultHandler(io::O, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}
 end
 
 """
-    DefaultHandler{F}(filename::AbstractString, fmt::F, opts::Dict{Symbol, Any}) where {F<Formatter}
+    DefaultHandler(
+        filename::AbstractString,
+        fmt::F=DefaultFormatter(),
+        opts=Dict{Symbol, Any}();
+        levels=nothing,
+    ) where {F<:Formatter}
 
 Creates a DefaultHandler with a IO handle to the specified filename.
 
@@ -112,7 +128,13 @@ Creates a DefaultHandler with a IO handle to the specified filename.
 * `fmt::Formatter`: the Formatter to use (default to `DefaultFormatter()`)
 * `opts::Dict`: the optional arguments (defaults to `Dict{Symbol, Any}()`)
 """
-function DefaultHandler(filename::AbstractString, fmt::F=DefaultFormatter(), opts=Dict{Symbol, Any}(); levels=nothing) where {F<:Formatter}
+function DefaultHandler(
+    filename::AbstractString,
+    fmt::F=DefaultFormatter(),
+    opts=Dict{Symbol, Any}();
+    levels=nothing,
+) where {F<:Formatter}
+
     file = open(filename, "a")
     setup_opts(opts)
     handler = DefaultHandler(fmt, file, opts, Memento.Filter[], levels, "not_set")

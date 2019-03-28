@@ -1,7 +1,7 @@
 """
     Filter
 
-I wrapper around a function that takes a log `Record` and returns
+A wrapper around a function that takes a log `Record` and returns
 a bool whether to skip logging it.
 
 # Fields
