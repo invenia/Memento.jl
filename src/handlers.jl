@@ -1,15 +1,13 @@
 """
     Handler
 
-Manage formatting `Record`s and printing
-the resulting `String` to an `IO` type. All `Handler`
-subtypes must implement at least 1 `log(::Handler, ::Record)`
-method.
+Manage formatting `Record`s and logging the resulting `String`. All `Handler` subtypes must
+implement at least 1 `log(::Handler, ::Record)` method.
 
-NOTE: Handlers can useful if you need to special case logging behaviour
-based on the `Formatter`, `IO` and/or `Record` types.
+NOTE: Handlers can be useful if you need to special case logging behaviour based on the
+`Formatter`, `IO` and/or `Record` types.
 """
-abstract type Handler{F<:Formatter, O<:IO} end
+abstract type Handler{F<:Formatter} end
 
 """
     getlevel(::Handler) -> AbstractString
@@ -76,7 +74,7 @@ Fields:
             )
         )```
 """
-mutable struct DefaultHandler{F, O} <: Handler{F, O}
+mutable struct DefaultHandler{F, O<:IO} <: Handler{F}
     fmt::F
     io::O
     opts::Dict{Symbol, Any}
