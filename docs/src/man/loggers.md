@@ -1,6 +1,6 @@
 # [Loggers](@id man_loggers)
 
-A [`Logger`](@ref) is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default "root" logger stored in global `_loggers` inside the `Memento` module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code.
+A [`Logger`](@ref) is the primary component you use to send formatted log messages to various IO outputs. This type holds information needed to manage the process of creating and storing logs. There is a default "root" logger stored in const `_loggers` inside the `Memento` module. Since Memento implements hierarchical logging you should define child loggers that can be configured independently and better describe the individual components within your code.
 To create a new logger for you code it is recommended to do `getlogger(current_module())`.
 
 ```julia

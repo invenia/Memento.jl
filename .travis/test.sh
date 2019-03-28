@@ -25,14 +25,12 @@ elif [[ "$TEST_TYPE" == "bench" ]]; then
 elif [[ "$TEST_TYPE" == "userimage" ]]; then
     # Create a user image which includes Memento to make sure that _loggers is assigned at compile-time
     # See: https://github.com/invenia/Memento.jl/pull/21
-    julia --color=yes --project=. -e '
-        using Libdl
-        LIB_PATH = abspath(Sys.BINDIR, Base.LIBDIR)
-        sysimg_lib = joinpath(LIB_PATH, "julia", "sys.$(Libdl.dlext)")
-        userimg_o = "userimg.o"
-        userimg_lib = "userimg.$(Libdl.dlext)"
-        code = "Base.reinit_stdio(); using Memento; using Test; logger = getlogger(\"Test\")"
-        run(`$(Base.julia_cmd()) --output-o $userimg_o --sysimage $sysimg_lib --startup-file=no -e "$code"`)
-        run(`cc -shared -o $userimg_lib $userimg_o -ljulia -L$LIB_PATH`)
+    echo "using Pkg; Pkg.add(PackageSpec(name=\"Memento\", rev=\"$TRAVIS_BRANCH\")); using Memento; using Test; logger = getlogger(\"Test\")" > userimg.jl
+
+    julia --color=yes -e '
+        using Pkg
+        Pkg.add("PackageCompiler")
+        using PackageCompiler: build_sysimg, default_sysimg_path
+        build_sysimg(default_sysimg_path(), joinpath(pwd(), "userimg.jl"))
     '
 fi
