@@ -81,7 +81,7 @@ instead of `getindex`.
 """
 abstract type AttributeRecord <: Record end
 
-Base.getindex(rec::Record, attr::Symbol) = getfield(rec, attr)
+Base.getindex(rec::T, attr::Symbol) where {T <: Record} = getproperty(rec, attr)
 Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
@@ -97,21 +97,10 @@ function Base.iterate(rec::T, state=0) where T <: AttributeRecord
     return (fieldname(T, state) => get(getfield(rec, state)), state)
 end
 
-function getattribute end  # Remove when depwarn in `getindex` is removed
+Base.getproperty(rec::AttributeRecord, attr::Symbol) = get(getfield(rec, attr))
 
-function Base.getindex(rec::AttributeRecord, attr::Symbol)
-    if hasmethod(Memento.getattribute, (typeof(rec), Symbol))
-        Base.depwarn(
-            "Memento.getattribute is deprecated. Subtypes of `AttributeRecord` should " *
-            "implement Base.getproperty(::MyRecord, ::Symbol) instead.",
-            :getattribute
-        )
-        return get(getattribute(rec, attr))
-    end
-    return get(getproperty(rec, attr))
-end
+@deprecate getindex(rec::AttributeRecord, attr::Symbol) getproperty(rec::AttributeRecord, attr::Symbol)
 
-Base.getproperty(rec::AttributeRecord, attr::Symbol) = getfield(rec, attr)
 
 """
     Dict(rec::Record)

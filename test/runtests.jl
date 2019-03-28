@@ -44,9 +44,9 @@ end
 
 function Base.getproperty(::ConstRecord, attr::Symbol)
     if attr === :level
-        return Memento.Attribute(() -> "error")
+        return "error"
     elseif attr === :msg
-        return Memento.Attribute(() -> "It's a ConstRecord")
+        return "It's a ConstRecord"
     else
         throw(KeyError(attr))
     end

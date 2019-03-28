@@ -4,8 +4,10 @@
     # NOTE: This check might not be needed as of 0.6 because I can't find a
     # condition where the stacktrace is empty.
     no_lookup = DefaultRecord(
-        rec.date, rec.level, rec.levelnum, rec.msg, rec.name, rec.pid,
-        Memento.Attribute(nothing), rec.stacktrace
+        Memento.Attribute(rec.date), Memento.Attribute(rec.level),
+        Memento.Attribute(rec.levelnum), Memento.Attribute(rec.msg),
+        Memento.Attribute(rec.name), Memento.Attribute(rec.pid),
+        Memento.Attribute(nothing), Memento.Attribute(rec.stacktrace)
     )
 
     @testset "DefaultFormatter" begin
