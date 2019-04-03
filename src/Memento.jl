@@ -37,9 +37,6 @@ const _log_levels = Dict{AbstractString, Int}(
     "emergency" => 80
 )
 
-global _loggers
-global LOGGER
-
 include("io.jl")
 include("records.jl")
 include("filters.jl")
@@ -53,12 +50,15 @@ include("exceptions.jl")
 include("memento_test.jl")
 include("deprecated.jl")
 
-function __init__()
-    global _loggers = Dict{AbstractString, Logger}(
-        "root" => Logger("root"),
-    )
-    global LOGGER = getlogger(@__MODULE__)
+# Initializing at compile-time will work as long as the loggers which are added do not
+# contain references to STDOUT.
+const _loggers = Dict{AbstractString, Logger}(
+    "root" => Logger("root"),
+)
 
+const LOGGER = getlogger(@__MODULE__)
+
+function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)
     Memento.register(LOGGER)
 end
