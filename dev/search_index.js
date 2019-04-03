@@ -157,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Records",
     "title": "AttributeRecords",
     "category": "section",
-    "text": "An AttributeRecord is an abstract subtype of Record that lazily evaluates its properties. Fields are stored as Attributes, which will evaluate a function and cache the result the first time it is read.By default, any subtypes of AttributeRecord will expect its fields to be Attributes. Non-standard subtypes of AttributeRecord should implement Memento.getattribute(::MyRecord, ::Symbol) and key-value pair iteration, where the values have been extracted from Attributes using get."
+    "text": "An AttributeRecord is an abstract subtype of Record that lazily evaluates its properties. Fields are stored as Attributes, which will evaluate a function and cache the result the first time it is read.By default, any subtypes of AttributeRecord will expect its fields to be Attributes. Non-standard subtypes of AttributeRecord should implement Base.getproperty(::MyRecord, ::Symbol) and key-value pair iteration, where the values have been extracted from Attributes using get."
 },
 
 {
@@ -629,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Public",
     "title": "Memento.AttributeRecord",
     "category": "type",
-    "text": "AttributeRecord <: Record\n\nA Record which stores its properties as Attributes for lazy evaluation.\n\nCalling getindex or iterating will evaluate and cache the properties accessed.\n\nSubtypes of AttributeRecord should implement Memento.getattribute(::MyRecord, ::Symbol) instead of getindex.\n\n\n\n\n\n"
+    "text": "AttributeRecord <: Record\n\nA Record which stores its properties as Attributes for lazy evaluation.\n\nCalling getindex or iterating will evaluate and cache the properties accessed.\n\nSubtypes of AttributeRecord should implement Base.getproperty(::MyRecord, ::Symbol) instead of getindex.\n\n\n\n\n\n"
 },
 
 {
@@ -950,14 +950,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Memento.get_trace",
     "category": "method",
     "text": "get_trace()\n\nReturns the StackTrace with StackFrames from the Memento module filtered out.\n\n\n\n\n\n"
-},
-
-{
-    "location": "api/private/#Memento.getattribute-Tuple{AttributeRecord,Symbol}",
-    "page": "Private",
-    "title": "Memento.getattribute",
-    "category": "method",
-    "text": "getattribute(rec::AttributeRecord, attr::Symbol)\n\n\n\n\n\n"
 },
 
 {
