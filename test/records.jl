@@ -26,8 +26,8 @@
             rec = DefaultRecord("Logger.example", "info", 20, "blah")
 
             @test haskey(rec, :date)
-            @test rec[:date] == get(rec.date)
-            @test get(rec.date) == something(rec.date.x)
+            @test rec[:date] == rec.date
+            @test rec.date == something(rec.date)
 
             dict = Dict(rec)
             @test rec[:date] == dict[:date]

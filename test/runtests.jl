@@ -42,11 +42,11 @@ SimpleRecord(level, msg) = SimpleRecord(level, msg, Dates.now(tz"UTC"))
 struct ConstRecord <: AttributeRecord
 end
 
-function Memento.getattribute(::ConstRecord, attr::Symbol)
+function Base.getproperty(::ConstRecord, attr::Symbol)
     if attr === :level
-        return Memento.Attribute(() -> "error")
+        return "error"
     elseif attr === :msg
-        return Memento.Attribute(() -> "It's a ConstRecord")
+        return "It's a ConstRecord"
     else
         throw(KeyError(attr))
     end
