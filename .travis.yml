@@ -15,12 +15,6 @@ matrix:
   allow_failures:
     - julia: nightly
     - env: TEST_TYPE=bench
-    - julia: 0.7
-      env: TEST_TYPE=userimage
-    - julia: 1.0
-      env: TEST_TYPE=userimage
-    - julia: 1.1
-      env: TEST_TYPE=userimage
   include:
     - if: branch = master
       julia: 1.0

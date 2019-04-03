@@ -203,7 +203,7 @@ Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
 end
 
 
-# Test files should assume the global _loggers has been reset
+# Test files should assume the const _loggers has been reset
 for file in files
     Memento.reset!()
     include(file)
