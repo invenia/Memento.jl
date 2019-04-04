@@ -67,7 +67,7 @@ abstract type Record <: AbstractDict{Symbol, Any} end
 
 Returns the record level.
 """
-getlevel(rec::Record) = rec[:level]
+getlevel(rec::Record) = rec.level
 
 """
     AttributeRecord <: Record

@@ -11,7 +11,7 @@ import Syslogs
 import JSON
 using TimeZones
 
-import Base: show, error, log
+import Base: show, error, log, getindex
 
 export info, warn, debug, notice, error, critical, alert, emergency,
        isset, isroot, ispropagating, setpropagating!,
