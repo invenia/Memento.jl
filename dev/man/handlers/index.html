@@ -12,6 +12,6 @@ end</code></pre><p>However, under some circumstances it may be necessary to cust
 
 function emit(handler::MyHandler{F, O}, rec::Record) where {F&lt;:Formatter, O&lt;:Syslog}
     str = Memento.format(handler.fmt, rec)
-    println(handler.io, rec[:level], str)
+    println(handler.io, rec.level, str)
     flush(handler.io)
 end</code></pre><footer><hr/><a class="previous" href="../loggers/"><span class="direction">Previous</span><span class="title">Loggers</span></a><a class="next" href="../formatters/"><span class="direction">Next</span><span class="title">Formatters</span></a></footer></article></body></html>
