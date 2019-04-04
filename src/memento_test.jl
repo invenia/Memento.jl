@@ -113,12 +113,12 @@ function Base.log(handler::TestHandler, rec::Record)
     level = getlevel(rec)
 
     # Uncomment the lines below to debug issues with the `TestHandler`
-    # println(string("Record: ", level, ", ", rec[:msg]))
+    # println(string("Record: ", level, ", ", rec.msg))
     # println(string("Search: ", handler.level, ", ", handler.msg))
-    # println(string("Found: ", level == handler.level && occursin_msg(handler.msg, String(rec[:msg]))))
+    # println(string("Found: ", level == handler.level && occursin_msg(handler.msg, String(rec.msg))))
 
-    if level == handler.level && occursin_msg(handler.msg, String(rec[:msg]))
-        handler.found = (level, rec[:msg])
+    if level == handler.level && occursin_msg(handler.msg, String(rec.msg))
+        handler.found = (level, rec.msg)
     end
 end
 

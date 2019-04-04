@@ -310,7 +310,7 @@
                 setlevel!(handler, "warn")
                 # add_filter(
                 #     handler,
-                #     Filter((rec) -> rec[:levelnum] >= LEVELS["warn"])
+                #     Filter((rec) -> rec.levelnum >= LEVELS["warn"])
                 # )
 
                 Memento.info(logger, "This shouldn't get logged")

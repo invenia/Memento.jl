@@ -10,7 +10,7 @@ using Syslogs
 # Define a 2 line glue method as the `Syslog` type requires a level argument be passed into
 # the `println` method.
 function Memento.emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
-    println(handler.io, rec[:level], format(handler.fmt, rec))
+    println(handler.io, rec.level, format(handler.fmt, rec))
     flush(handler.io)
 end
 

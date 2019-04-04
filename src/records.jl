@@ -55,9 +55,9 @@ A dictionary-like container with `Symbol` keys used to store information about a
 including the msg, date, level, stacktrace, etc. `Formatter`s use `Records` to format log
 message strings.
 
-You can access the properties of a `Record` by using `getindex` (ie: record[:msg]).
+You can access the properties of a `Record` by using `getproperty` (ie: record.msg).
 
-Subtypes of `Record` should implement `getindex(::MyRecord, ::Symbol)` and key-value pair
+Subtypes of `Record` should implement `getproperty(::MyRecord, ::Symbol)` and key-value pair
 iteration.
 """
 abstract type Record <: AbstractDict{Symbol, Any} end
@@ -74,14 +74,11 @@ getlevel(rec::Record) = rec.level
 
 A `Record` which stores its properties as `Attribute`s for lazy evaluation.
 
-Calling `getindex` or iterating will evaluate and cache the properties accessed.
-
-Subtypes of `AttributeRecord` should implement `Base.getproperty(::MyRecord, ::Symbol)`
-instead of `getindex`.
+Calling `getproperty` or iterating will evaluate and cache the properties accessed.
 """
 abstract type AttributeRecord <: Record end
 
-Base.getindex(rec::T, attr::Symbol) where {T <: Record} = getproperty(rec, attr)
+@deprecate getindex(rec::T, attr::Symbol) where {T <: Record} getproperty(rec, attr)
 Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
@@ -98,8 +95,6 @@ function Base.iterate(rec::T, state=0) where T <: AttributeRecord
 end
 
 Base.getproperty(rec::AttributeRecord, attr::Symbol) = get(getfield(rec, attr))
-
-@deprecate getindex(rec::AttributeRecord, attr::Symbol) getproperty(rec::AttributeRecord, attr::Symbol)
 
 
 """

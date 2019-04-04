@@ -26,7 +26,7 @@ using Syslogs
 
 function emit(handler::MyHandler{F, O}, rec::Record) where {F<:Formatter, O<:Syslog}
     str = Memento.format(handler.fmt, rec)
-    println(handler.io, rec[:level], str)
+    println(handler.io, rec.level, str)
     flush(handler.io)
 end
 ```

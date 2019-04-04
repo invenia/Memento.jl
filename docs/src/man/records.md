@@ -1,10 +1,10 @@
 # [Records](@id man_records)
 
 Records store information about log events (e.g., message, timestamp, log level) that is used by [`Formatter`](@ref)s to format log messages.
-A record behaves as a dictionary-like container with `Symbol` keys, and you can access the properties of a [`Record`](@ref) by using `getindex` (i.e., `record[:msg]`).
+A record behaves as a dictionary-like container with `Symbol` keys, and you can access the properties of a [`Record`](@ref) by using `getproperty` (i.e., `record.msg`).
 
 By default, any subtypes of [`Record`](@ref) will treat its fields as keys.
-Non-standard subtypes of [`Record`](@ref) should implement `getindex(::MyRecord, ::Symbol)` and key-value pair iteration.
+Non-standard subtypes of [`Record`](@ref) should implement `getproperty(::MyRecord, ::Symbol)` and key-value pair iteration.
 
 ## AttributeRecords
 
