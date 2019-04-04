@@ -132,7 +132,7 @@ flush(io::REST) = io
 # We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`
 function log(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}
     msg = format(handler.fmt, rec)
-    println(handler.io, rec[:level], msg)
+    println(handler.io, rec.level, msg)
     flush(handler.io)
 end
 

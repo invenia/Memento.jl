@@ -66,7 +66,7 @@ Base.push!(handler::FilterHandler, filter::Memento.Filter) = push!(handler.filte
 Memento.getfilters(handler::FilterHandler) = handler.filters
 
 function Memento.emit(handler::Union{SimplestHandler, FilterHandler}, record::Record)
-    println(handler.buf, record[:msg])
+    println(handler.buf, record.msg)
 end
 
 struct AsyncHandler <: Handler{Union{}, IOBuffer}
@@ -87,7 +87,7 @@ end
 function process_record!(handler::AsyncHandler)
     while isopen(handler.channel)
         record = take!(handler.channel)
-        println(handler.buf, record[:msg])
+        println(handler.buf, record.msg)
     end
 end
 
@@ -95,7 +95,7 @@ function Memento.emit(handler::AsyncHandler, record::Record)
     put!(handler.channel, record)
 end
 
-_props(cr::ConstRecord) = (:level => cr[:level], :msg => cr[:msg])
+_props(cr::ConstRecord) = (:level => cr.level, :msg => cr.msg)
 
 Base.iterate(cr::ConstRecord, state...) = iterate(_props(cr), state...)
 

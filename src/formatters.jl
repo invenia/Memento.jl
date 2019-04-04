@@ -57,7 +57,7 @@ function format(fmt::DefaultFormatter, rec::Record)
         value = content
 
         if token.second
-            tmp_val = rec[content]
+            tmp_val = getproperty(rec, content)
 
             if content === :lookup
                 name, file, line = if isa(tmp_val, StackFrame)
@@ -131,7 +131,7 @@ function format(fmt::DictFormatter, rec::Record)
     dict = Dict{Symbol, Any}()
 
     for (alias, key) in aliases
-        tmp_val = rec[key]
+        tmp_val = getproperty(rec, key)
 
         if key === :date
             value = string(tmp_val)
