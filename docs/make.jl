@@ -3,11 +3,13 @@ using Memento
 
 makedocs(
     modules=[Memento, Memento.TestUtils],
-    format=Documenter.HTML(prettyurls=(get(ENV, "CI", nothing) == "true")),
+    format=Documenter.HTML(
+        prettyurls=get(ENV, "CI", nothing) == "true",
+        assets=["assets/invenia.css"],
+    ),
     repo="https://github.com/invenia/Memento.jl/blob/{commit}{path}#L{line}",
     sitename="Memento.jl",
     authors="Invenia Technical Computing Corporation and contributors.",
-    assets = ["assets/invenia.css"],
     pages=Any[
         "Home" => "index.md",
         "Manual" => Any[
