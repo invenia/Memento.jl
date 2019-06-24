@@ -98,7 +98,7 @@ end
 """
     @test_warn(logger, msg, expr)
 
-Convenience macro that calls `Memento.TestUtils.@test_log(logger, "warn", msg, expr)`.
+Convenience macro that calls [`@test_log(logger, "warn", msg, expr)`](@ref @test_log).
 """
 macro test_warn(logger, msg, expr)
     quote
@@ -109,7 +109,7 @@ end
 """
     @test_throws(logger, extype, expr)
 
-Disables the `logger` and calls `@test_throws extype expr`.
+Disables the `logger` and calls [`@test_throws extype expr`](https://docs.julialang.org/en/v1/stdlib/Test/#Test.@test_throws).
 """
 macro test_throws(logger, extype, expr)
     quote
