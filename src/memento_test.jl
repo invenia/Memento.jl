@@ -19,8 +19,31 @@ occursin_msg(S::Union{AbstractArray,Tuple}, output) = all(s -> occursin_msg(s, o
 """
     @test_log(logger, level, msg, expr)
 
-Adds a temporary test handler to the `logger` that checks for a record with the `level` and
-`msg` before executing the `expr`. The handler is always removed after executing `expr`.
+Test that the expression `expr` emits a record in the `logger` with the specified `level`
+string and contains the `msg` string or matches the `msg` regular expression.
+If `msg` is a boolean function, tests whether `msg(output)` returns true.
+If `msg` is a tuple or array, checks that the output contains/matches each item in `msg`.
+Returns the result of evaluating `expr`.
+
+This will temporarily add a test handler to the `logger` which will always be removed after
+executing the expression.
+
+See also [`@test_nolog`](@ref) to check for the absence of a record.
+
+## Example
+```jldoctest
+julia> using Memento, Memento.TestUtils
+
+julia> logger = getlogger("test_log");
+
+julia> m = "Hello World!";
+
+julia> @test_log logger "info" "Hello" info(logger, m)
+
+julia> @test_log logger "info" r"^Hello" info(logger, m)
+
+julia> @test_log logger "info" ("Hello", r"World!\$") info(logger, m)  # All elements occursin
+```
 """
 macro test_log(logger, level, msg, expr)
     quote
@@ -46,9 +69,10 @@ end
 """
     @test_nolog(logger, level, msg, expr)
 
-Adds a temporary test handler to the `logger` that checks that there was no log record with
-the expected `level` and `msg` before executing the `expr`. The handler is always removed
-after executing `expr`.
+Test that the expression `expr` does not emit a record in the `logger` with the specified
+`level` string containing the `msg` string or matching the `msg` regular expression.
+
+See also [`@test_log`](@ref) for further details.
 """
 macro test_nolog(logger, level, msg, expr)
     quote
@@ -74,7 +98,7 @@ end
 """
     @test_warn(logger, msg, expr)
 
-Convenience macro that calls `Memento.TestUtils.@test_log(logger, "warn", msg, expr)`.
+Convenience macro that calls [`@test_log(logger, "warn", msg, expr)`](@ref @test_log).
 """
 macro test_warn(logger, msg, expr)
     quote
@@ -85,7 +109,7 @@ end
 """
     @test_throws(logger, extype, expr)
 
-Disables the `logger` and calls `@test_throws extype, expr`.
+Disables the `logger` and calls [`@test_throws extype expr`](https://docs.julialang.org/en/v1/stdlib/Test/#Test.@test_throws).
 """
 macro test_throws(logger, extype, expr)
     quote
