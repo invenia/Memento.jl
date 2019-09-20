@@ -1,17 +1,17 @@
 import Base.CoreLogging:
     AbstractLogger,
+    LogLevel,
     handle_message,
     min_enabled_level,
     shouldlog,
-    global_logger,
-    Debug
+    global_logger
 
-const LEVEL_MAP = Dict{AbstractString}
 struct CoreLogger <: AbstractLogger
+    min_level::LogLevel
 end
 
-min_enabled_level(logger::CoreLogger) = Debug
-shouldlog(logger::CoreLogger, arags...) = true
+min_enabled_level(logger::CoreLogger) = logger.min_level
+shouldlog(logger::CoreLogger, args...) = true
 
 function handle_message(::CoreLogger, cl_level, msg, mod, group, id, filepath, line; kwargs...)
     logger = getlogger(mod)
@@ -19,7 +19,7 @@ function handle_message(::CoreLogger, cl_level, msg, mod, group, id, filepath, l
     log(logger, logger.record(logger.name, level, getlevels(logger)[level], msg))
 end
 
-function substitute!()
-    global_logger(CoreLogger())
+function substitute!(level::LogLevel=min_enabled_level(global_logger()))
+    global_logger(CoreLogger(level))
     notice(getlogger(@__MODULE__), "Substituting global logging with Memento")
 end
