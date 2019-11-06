@@ -44,7 +44,7 @@ mutable struct EC2Record <: AttributeRecord
             Attribute(levelnum),
             Attribute{AbstractString}(msg),
             Attribute(name),
-            Attribute(myid()),
+            Attribute(getpid()),
             Attribute{StackFrame}(get_lookup(trace)),
             trace,
             Attribute(ENV["INSTANCE_ID"]),

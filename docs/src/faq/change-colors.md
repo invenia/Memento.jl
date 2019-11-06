@@ -3,10 +3,9 @@
 Colors can be enabled/disabled and set using via the `is_colorized` and `colors` options to the `DefaultHandler`.
 
 ```julia
-julia> add_handler(logger, DefaultHandler(
-    STDOUT, DefaultFormatter(),
-    Dict{Symbol, Any}(:is_colorized => true)),
-    "console"
+julia> push!(logger, DefaultHandler(
+    stdout, DefaultFormatter(),
+    Dict{Symbol, Any}(:is_colorized => true))
 )
 ```
 will create a `DefaultHandler` with colorization.
@@ -30,8 +29,8 @@ Dict{AbstractString, Symbol}(
 However, you can specify custom colors/log levels like so:
 
 ```julia
-add_handler(logger, DefaultHandler(
-    STDOUT, DefaultFormatter(),
+push!(logger, DefaultHandler(
+    stdout, DefaultFormatter(),
     Dict{Symbol, Any}(
         :colors => Dict{AbstractString, Symbol}(
             "trace" => :magenta,
@@ -41,8 +40,7 @@ add_handler(logger, DefaultHandler(
             "error" => :red,
             "panic" => :green,
         )
-    ),
-    "console"
+    )
 )
 ```
 

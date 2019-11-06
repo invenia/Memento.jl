@@ -53,7 +53,7 @@ include("memento_test.jl")
 include("deprecated.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
-# contain references to STDOUT.
+# contain references to stdout.
 const _loggers = Dict{AbstractString, Logger}(
     "root" => Logger("root"),
 )
