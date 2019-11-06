@@ -6,9 +6,9 @@ Detailed docs on contributing to Julia packages can be found [here](http://docs.
 
 To start hacking code or writing docs, simply:
 
-1. `julia> Pkg.add("Memento"); Pkg.checkout("Memento")`
+1. `julia> using Pkg; Pkg.develop("Memento")`
 2. Make your changes.
-3. Test your changes with `julia --compilecache=no -e 'Pkg.test("Memento"; coverage=true)'`
+3. Test your changes with `julia --compiled-modules=no -e 'using Pkg; Pkg.test("Memento"; coverage=true)'`
 4. Check that your changes haven't reduced the test coverage. From the root Memento package folder run `julia -e 'using Coverage; Coverage.get_summary(process_folder())'`.
 5. Make a pull request to [Memento](https://github.com/invenia/Memento.jl) and share your changes with the rest of the community.
 
