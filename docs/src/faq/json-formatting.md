@@ -8,12 +8,11 @@ However, the original behaviour can still be easily achieved by passing in `JSON
 ```julia
 using JSON
 
-add_handler(
+push!(
     logger,
     DefaultHandler(
         "json-output.log",
         DictFormatter(JSON.json)
-    ),
-    "JSON"
+    )
 )
 ```

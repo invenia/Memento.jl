@@ -160,7 +160,7 @@ function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::In
         Attribute(levelnum),
         Attribute{AbstractString}(msg),
         Attribute(name),
-        Attribute(myid()),
+        Attribute(getpid()),
         Attribute{Union{StackFrame, Nothing}}(get_lookup(trace)),
         trace,
     )

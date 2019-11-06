@@ -11,6 +11,6 @@ critical(logger, "The world is exploding")
 child_logger = getlogger("Foo.bar")
 setlevel!(child_logger, "warn")
 push!(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} | {level} | {name}]: {msg}")));
-debug(child_logger, "Something that should only be printed to STDOUT on the root_logger.")
-warn(child_logger, "Warning to STDOUT and the log file.")
+debug(child_logger, "Something that should only be printed to stdout on the root_logger.")
+warn(child_logger, "Warning to stdout and the log file.")
 exit()
