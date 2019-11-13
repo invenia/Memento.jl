@@ -15,6 +15,7 @@ occursin_msg(s::AbstractString, output) = occursin(s, output)
 occursin_msg(s::Regex, output) = occursin(s, output)
 occursin_msg(s::Function, output) = s(output)
 occursin_msg(S::Union{AbstractArray,Tuple}, output) = all(s -> occursin_msg(s, output), S)
+occursin_msg(s, ::Nothing) = false  # Fallback, but shouldn't be needed
 
 """
     @test_log(logger, level, msg, expr)
@@ -56,8 +57,11 @@ macro test_log(logger, level, msg, expr)
 
             setpropagating!($(esc(logger)), false) do
                 ret = $(esc(expr))
-                @test handler.found[1] == $(esc(level))
-                @test occursin_msg($(esc(msg)), handler.found[2])
+
+                @test(
+                    handler.found[1] == $(esc(level)) &&
+                    occursin_msg($(esc(msg)), handler.found[2])
+                )
                 ret
             end
         finally

@@ -24,6 +24,7 @@
         @test_nolog(logger, "info", msg, Memento.debug(logger, msg))
         @test_nolog(logger, "info", msg, Memento.info(logger, different_msg))
         @test_nolog(logger, "info", msg, Memento.warn(logger, different_msg))
+        @test_nolog(logger, "info", r".*foo.*", Memento.info(logger, "baz"))
     end
 
     @testset "@test_warn" begin
