@@ -21,11 +21,12 @@ julia>setlevel!(getlogger("Main"), "info")
 ```
 Will only set the logging level to "info" for the "Main" logger and any future children of the "Main" logger.
 
-By default Memento has 9 logging levels.
+By default Memento has 10 logging levels.
 
 Level | Number | Description
 --- | --- | ---
 not_set | 0 | Will not log anything, but may still propagate messages to its parents.
+trace | 5 | Log messages only intended for tracing program execution.
 debug | 10 | Log verbose message used for debugging.
 info | 20 | Log general information about a program.
 notice | 30 | Log important events that are still part of normal execution.
