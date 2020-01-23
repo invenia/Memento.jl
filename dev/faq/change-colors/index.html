@@ -4,6 +4,7 @@
     Dict{Symbol, Any}(:is_colorized =&gt; true)),
     &quot;console&quot;
 )</code></pre><p>will create a <code>DefaultHandler</code> with colorization.</p><p>By default the following colors are used:</p><pre><code class="language-julia">Dict{AbstractString, Symbol}(
+    &quot;trace&quot; =&gt; :normal,
     &quot;debug&quot; =&gt; :blue,
     &quot;info&quot; =&gt; :green,
     &quot;notice&quot; =&gt; :cyan,
@@ -16,11 +17,12 @@
     STDOUT, DefaultFormatter(),
     Dict{Symbol, Any}(
         :colors =&gt; Dict{AbstractString, Symbol}(
+            &quot;trace&quot; =&gt; :trace,
             &quot;debug&quot; =&gt; :black,
             &quot;info&quot; =&gt; :blue,
             &quot;warn&quot; =&gt; :yellow,
             &quot;error&quot; =&gt; :red,
-            &quot;crazy&quot; =&gt; :green
+            &quot;panic&quot; =&gt; :green,
         )
     ),
     &quot;console&quot;
