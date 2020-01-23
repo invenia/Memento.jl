@@ -96,9 +96,9 @@ end
 # A really simple CSVFormatter
 mutable struct CSVFormatter <: Formatter
     delim::Char
-    vals::Array{Symbol}
+    vals::Vector{Symbol}
 
-    CSVFormatter(delim=',', vals=Array{Symbol}()) = new(delim, vals)
+    CSVFormatter(delim=',', vals=Vector{Symbol}()) = new(delim, vals)
 end
 
 function format(fmt::CSVFormatter, rec::Record)
