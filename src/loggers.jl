@@ -464,6 +464,7 @@ Logs the message at the $level level.
 
 Logs the message produced by the provided function at the $level level.
 """
+@doc msg("trace") trace
 @doc msg("debug") debug
 @doc msg("info") info
 @doc msg("notice") notice
