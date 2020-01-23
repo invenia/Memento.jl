@@ -125,14 +125,14 @@ macro test_throws(logger, extype, expr)
     end
 end
 
-mutable struct TestHandler{F, O} <: Handler{F, O}
+mutable struct TestHandler{F} <: Handler{F}
     level::String
     msg
     found::Tuple
 end
 
 function TestHandler(level, msg)
-    TestHandler{DefaultFormatter, IOBuffer}(
+    TestHandler{DefaultFormatter}(
         String(level), msg, (EMPTY_MATCH, EMPTY_MATCH)
     )
 end

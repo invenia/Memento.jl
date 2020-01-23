@@ -52,11 +52,11 @@ function Base.getproperty(::ConstRecord, attr::Symbol)
     end
 end
 
-struct SimplestHandler <: Handler{Union{}, IOBuffer}
+struct SimplestHandler <: Handler{Union{}}
     buf::IOBuffer
 end
 
-struct FilterHandler <: Handler{Union{}, IOBuffer}
+struct FilterHandler <: Handler{Union{}}
     buf::IOBuffer
     filters::Vector{Memento.Filter}
 end
@@ -69,7 +69,7 @@ function Memento.emit(handler::Union{SimplestHandler, FilterHandler}, record::Re
     println(handler.buf, record.msg)
 end
 
-struct AsyncHandler <: Handler{Union{}, IOBuffer}
+struct AsyncHandler <: Handler{Union{}}
     buf::IOBuffer
     channel::Channel{Record}
 
