@@ -15,6 +15,7 @@ By default the following colors are used:
 
 ```julia
 Dict{AbstractString, Symbol}(
+    "trace" => :normal,
     "debug" => :blue,
     "info" => :green,
     "notice" => :cyan,
@@ -33,11 +34,12 @@ add_handler(logger, DefaultHandler(
     STDOUT, DefaultFormatter(),
     Dict{Symbol, Any}(
         :colors => Dict{AbstractString, Symbol}(
+            "trace" => :trace,
             "debug" => :black,
             "info" => :blue,
             "warn" => :yellow,
             "error" => :red,
-            "crazy" => :green
+            "panic" => :green,
         )
     ),
     "console"

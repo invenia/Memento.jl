@@ -13,7 +13,7 @@ using TimeZones
 
 import Base: show, error, log, getindex
 
-export info, warn, debug, notice, error, critical, alert, emergency,
+export info, warn, debug, trace, notice, error, critical, alert, emergency,
        isset, isroot, ispropagating, setpropagating!,
        getlevel, setlevel!, addlevel!, setrecord!,
        getlogger, gethandlers, getfilters, format, emit,
@@ -27,6 +27,7 @@ const DEFAULT_LOG_LEVEL = "info"
 
 const _log_levels = Dict{AbstractString, Int}(
     "not_set" => 0,
+    "trace" => 5,
     "debug" => 10,
     "info" => 20,
     "notice" => 30,

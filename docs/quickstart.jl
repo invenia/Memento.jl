@@ -1,7 +1,8 @@
 # Copy and paste these line into a REPL and screen capture to produce the
 # sample usage image.
 using Memento
-logger = Memento.config!("debug"; fmt="[{level} | {name}]: {msg}")
+logger = Memento.config!("trace"; fmt="[{level} | {name}]: {msg}")
+trace(logger, "Some code you're tracing.")
 debug(logger, "Something to help you track down a bug.")
 info(logger, "Something you might want to know.")
 notice(logger, "This is probably pretty important.")
