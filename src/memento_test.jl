@@ -3,6 +3,7 @@ module TestUtils
 using ..Memento
 using Test
 
+# Needed to extend these macros
 import Test: @test_warn, @test_throws
 
 export @test_log, @test_nolog

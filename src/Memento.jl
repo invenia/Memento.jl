@@ -7,11 +7,12 @@ using Sockets
 using Distributed
 using Serialization
 
-import Syslogs
-import JSON
+using Syslogs
+using JSON
 using TimeZones
 
-import Base: show, error, log, getindex
+# We're often extending these methods
+import Base: error, log
 
 export info, warn, debug, trace, notice, error, critical, alert, emergency,
        isset, isroot, ispropagating, setpropagating!,

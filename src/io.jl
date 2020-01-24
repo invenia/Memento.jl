@@ -1,5 +1,3 @@
-import Base.println, Base.flush
-
 const DEFAULT_MAX_FILE_SIZE = 5000 * 1028
 
 """
@@ -76,7 +74,7 @@ end
 Writes the string to a file and creates a new file if
 we've reached the max file size.
 """
-function println(f::FileRoller, s::AbstractString)
+function Base.println(f::FileRoller, s::AbstractString)
     if f.byteswritten > f.max_sz
         gf = getfile(f.folder, f.prefix)
         f.filepath = gf[1]
@@ -91,4 +89,4 @@ end
 
 Flushes the current open file.
 """
-flush(f::FileRoller) = flush(f.file)
+Base.flush(f::FileRoller) = flush(f.file)
