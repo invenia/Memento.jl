@@ -1,41 +1,47 @@
 language: julia
 os:
   - linux
+  - windows
 julia:
-  - 0.7  # Replace Memento.x(...) with x(...) where x is `info` or `warn` when dropping 0.7
   - 1.0
-  - 1.1
+  - 1.3
   - nightly
+arch:
+  - x64
+  - x86
 env:
   - TEST_TYPE=basic
   # - TEST_TYPE=bench
   - TEST_TYPE=userimage
-matrix:
-  fast_finish: true
-  allow_failures:
-    - julia: nightly
-    - env: TEST_TYPE=bench
-  include:
-    - if: branch = master
-      julia: 1.0
-      os: osx
-      env: TEST_TYPE=basic
-  exclude:
-    - julia: nightly
-      env: TEST_TYPE=userimage
-
-notifications:
-  email: false
 script:
   - ./.travis/test.sh
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
 jobs:
+  fast_finish: true
+  allow_failures:
+    - julia: nightly
+  # Don't bother running the userimage tests on nightly or windows
+  # also don't worry about linux 32-bit or windows 64-bit
+  exclude:
+    - julia: nightly
+      env: TEST_TYPE=userimage
+    - os: windows
+      env: TEST_TYPE=userimage
+    - os: linux
+      arch: x86
+    - os: windows
+      arch: x64
   include:
-    - stage: "Documentation"
+    - if: branch = master
       julia: 1.0
-      os: linux
-      script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl
+      os: osx
+      env: TEST_TYPE=basic
+    - stage: Documentation
+      julia: 1.0
+      script: julia --project=docs -e '
+          using Pkg;
+          Pkg.develop(PackageSpec(path=pwd()));
+          Pkg.instantiate();
+          include("docs/make.jl");'
       after_success: skip
