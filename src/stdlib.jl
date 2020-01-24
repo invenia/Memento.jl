@@ -1,4 +1,5 @@
-import Base.CoreLogging:
+using Base.CoreLogging:
+    CoreLogging,
     AbstractLogger,
     LogLevel,
     handle_message,
@@ -10,10 +11,20 @@ struct BaseLogger <: AbstractLogger
     min_level::LogLevel
 end
 
-min_enabled_level(logger::BaseLogger) = logger.min_level
-shouldlog(logger::BaseLogger, args...) = true
+CoreLogging.min_enabled_level(logger::BaseLogger) = logger.min_level
+CoreLogging.shouldlog(logger::BaseLogger, args...) = true
 
-function handle_message(::BaseLogger, cl_level, msg, mod, group, id, filepath, line; kwargs...)
+function CoreLogging.handle_message(
+    ::BaseLogger,
+    cl_level,
+    msg,
+    mod,
+    group,
+    id,
+    filepath,
+    line;
+    kwargs...
+)
     logger = getlogger(mod)
     level = lowercase(string(cl_level))
     log(logger, logger.record(logger.name, level, getlevels(logger)[level], msg))

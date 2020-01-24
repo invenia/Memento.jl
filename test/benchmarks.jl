@@ -2,7 +2,7 @@
 
 using PkgBenchmark
 
-import BenchmarkTools:
+using BenchmarkTools:
     BenchmarkGroup,
     TrialJudgement,
     prettydiff,
