@@ -34,7 +34,7 @@ add_handler(logger, DefaultHandler(
     STDOUT, DefaultFormatter(),
     Dict{Symbol, Any}(
         :colors => Dict{AbstractString, Symbol}(
-            "trace" => :trace,
+            "trace" => :magenta,
             "debug" => :black,
             "info" => :blue,
             "warn" => :yellow,
