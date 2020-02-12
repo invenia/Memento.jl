@@ -430,8 +430,18 @@ let
                     end
 
                     function $level(msg::Function, logger::Logger)
-                        log(msg, logger, $key)
-                        throw(ErrorException(msg()))
+                        # NOTE: We can't lazily evaluate do-blocks on errors or higher
+                        # because we need to determine whether the function returns
+                        # a string or an error type. We provide this syntax for readability
+                        # rather than performance.
+                        m = msg()
+                        if isa(m, String)
+                            log(logger, $key, m)
+                            throw(ErrorException(m))
+                        else
+                            log(logger, $key, sprint(io -> showerror(io, m)))
+                            throw(m)
+                        end
                     end
 
                     function $level(logger::Logger, exc::Exception)

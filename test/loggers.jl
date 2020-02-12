@@ -82,6 +82,21 @@
             @test occursin("Error numero uno", output)
             @test occursin("Error numero dos", output)
 
+            # Test using a do-block for logging and throwing an exception
+            @test_throws DomainError Memento.error(logger) do
+                DomainError(
+                    -1,
+                    string(
+                        "sqrt will only return a complex result if called with a complex ",
+                        "argument. Try sqrt(Complex(x))."
+                    ),
+                )
+            end
+
+            @test_throws ErrorException Memento.error(logger) do
+                "I'm an error msg."
+            end
+
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
             @test occursin("[fubar]:Logger.example - $msg", String(take!(io)))
