@@ -249,6 +249,7 @@ Sets the record type for the logger.
 function setrecord!(logger::Logger, rec::Type{R}; recursive=false) where {R<:Record}
     logger.record = rec
     recursive && setrecord!.(getchildren(logger.name), rec; recursive=true)
+    return rec
 end
 
 """
