@@ -435,12 +435,13 @@ let
                         # a string or an error type. We provide this syntax for readability
                         # rather than performance.
                         m = msg()
-                        if isa(m, AbstractString)
-                            log(logger, $key, m)
-                            throw(ErrorException(m))
-                        else
+                        if isa(m, Exception)
                             log(logger, $key, sprint(showerror, m))
                             throw(m)
+                        else
+                            s = isa(m, AbstractString) ? m : string(m)
+                            log(logger, $key, s)
+                            throw(ErrorException(s))
                         end
                     end
 

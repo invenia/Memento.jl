@@ -92,10 +92,12 @@
                     ),
                 )
             end
+            @test occursin("Try sqrt(Complex(x)).", String(take!(io)))
 
             @test_throws ErrorException Memento.error(logger) do
                 "I'm an error msg."
             end
+            @test occursin("I'm an error msg.", String(take!(io)))
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
