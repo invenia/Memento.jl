@@ -435,7 +435,7 @@ let
                         # a string or an error type. We provide this syntax for readability
                         # rather than performance.
                         m = msg()
-                        if isa(m, String)
+                        if isa(m, AbstractString)
                             log(logger, $key, m)
                             throw(ErrorException(m))
                         else
