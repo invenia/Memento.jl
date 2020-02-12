@@ -98,6 +98,21 @@
                 "I'm an error msg."
             end
             @test occursin("I'm an error msg.", String(take!(io)))
+            msg = "Failed to process stage Foo of program: "
+            @test_throws ErrorException try
+                sqrt(-1)
+            catch e
+                Memento.error(logger, msg, e)
+            end
+            @test occursin(msg, String(take!(io)))
+
+            msg = "Foo failed, falling back to method Bar: "
+            try
+                sqrt(-1)
+            catch e
+                Memento.warn(logger, msg, e)
+            end
+            @test occursin(msg, String(take!(io)))
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)

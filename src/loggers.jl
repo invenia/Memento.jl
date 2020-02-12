@@ -460,6 +460,12 @@ let
                         end
                         throw(exc)
                     end
+
+                    function $level(logger::Logger, msg::AbstractString, exc::Exception)
+                        e = ErrorException(msg * sprint(showerror, exc))
+                        log(logger, $key, sprint(showerror, e))
+                        throw(e)
+                    end
                 end
                 f = eval(level)
             end
@@ -507,6 +513,7 @@ If the exception is a `CompositeException`, each contained exception is logged, 
 
 """
     warn(logger::Logger, exc::Exception)
+    warn(logger::Logger, msg, exc::Exception)
 
 Takes an exception and logs it.
 If the exception is a `CompositeException`, each contained exception is logged.
@@ -519,4 +526,8 @@ function warn(logger::Logger, exc::CompositeException)
     for sub_exc in exc
         log(logger, "warn", sprint(io -> showerror(io, sub_exc)))
     end
+end
+
+function warn(logger::Logger, msg::AbstractString, exc::Exception)
+    log(logger, "warn", msg * sprint(showerror, exc))
 end
