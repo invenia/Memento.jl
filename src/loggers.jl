@@ -439,7 +439,7 @@ let
                             log(logger, $key, m)
                             throw(ErrorException(m))
                         else
-                            log(logger, $key, sprint(io -> showerror(io, m)))
+                            log(logger, $key, sprint(showerror, m))
                             throw(m)
                         end
                     end
