@@ -169,6 +169,18 @@
         @test all(==("info"), getlevel.(a_children))
     end
 
+    @testset "Recursive setrecord" begin
+        getlogger.(("foo.bar.baz", "a.b.c"))
+        foo_children = Memento.getchildren("foo")
+        a_children = Memento.getchildren("a")
+
+        @test all(==(DefaultRecord), getfield.(foo_children, :record))
+        setrecord!(getlogger("foo"), SimpleRecord; recursive=true)
+
+        @test all(==(SimpleRecord), getfield.(foo_children, :record))
+        @test all(==(DefaultRecord), getfield.(a_children, :record))
+    end
+
     @testset "Memento.config" begin
         root_logger = Memento.config!(
             "info";

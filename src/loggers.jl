@@ -246,7 +246,10 @@ Sets the record type for the logger.
 * `logger::Logger`: the logger to set.
 * `rec::Record`: A `Record` type to use for logging messages (ie: `DefaultRecord`).
 """
-setrecord!(logger::Logger, rec::Type{R}) where {R<:Record} = logger.record = rec
+function setrecord!(logger::Logger, rec::Type{R}; recursive=false) where {R<:Record}
+    logger.record = rec
+    recursive && setrecord!.(getchildren(logger.name), rec; recursive=true)
+end
 
 """
     getfilters(logger::Logger) -> Array{Filter}
