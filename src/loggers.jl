@@ -462,9 +462,9 @@ let
                     end
 
                     function $level(logger::Logger, msg::AbstractString, exc::Exception)
-                        e = ErrorException(msg * sprint(showerror, exc))
-                        log(logger, $key, sprint(showerror, e))
-                        throw(e)
+                        msg *= sprint(showerror, exc)
+                        log(logger, $key, msg)
+                        throw(ErrorException(msg))
                     end
                 end
                 f = eval(level)
