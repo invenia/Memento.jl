@@ -462,7 +462,7 @@ let
                     end
 
                     function $level(logger::Logger, msg::AbstractString, exc::Exception)
-                        msg *= sprint(showerror, exc)
+                        msg *= "\n" * sprint(showerror, exc)
                         log(logger, $key, msg)
                         throw(ErrorException(msg))
                     end
@@ -529,5 +529,5 @@ function warn(logger::Logger, exc::CompositeException)
 end
 
 function warn(logger::Logger, msg::AbstractString, exc::Exception)
-    log(logger, "warn", msg * sprint(showerror, exc))
+    log(logger, "warn", msg * "\n" * sprint(showerror, exc))
 end
