@@ -24,9 +24,11 @@ makedocs(
         "FAQ" => Any[
             "faq/another-logging-lib.md",
             "faq/change-colors.md",
+            "faq/config-recipes.md",
             "faq/logging-to-syslog.md",
             "faq/json-formatting.md",
             "faq/pkg-usage.md",
+            "faq/testing.md",
         ],
         "API" => Any[
             "api/public.md",
