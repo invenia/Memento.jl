@@ -1,4 +1,4 @@
-# Using Memento in Julia packages?
+# Using Memento in Julia packages?(@id pkg_usage)
 
 Some care needs to be taken when working with Memento from [precompiled modules](https://docs.julialang.org/en/latest/manual/modules/#Module-initialization-and-precompilation-1).
 Specifically, it is important to note that if you want folks be able to configure your logger from outside the module you'll want to register the logger in your `__init__()` method.
