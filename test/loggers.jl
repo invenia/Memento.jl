@@ -98,6 +98,25 @@
                 "I'm an error msg."
             end
             @test occursin("I'm an error msg.", String(take!(io)))
+            msg = "Failed to process stage Foo of program: "
+            @test_throws ErrorException try
+                sqrt(-1)  # Throws `DomainError`
+            catch e
+                Memento.error(logger, msg, e)
+            end
+            log_msg = String(take!(io))
+            @test occursin(msg, log_msg)
+            @test occursin("DomainError", log_msg)
+
+            msg = "Foo failed, falling back to method Bar: "
+            try
+                sqrt(-1)
+            catch e
+                Memento.warn(logger, msg, e)
+            end
+            log_msg = String(take!(io))
+            @test occursin(msg, log_msg)
+            @test occursin("DomainError", log_msg)
 
             msg = "Something went very wrong"
             log(logger, "fubar", msg)
