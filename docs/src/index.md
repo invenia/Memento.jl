@@ -65,14 +65,14 @@ julia> push!(child_logger, DefaultHandler(tempname(), DefaultFormatter("[{date} 
 
 Memento.DefaultHandler{Memento.DefaultFormatter,IOStream}(Memento.DefaultFormatter("[{date} | {level} | {name}]: {msg}"),IOStream(<file /var/folders/_6/25myjdtx2fxgjvznn19rp22m0000gn/T/julia8lonyA>),Dict{Symbol,Any}(Pair{Symbol,Any}(:is_colorized,false)))
 
-julia> debug(child_logger, "Something that should only be printed to STDOUT on the root_logger.")
-[debug | Foo.bar]: Something that should only be printed to STDOUT on the root_logger.
+julia> debug(child_logger, "Something that should only be printed to stdout on the root_logger.")
+[debug | Foo.bar]: Something that should only be printed to stdout on the root_logger.
 
-julia> warn(child_logger, "Warning to STDOUT and the log file.")
-[warn | Foo.bar]: Warning to STDOUT and the log file.
+julia> warn(child_logger, "Warning to stdout and the log file.")
+[warn | Foo.bar]: Warning to stdout and the log file.
 ```
 
-NOTE: We used `getlogger("Foo.bar")`, but you can also do `getlogger(current_module())` which allows us to avoid hard coding in logger names.
+NOTE: We used `getlogger("Foo.bar")`, but you can also do `getlogger(@__MODULE__)` which allows us to avoid hard coding in logger names.
 
 ## Piggybacking onto another package's logger
 

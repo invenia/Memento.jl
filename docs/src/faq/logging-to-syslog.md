@@ -21,25 +21,23 @@ end
 Now we can start logging to syslog locally:
 
 ```julia
-add_handler(
+push!(
     logger,
     DefaultHandler(
         Syslog(),
         DefaultFormatter("{level}: {msg}")
-    ),
-    "Syslog"
+    )
 )
 ```
 
 We can also log to remote syslog servers via UDP or TCP:
 
 ```julia
-add_handler(
+push!(
     logger,
     DefaultHandler(
         Syslog(ip"123.34.56.78"),
         DefaultFormatter("{level}: {msg}")
-    ),
-    "Syslog"
+    )
 )
 ```

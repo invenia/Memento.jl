@@ -10,14 +10,14 @@ julia> Memento.config!("debug")
 Will log all messages for all loggers at or above "debug".
 
 ```julia
-julia>Memento.config!("warn")
+julia> Memento.config!("warn")
 ```
 Will only log message at or above the "warn" level.
 
 We can also set the logging level for specific loggers or collections of loggers if we explicitly set the level on an existing logger.
 
 ```julia
-julia>setlevel!(getlogger("Main"), "info")
+julia> setlevel!(getlogger("Main"), "info")
 ```
 Will only set the logging level to "info" for the "Main" logger and any future children of the "Main" logger.
 
@@ -81,6 +81,48 @@ For more details on the [`DefaultFormatter`](@ref) and [`DefaultRecord`](@ref) p
 More general information on [`Formatter`s](@ref man_formatters) and [`Record`s](@ref man_records) will be discussed later in this manual.
 
 ## Architecture
+
+Memento is a hierarchical logging library, meaning that loggers may have child loggers with their own configurations (e.g., levels, handlers, record types).
+By default, logs sent to child loggers propagate up to the root logger, allowing for a simple default configuration at the root.
+Memento.jl is designed to separate the responsibilities of logging in libraries (e.g., modules, packages) vs applications.
+In general, libraries should focus on logging relevant messages to a library specific child logger, and avoid configuring the child logger directly.
+
+```julia
+module MyModule
+
+using Memento
+
+const LOGGER = getlogger(@__MODULE__)
+
+__init__() = Memento.register(LOGGER)
+noisy() = debug(LOGGER, "LOUD NOISES!")
+hello() = info(LOGGER, "Hello World!")
+danger() = warn(LOGGER, "Danger Zone!")
+
+end
+```
+
+See the package usage [docs](@ref pkg_usage) for details.
+
+On the hand, applications are responsible for setting logging levels and attaching custom handlers to specific child loggers as needed.
+
+```julia
+using Memento
+using MyModule
+
+# Configure global logging level and formatting
+Memento.config!("info"; fmt="[{level} | {name}]: {msg}")
+push!(getlogger("MyModule"), DefaultHandler("noisy.log"))
+
+# Will only log to noisy.log and not the console
+MyModule.noisy()
+
+# These will log to both noisy.log and the console
+MyModule.hello()
+MyModule.danger()
+```
+
+See some of our [configuration recipes](@ref config_recipes) for more details.
 
 There are five main components of Memento.jl that you can manipulate:
 
