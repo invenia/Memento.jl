@@ -30,7 +30,17 @@ elif [[ "$TEST_TYPE" == "userimage" ]]; then
     julia --color=yes -e '
         using Pkg
         Pkg.add("PackageCompiler")
-        using PackageCompiler: build_sysimg, default_sysimg_path
-        build_sysimg(default_sysimg_path(), joinpath(pwd(), "userimg.jl"))
+        using PackageCompiler
+        if VERSION >= v"1.3.1"
+            PackageCompiler.create_sysimage(;
+                precompile_statements_file=joinpath(pwd(), "userimg.jl"),
+                replace_default=true,
+            )
+        else
+            PackageCompiler.build_sysimg(
+                PackageCompiler.default_sysimg_path(),
+                joinpath(pwd(), "userimg.jl"),
+            )
+        end
     '
 fi
