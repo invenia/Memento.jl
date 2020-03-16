@@ -219,3 +219,39 @@ function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O
 
     flush(handler.io)
 end
+
+# Handler for escalating logs to errors
+struct EscalationError <: Exception
+    msg
+end
+
+struct Escalator{F} <: Handler{F}
+    fmt::F
+    filters::Array{Memento.Filter}
+    levels::Dict{AbstractString, Int}
+    level::AbstractString
+end
+
+function Escalator(
+    fmt::F=DefaultFormatter(), level="warn"; levels=nothing
+) where {F<:Formatter}
+    handler = Escalator(
+        fmt,
+        Memento.Filter[],
+        levels === nothing ? Memento._log_levels : levels,
+        level,
+    )
+
+    push!(handler, Memento.Filter(handler))
+    return handler
+end
+
+getfilters(handler::Escalator) = handler.filters
+Base.push!(handler::Escalator, filter::Memento.Filter) = push!(handler.filters, filter)
+getlevels(handler::Escalator) = handler.levels
+getlevel(handler::Escalator) = handler.level
+function setlevel!(handler::Escalator, level::AbstractString)
+    handler.level = handler.levels[level]
+end
+
+emit(handler::Escalator, rec::Record) = throw(EscalationError(format(handler.fmt ,rec)))
