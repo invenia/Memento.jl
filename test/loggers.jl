@@ -217,7 +217,7 @@
         @test all(==(DefaultRecord), getfield.(a_children, :record))
     end
 
-    @testset "Memento.config" begin
+    @testset "Memento.config!" begin
         root_logger = Memento.config!(
             "info";
             fmt="[{date} | {level} | {name}]: {msg}", colorized=false
@@ -247,12 +247,12 @@
         )
         @test !ispropagating(non_prop_logger)
 
-        Memento.config("notice"; recursive=true)
+        Memento.config!("notice"; recursive=true)
         @test all(l -> getlevel(l) == "notice", values(Memento._loggers))
 
         # reconfig
         logger = getlogger("NoReplace")
-        new_logger = Memento.config("NoReplace", "info")
+        new_logger = Memento.config!("NoReplace", "info")
         @test new_logger === getlogger("NoReplace")
         @test new_logger === logger
     end
