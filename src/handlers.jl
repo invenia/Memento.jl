@@ -232,8 +232,21 @@ struct Escalator{F} <: Handler{F}
     level::AbstractString
 end
 
+"""
+    Escalator(fmt=DefaultFormatter(); level="warn", levels=nothing)
+
+Escalates any logs it sees above a certain `level` to [`EscalationError`s](@ref).
+
+# Arguements
+
+- `fmt::Formatter`: for converting `Record`s to error messages `Strings`
+
+# Keyword Arguements
+- `level`: threshold level for when to error, otherwise this is a no-op
+- `levels`: an alternate levels dictionary if we're considering non-default levels
+"""
 function Escalator(
-    fmt::F=DefaultFormatter(), level="warn"; levels=nothing
+    fmt::F=DefaultFormatter(); level="warn", levels=nothing
 ) where {F<:Formatter}
     handler = Escalator(
         fmt,

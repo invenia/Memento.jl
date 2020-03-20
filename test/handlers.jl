@@ -320,4 +320,44 @@
             end
         end
     end
+
+    @testset "Escalator" begin
+        @testset "Basic" begin
+            # Using default behaviour to convert warnings to errors
+            handler = Escalator()
+            logger = Logger(
+                "Escalator.basic",
+                Dict("Escalator" => handler),
+                "info",
+                LEVELS,
+                DefaultRecord,
+                true,
+            )
+
+            # Info messages should work fine as no-ops
+            info(logger, "Hello World!")
+
+            # Test that we throw an escalation error for warnings
+            @test_throws Memento.EscalationError warn(logger, "Goodbye World!")
+        end
+
+        @testset "info" begin
+            # Using default behaviour to convert notice and warnings to errors
+            handler = Escalator(level="info")
+            logger = Logger(
+                "Escalator.basic",
+                Dict("Escalator" => handler),
+                "info",
+                LEVELS,
+                DefaultRecord,
+                true,
+            )
+
+            # Test that we throw an escalation error for info messages
+            @test_throws Memento.EscalationError info(logger, "Goodbye World!")
+
+            # Test that we throw an escalation error for warnings
+            @test_throws Memento.EscalationError warn(logger, "Goodbye World!")
+        end
+    end
 end
