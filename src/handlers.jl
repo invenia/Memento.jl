@@ -220,12 +220,7 @@ function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O
     flush(handler.io)
 end
 
-# Handler for escalating logs to errors
-struct EscalationError <: Exception
-    msg
-end
-
-struct Escalator{F} <: Handler{F}
+mutable struct Escalator{F} <: Handler{F}
     fmt::F
     filters::Array{Memento.Filter}
     levels::Dict{AbstractString, Int}
@@ -237,11 +232,11 @@ end
 
 Escalates any logs it sees above a certain `level` to [`EscalationError`s](@ref).
 
-# Arguements
+# Arguments
 
 - `fmt::Formatter`: for converting `Record`s to error messages `Strings`
 
-# Keyword Arguements
+# Keyword Arguments
 - `level`: threshold level for when to error, otherwise this is a no-op
 - `levels`: an alternate levels dictionary if we're considering non-default levels
 """
@@ -264,7 +259,8 @@ Base.push!(handler::Escalator, filter::Memento.Filter) = push!(handler.filters, 
 getlevels(handler::Escalator) = handler.levels
 getlevel(handler::Escalator) = handler.level
 function setlevel!(handler::Escalator, level::AbstractString)
-    handler.level = handler.levels[level]
+    handler.levels[level]     # Throw a key error if the levels isn't in levels
+    handler.level = level
 end
 
 emit(handler::Escalator, rec::Record) = throw(EscalationError(format(handler.fmt ,rec)))

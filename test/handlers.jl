@@ -343,7 +343,8 @@
 
         @testset "info" begin
             # Using default behaviour to convert notice and warnings to errors
-            handler = Escalator(level="info")
+            handler = Escalator()
+            setlevel!(handler, "info")
             logger = Logger(
                 "Escalator.basic",
                 Dict("Escalator" => handler),
@@ -358,6 +359,23 @@
 
             # Test that we throw an escalation error for warnings
             @test_throws Memento.EscalationError warn(logger, "Goodbye World!")
+        end
+
+        @testset "stdlib" begin
+            # Test escalating base logging records
+            orig_logger = Base.CoreLogging.global_logger()
+            base_logger = Memento.BaseLogger(min_enabled_level(global_logger()))
+            logger = getlogger(string(@__MODULE__))
+
+            try
+                global_logger(base_logger)
+                push!(logger, Escalator())
+                @test_throws Memento.EscalationError @warn("Goodbye World!")
+            finally
+                # Remove the logger and replace the core logging
+                delete!(Memento._loggers, string(@__MODULE__))
+                global_logger(orig_logger)
+            end
         end
     end
 end
