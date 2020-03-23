@@ -263,4 +263,4 @@ function setlevel!(handler::Escalator, level::AbstractString)
     handler.level = level
 end
 
-emit(handler::Escalator, rec::Record) = throw(EscalationError(format(handler.fmt ,rec)))
+emit(handler::Escalator, rec::Record) = throw(EscalationError(format(handler.fmt, rec)))
