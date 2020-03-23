@@ -20,7 +20,7 @@ export info, warn, debug, trace, notice, error, critical, alert, emergency,
        getlogger, gethandlers, getfilters, format, emit,
 
        Logger, Record, AttributeRecord, DefaultRecord, Formatter, Handler,
-       DefaultFormatter, DictFormatter, DefaultHandler, FileRoller,
+       DefaultFormatter, DictFormatter, DefaultHandler, Escalator, FileRoller,
        LoggerSerializationError
 
 

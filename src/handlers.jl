@@ -219,3 +219,48 @@ function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O
 
     flush(handler.io)
 end
+
+mutable struct Escalator{F} <: Handler{F}
+    fmt::F
+    filters::Array{Memento.Filter}
+    levels::Dict{AbstractString, Int}
+    level::AbstractString
+end
+
+"""
+    Escalator(fmt=DefaultFormatter(); level="warn", levels=nothing)
+
+Escalates any logs it sees above a certain `level` to [`EscalationError`s](@ref).
+
+# Arguments
+
+- `fmt::Formatter`: for converting `Record`s to error messages `Strings`
+
+# Keyword Arguments
+- `level`: threshold level for when to error, otherwise this is a no-op
+- `levels`: an alternate levels dictionary if we're considering non-default levels
+"""
+function Escalator(
+    fmt::F=DefaultFormatter(); level="warn", levels=nothing
+) where {F<:Formatter}
+    handler = Escalator(
+        fmt,
+        Memento.Filter[],
+        levels === nothing ? Memento._log_levels : levels,
+        level,
+    )
+
+    push!(handler, Memento.Filter(handler))
+    return handler
+end
+
+getfilters(handler::Escalator) = handler.filters
+Base.push!(handler::Escalator, filter::Memento.Filter) = push!(handler.filters, filter)
+getlevels(handler::Escalator) = handler.levels
+getlevel(handler::Escalator) = handler.level
+function setlevel!(handler::Escalator, level::AbstractString)
+    handler.levels[level]     # Throw a key error if the levels isn't in levels
+    handler.level = level
+end
+
+emit(handler::Escalator, rec::Record) = throw(EscalationError(format(handler.fmt, rec)))

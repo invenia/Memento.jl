@@ -10,6 +10,8 @@ using TimeZones
 using Dates
 using Serialization
 
+using Base.CoreLogging: global_logger, min_enabled_level
+
 files = [
     "records.jl",
     "formatters.jl",

@@ -320,4 +320,62 @@
             end
         end
     end
+
+    @testset "Escalator" begin
+        @testset "Basic" begin
+            # Using default behaviour to convert warnings to errors
+            handler = Escalator()
+            logger = Logger(
+                "Escalator.basic",
+                Dict("Escalator" => handler),
+                "info",
+                LEVELS,
+                DefaultRecord,
+                true,
+            )
+
+            # Info messages should work fine as no-ops
+            info(logger, "Hello World!")
+
+            # Test that we throw an escalation error for warnings
+            @test_throws Memento.EscalationError warn(logger, "Goodbye World!")
+        end
+
+        @testset "info" begin
+            # Using default behaviour to convert notice and warnings to errors
+            handler = Escalator()
+            setlevel!(handler, "info")
+            logger = Logger(
+                "Escalator.basic",
+                Dict("Escalator" => handler),
+                "info",
+                LEVELS,
+                DefaultRecord,
+                true,
+            )
+
+            # Test that we throw an escalation error for info messages
+            @test_throws Memento.EscalationError info(logger, "Goodbye World!")
+
+            # Test that we throw an escalation error for warnings
+            @test_throws Memento.EscalationError warn(logger, "Goodbye World!")
+        end
+
+        @testset "stdlib" begin
+            # Test escalating base logging records
+            orig_logger = Base.CoreLogging.global_logger()
+            base_logger = Memento.BaseLogger(min_enabled_level(global_logger()))
+            logger = getlogger(string(@__MODULE__))
+
+            try
+                global_logger(base_logger)
+                push!(logger, Escalator())
+                @test_throws Memento.EscalationError @warn("Goodbye World!")
+            finally
+                # Remove the logger and replace the core logging
+                delete!(Memento._loggers, string(@__MODULE__))
+                global_logger(orig_logger)
+            end
+        end
+    end
 end

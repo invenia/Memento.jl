@@ -13,6 +13,7 @@ end
 
 CoreLogging.min_enabled_level(logger::BaseLogger) = logger.min_level
 CoreLogging.shouldlog(logger::BaseLogger, args...) = true
+CoreLogging.catch_exceptions(logger::BaseLogger) = false
 
 function CoreLogging.handle_message(
     ::BaseLogger,
