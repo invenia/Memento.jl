@@ -143,8 +143,8 @@ function register(logger::Logger)
     end
 
     # Call getpath to potentially register any missing parent loggers.
-    # getpath(logger)
-    # return logger
+    getpath(logger)
+    return logger
 end
 
 """

@@ -302,6 +302,6 @@
 
     @testset "No parent logger registered" begin
         original_logger = Logger("foo.bar.baz")
-        @test !haskey(Memento._loggers, "foo.bar")
+        @test haskey(Memento._loggers, "foo.bar")
     end
 end
