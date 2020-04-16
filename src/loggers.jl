@@ -141,6 +141,10 @@ function register(logger::Logger)
     else
         debug(LOGGER, "$logger is already registered.")
     end
+
+    # Call getpath to potentially register any missing parent loggers.
+    getpath(logger)
+    return logger
 end
 
 """

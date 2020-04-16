@@ -299,4 +299,9 @@
         logger = getlogger("new_logger")
         @test logger == original_logger
     end
+
+    @testset "No parent logger registered" begin
+        original_logger = Logger("foo.bar.baz")
+        @test haskey(Memento._loggers, "foo.bar")
+    end
 end
