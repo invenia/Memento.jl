@@ -230,7 +230,7 @@ end
 """
     Escalator(fmt=DefaultFormatter(); level="warn", levels=nothing)
 
-Escalates any logs it sees above a certain `level` to [`EscalationError`s](@ref).
+Escalates any logs it sees above a certain `level` and throws an `EscalationError`.
 
 # Arguments
 

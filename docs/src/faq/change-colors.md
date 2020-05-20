@@ -1,4 +1,4 @@
-# Changing colors?
+# [Changing colors?](@id change_colors)
 
 Colors can be enabled/disabled and set using via the `is_colorized` and `colors` options to the `DefaultHandler`.
 

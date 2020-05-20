@@ -2,7 +2,7 @@
 """
     config!([logger], level; fmt::AbstractString, levels::Dict{AbstractString, Int}, colorized::Bool) -> Logger
 
-Sets the `Memento._log_levels`, creates a default root logger with a `DefaultHandler`
+Sets the `Memento._log_levels`, creates a default root logger with a [`DefaultHandler`](@ref)
 that prints to stdout.
 
 # Arguments
@@ -10,8 +10,9 @@ that prints to stdout.
 * `level::AbstractString`: the minimum logging level to log message to the root logger (required).
 
 # Keywords
-* `fmt::AbstractString`: a format string to pass to the `DefaultFormatter` which describes
-    how to log messages (defaults to `Memento.DEFAULT_FMT_STRING`)
+* `fmt::AbstractString`: a format string to pass to the [`DefaultFormatter`](@ref) which describes
+    how to log messages (defaults to `Memento.DEFAULT_FMT_STRING`).
+    By default, format tokens should match the [`DefaultRecord`](@ref) fieldnames.
 * `levels`: the default logging levels to use (defaults to `Memento._log_levels`).
 * `colorized`: whether or not the message to stdout should be colorized.
 * `recursive`: whether or not to recursive set the level of all child loggers.

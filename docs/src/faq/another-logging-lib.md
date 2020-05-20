@@ -1,4 +1,4 @@
-# Another logging library?
+# [Another logging library?](@id yall)
 
 *...or why did you fork [Lumberjack.jl](https://github.com/WestleyArgentum/Lumberjack.jl)?*
 
