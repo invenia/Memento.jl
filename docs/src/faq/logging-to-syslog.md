@@ -1,4 +1,4 @@
-# Logging to Syslog?
+# [Logging to Syslog?](@id syslogs)
 
 In Memento v0.4, the builtin `Syslog` type was moved into its own package [Syslogs.jl](https://github.com/invenia/Syslogs.jl) which allows folks to use either Syslogs.jl or Memento.jl independently from one another.
 Unfortunately, this does require the following bit of glue code in your projects.

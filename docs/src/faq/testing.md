@@ -1,4 +1,4 @@
-# How do I test my logging behaviour?
+# [How do I test my logging behaviour?](@id testing)
 
 Memento extends various base test macros for checking whether a log message was emitted or not.
 

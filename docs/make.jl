@@ -30,10 +30,7 @@ makedocs(
             "faq/pkg-usage.md",
             "faq/testing.md",
         ],
-        "API" => Any[
-            "api/public.md",
-            "api/private.md",
-        ],
+        "API" => "api.md",
         "Contributing" => "contributing.md",
     ],
 )
