@@ -1,5 +1,9 @@
 module Memento
 
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 0
+end
+
 using Base: StackTrace, StackFrame
 using UUIDs
 using Dates
