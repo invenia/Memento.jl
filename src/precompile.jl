@@ -1,7 +1,9 @@
 function _precompile_()
     ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
     # Memento
-    isdefined(Memento, Symbol("##config!#72")) && precompile(Tuple{getfield(Memento, Symbol("##config!#72")), Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}, typeof(Memento.config!), String, String})
+    @assert precompile(Core.kwfunc(Memento.config!), (Vector{Any}, typeof(Memento.config!), String))
+    @assert precompile(Core.kwfunc(Memento.config!), (Vector{Any}, typeof(Memento.config!), String, String))
+    @assert precompile(Core.kwfunc(Memento.config!), (Vector{Any}, typeof(Memento.config!), Memento.Logger, String))
     @assert precompile(Tuple{typeof(Memento._log), Memento.Logger, String, String})
     @assert precompile(Tuple{typeof(Memento.config!), String})
     @assert precompile(Tuple{typeof(Memento.getlogger), String})
@@ -12,10 +14,8 @@ function _precompile_()
     # Unknown
     @assert precompile(Tuple{Type{Memento.DefaultHandler{F, O} where O<:IO where F}, Base.TTY, Memento.DefaultFormatter, Base.Dict{Symbol, Any}})
     @assert precompile(Tuple{Type{Memento.DefaultRecord}, String, String, Int64, String})
-    isdefined(Memento, Symbol("#level_filter#36")) && precompile(Tuple{getfield(Memento, Symbol("#level_filter#36")){Memento.Logger}, Memento.DefaultRecord})
 
     # Base
-    isdefined(Base, Symbol("##all#638")) && precompile(Tuple{getfield(Base, Symbol("##all#638")), typeof(identity), typeof(Base.all), typeof(identity), Array{Memento.Filter, 1}})
     @assert precompile(Tuple{typeof(Base.all), typeof(identity), Array{Memento.Filter, 1}})
     @assert precompile(Tuple{typeof(Base.get), Memento.Attribute{String}})
     @assert precompile(Tuple{typeof(Base.log), Memento.Logger, Memento.DefaultRecord})
@@ -27,8 +27,6 @@ function _precompile_()
     @assert precompile(Tuple{typeof(Base.show), Base.GenericIOBuffer{Array{UInt8, 1}}, Memento.Logger})
 
     # Manual
-    @assert precompile(Tuple{typeof(Memento.config!), String, String})
-    @assert precompile(Tuple{typeof(Memento.config!), Memento.Logger, String})
     @assert precompile(Tuple{typeof(Base.log), Memento.Logger, String, String})
     @assert precompile(Tuple{typeof(Memento.trace), Memento.Logger, String})
     @assert precompile(Tuple{typeof(Memento.debug), Memento.Logger, String})
