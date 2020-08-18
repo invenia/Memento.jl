@@ -60,7 +60,6 @@ const _loggers = Dict{AbstractString, Logger}(
 )
 
 const LOGGER = getlogger(@__MODULE__)
-const _default_formatter = DefaultFormatter(DEFAULT_FMT_STRING)
 
 function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)

@@ -45,6 +45,7 @@ struct DefaultFormatter <: Formatter
     end
 end
 
+
 """
     format(::DefaultFormatter, ::Record) -> String
 
