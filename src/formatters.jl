@@ -25,11 +25,11 @@ Ex) "[{level} | {name}]: {msg}" will print message of the form
 struct DefaultFormatter <: Formatter
     fmt_str::AbstractString
     tokens::Vector{Pair{Symbol, Bool}}
-    output_tz::Dates.TimeZone
+    output_tz::Union{Dates.TimeZone, Nothing}
 
     function DefaultFormatter(
         fmt_str::AbstractString=DEFAULT_FMT_STRING,
-        output_tz=localzone(),
+        output_tz=nothing,
     )
         #r"(?<={).+?(?=})
         tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
@@ -77,7 +77,10 @@ function format(fmt::DefaultFormatter, rec::Record)
                 value = string(" stack:[", join(str_frames, ", "), "]")
             elseif content === :date
                 value = if tmp_val isa ZonedDateTime
-                    Dates.format(astimezone(tmp_val, fmt.output_tz), DATE_FMT_STRING)
+                    # `localzone` is somewhat expensive, so we both delay calling it and
+                    # cache the result with our `getlocalzone` function.
+                    tzout = fmt.output_tz === nothing ? getlocalzone() : fmt.output_tz
+                    Dates.format(astimezone(tmp_val, tzout), DATE_FMT_STRING)
                 elseif tmp_val isa DateTime
                     Dates.format(tmp_val, DATE_FMT_STRING)
                 else

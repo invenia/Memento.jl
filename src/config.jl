@@ -39,7 +39,8 @@ function config!(
     setpropagating!(logger, propagate)
     handler = DefaultHandler(
         stdout,
-        DefaultFormatter(fmt), Dict{Symbol, Any}(:is_colorized => colorized)
+        fmt == DEFAULT_FMT_STRING ? _default_formatter : DefaultFormatter(fmt),
+        Dict{Symbol, Any}(:is_colorized => colorized),
     )
     logger.handlers["console"] = handler
     register(logger)

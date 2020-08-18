@@ -51,6 +51,7 @@ include("config.jl")
 include("exceptions.jl")
 include("memento_test.jl")
 include("deprecated.jl")
+include("precompile.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to stdout.
@@ -60,9 +61,22 @@ const _loggers = Dict{AbstractString, Logger}(
 
 const LOGGER = getlogger(@__MODULE__)
 
+# Cached values either to lazily load or precompile.
+const _default_formatter = DefaultFormatter(DEFAULT_FMT_STRING)
+const _localtz = Ref{Union{Dates.TimeZone, Nothing}}(nothing)
+
+function getlocalzone()
+    if _localtz[] === nothing
+        global _localtz[] = localzone()
+    end
+
+    return _localtz[]
+end
+
 function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)
     Memento.register(LOGGER)
 end
 
+_precompile_()
 end
