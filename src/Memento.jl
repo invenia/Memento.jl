@@ -60,18 +60,7 @@ const _loggers = Dict{AbstractString, Logger}(
 )
 
 const LOGGER = getlogger(@__MODULE__)
-
-# Cached values either to lazily load or precompile.
 const _default_formatter = DefaultFormatter(DEFAULT_FMT_STRING)
-const _localtz = Ref{Union{Dates.TimeZone, Nothing}}(nothing)
-
-function getlocalzone()
-    if _localtz[] === nothing
-        global _localtz[] = localzone()
-    end
-
-    return _localtz[]
-end
 
 function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)

@@ -77,9 +77,8 @@ function format(fmt::DefaultFormatter, rec::Record)
                 value = string(" stack:[", join(str_frames, ", "), "]")
             elseif content === :date
                 value = if tmp_val isa ZonedDateTime
-                    # `localzone` is somewhat expensive, so we both delay calling it and
-                    # cache the result with our `getlocalzone` function.
-                    tzout = fmt.output_tz === nothing ? getlocalzone() : fmt.output_tz
+                    # `localzone` is expensive, so we don't call it until it is required.
+                    tzout = fmt.output_tz === nothing ? localzone() : fmt.output_tz
                     Dates.format(astimezone(tmp_val, tzout), DATE_FMT_STRING)
                 elseif tmp_val isa DateTime
                     Dates.format(tmp_val, DATE_FMT_STRING)
