@@ -51,6 +51,7 @@ include("config.jl")
 include("exceptions.jl")
 include("memento_test.jl")
 include("deprecated.jl")
+include("precompile.jl")
 
 # Initializing at compile-time will work as long as the loggers which are added do not
 # contain references to stdout.
@@ -65,4 +66,5 @@ function __init__()
     Memento.register(LOGGER)
 end
 
+_precompile_()
 end
