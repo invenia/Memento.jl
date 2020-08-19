@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>How do I test my logging behaviour? · Memento.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../../assets/invenia.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>Memento.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Manual</span><ul><li><a class="toctext" href="../../man/intro/">Introduction</a></li><li><a class="toctext" href="../../man/loggers/">Loggers</a></li><li><a class="toctext" href="../../man/handlers/">Handlers</a></li><li><a class="toctext" href="../../man/formatters/">Formatters</a></li><li><a class="toctext" href="../../man/records/">Records</a></li><li><a class="toctext" href="../../man/io/">IO</a></li><li><a class="toctext" href="../../man/conclusion/">Conclusion</a></li></ul></li><li><span class="toctext">FAQ</span><ul><li><a class="toctext" href="../another-logging-lib/">Another logging library?</a></li><li><a class="toctext" href="../change-colors/">Changing colors?</a></li><li><a class="toctext" href="../config-recipes/">Configuring Logging in Applications?</a></li><li><a class="toctext" href="../logging-to-syslog/">Logging to Syslog?</a></li><li><a class="toctext" href="../json-formatting/">Producing JSON logs?</a></li><li><a class="toctext" href="../pkg-usage/">Using Memento in Julia packages?</a></li><li class="current"><a class="toctext" href>How do I test my logging behaviour?</a><ul class="internal"></ul></li></ul></li><li><a class="toctext" href="../../api/">API</a></li><li><a class="toctext" href="../../contributing/">Contributing</a></li></ul></nav><article id="docs"><header><nav><ul><li>FAQ</li><li><a href>How do I test my logging behaviour?</a></li></ul><a class="edit-page" href="https://github.com/invenia/Memento.jl/blob/master/docs/src/faq/testing.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>How do I test my logging behaviour?</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="testing-1" href="#testing-1">How do I test my logging behaviour?</a></h1><p>Memento extends various base test macros for checking whether a log message was emitted or not.</p><pre><code class="language-julia">using Memento
+using Memento.TestUtils
+
+# @test_log
+logger = getlogger(&quot;test_log&quot;)
+msg = &quot;Hello!&quot;
+setlevel!(logger, &quot;info&quot;)
+@test_log(logger, &quot;info&quot;, msg, Memento.info(logger, msg))
+
+# Partial matches
+msg = &quot;Hello World!&quot;
+@test_log(logger, &quot;info&quot;, &quot;Hello&quot;, Memento.info(logger, msg))
+@test_log(logger, &quot;info&quot;, r&quot;Hello*&quot;, Memento.info(logger, msg))
+@test_log(logger, &quot;info&quot;, (&quot;Hello&quot;, &quot;World&quot;), Memento.info(logger, msg))
+@test_log(logger, &quot;info&quot;, x -&gt; x == msg, Memento.info(logger, msg))
+
+# @test_nolog
+logger = getlogger(&quot;test_nolog&quot;)
+setlevel!(logger, &quot;info&quot;)
+
+msg = &quot;Hello!&quot;
+different_msg = &quot;Goodbye&quot;
+
+@test_nolog(logger, &quot;info&quot;, msg, nothing)
+@test_nolog(logger, &quot;info&quot;, msg, Memento.debug(logger, msg))
+@test_nolog(logger, &quot;info&quot;, msg, Memento.info(logger, different_msg))
+@test_nolog(logger, &quot;info&quot;, msg, Memento.warn(logger, different_msg))
+@test_nolog(logger, &quot;info&quot;, r&quot;.*foo.*&quot;, Memento.info(logger, &quot;baz&quot;))
+
+# @test_warn
+logger = getlogger(&quot;test_warn&quot;)
+msg = &quot;Hello!&quot;
+@test_warn(logger, msg, Memento.warn(logger, &quot;Hello!&quot;))
+
+# @test_throws
+logger = getlogger(&quot;test_log&quot;)
+@test_throws(logger, ErrorException, error(logger, &quot;Error!&quot;))</code></pre><footer><hr/><a class="previous" href="../pkg-usage/"><span class="direction">Previous</span><span class="title">Using Memento in Julia packages?</span></a><a class="next" href="../../api/"><span class="direction">Next</span><span class="title">API</span></a></footer></article></body></html>

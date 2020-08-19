@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Logging to Syslog? · Memento.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../../assets/invenia.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>Memento.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Manual</span><ul><li><a class="toctext" href="../../man/intro/">Introduction</a></li><li><a class="toctext" href="../../man/loggers/">Loggers</a></li><li><a class="toctext" href="../../man/handlers/">Handlers</a></li><li><a class="toctext" href="../../man/formatters/">Formatters</a></li><li><a class="toctext" href="../../man/records/">Records</a></li><li><a class="toctext" href="../../man/io/">IO</a></li><li><a class="toctext" href="../../man/conclusion/">Conclusion</a></li></ul></li><li><span class="toctext">FAQ</span><ul><li><a class="toctext" href="../another-logging-lib/">Another logging library?</a></li><li><a class="toctext" href="../change-colors/">Changing colors?</a></li><li><a class="toctext" href="../config-recipes/">Configuring Logging in Applications?</a></li><li class="current"><a class="toctext" href>Logging to Syslog?</a><ul class="internal"></ul></li><li><a class="toctext" href="../json-formatting/">Producing JSON logs?</a></li><li><a class="toctext" href="../pkg-usage/">Using Memento in Julia packages?</a></li><li><a class="toctext" href="../testing/">How do I test my logging behaviour?</a></li></ul></li><li><a class="toctext" href="../../api/">API</a></li><li><a class="toctext" href="../../contributing/">Contributing</a></li></ul></nav><article id="docs"><header><nav><ul><li>FAQ</li><li><a href>Logging to Syslog?</a></li></ul><a class="edit-page" href="https://github.com/invenia/Memento.jl/blob/master/docs/src/faq/logging-to-syslog.md#L"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Logging to Syslog?</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="syslogs-1" href="#syslogs-1">Logging to Syslog?</a></h1><p>In Memento v0.4, the builtin <code>Syslog</code> type was moved into its own package <a href="https://github.com/invenia/Syslogs.jl">Syslogs.jl</a> which allows folks to use either Syslogs.jl or Memento.jl independently from one another. Unfortunately, this does require the following bit of glue code in your projects.</p><pre><code class="language-julia"># Load up `Syslogs.jl` where `Syslog` will be exported by default.
+using Syslogs
+
+# Define a 2 line glue method as the `Syslog` type requires a level argument be passed into
+# the `println` method.
+function Memento.emit(handler::DefaultHandler{F, O}, rec::Record) where {F&lt;:Formatter, O&lt;:Syslog}
+    println(handler.io, rec.level, format(handler.fmt, rec))
+    flush(handler.io)
+end
+
+# NOTE: This glue code is only necessary because Julia (as of v0.7) doesn&#39;t provide a good
+# mechanism for handling optional dependencies.</code></pre><p>Now we can start logging to syslog locally:</p><pre><code class="language-julia">push!(
+    logger,
+    DefaultHandler(
+        Syslog(),
+        DefaultFormatter(&quot;{level}: {msg}&quot;)
+    )
+)</code></pre><p>We can also log to remote syslog servers via UDP or TCP:</p><pre><code class="language-julia">push!(
+    logger,
+    DefaultHandler(
+        Syslog(ip&quot;123.34.56.78&quot;),
+        DefaultFormatter(&quot;{level}: {msg}&quot;)
+    )
+)</code></pre><footer><hr/><a class="previous" href="../config-recipes/"><span class="direction">Previous</span><span class="title">Configuring Logging in Applications?</span></a><a class="next" href="../json-formatting/"><span class="direction">Next</span><span class="title">Producing JSON logs?</span></a></footer></article></body></html>
