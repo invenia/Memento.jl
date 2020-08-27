@@ -78,6 +78,7 @@ Calling `getproperty` or iterating will evaluate and cache the properties access
 """
 abstract type AttributeRecord <: Record end
 
+Base.length(rec::T) where T <: Record = fieldcount(T)
 Base.haskey(rec::T, attr::Symbol) where {T <: Record} = hasfield(T, attr)
 Base.keys(rec::T) where {T <: Record} = (fieldname(T, i) for i in 1:fieldcount(T))
 
