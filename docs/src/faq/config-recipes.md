@@ -1,10 +1,10 @@
 # [Configuring Logging in Applications?](@id config_recipes)
 
-So we've provide examples of many different ways that Memento.jl can be extended, but what are some common examples for configuring Memento out of the box, without extending any components.
+So we've provided examples of many different ways that Memento.jl can be extended, but what are some common examples for configuring Memento out of the box, without extending any components.
 
 ## Logging to a File
 
-I want all my log message coming from `MyPkg` to be saved to a local file. Easy, just add a `DefaultHandler` with the desired filename to the specific child logger.
+I want all my log messages coming from `MyPkg` to be saved to a local file. Easy, just add a `DefaultHandler` with the desired filename to the specific child logger.
 
 ```julia
 push!(getlogger("MyPkg"), DefaultHandler("noisy.log"))

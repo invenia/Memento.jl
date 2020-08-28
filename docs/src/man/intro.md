@@ -104,7 +104,7 @@ end
 
 See the package usage [docs](@ref pkg_usage) for details.
 
-On the hand, applications are responsible for setting logging levels and attaching custom handlers to specific child loggers as needed.
+On the other hand, applications are responsible for setting logging levels and attaching custom handlers to specific child loggers as needed.
 
 ```julia
 using Memento
