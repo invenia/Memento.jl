@@ -14,7 +14,7 @@ noisy() = debug(LOGGER, &quot;LOUD NOISES!&quot;)
 hello() = info(LOGGER, &quot;Hello World!&quot;)
 danger() = warn(LOGGER, &quot;Danger Zone!&quot;)
 
-end</code></pre><p>See the package usage <a href="../../faq/pkg-usage/#pkg_usage-1">docs</a> for details.</p><p>On the hand, applications are responsible for setting logging levels and attaching custom handlers to specific child loggers as needed.</p><pre><code class="language-julia">using Memento
+end</code></pre><p>See the package usage <a href="../../faq/pkg-usage/#pkg_usage-1">docs</a> for details.</p><p>On the other hand, applications are responsible for setting logging levels and attaching custom handlers to specific child loggers as needed.</p><pre><code class="language-julia">using Memento
 using MyModule
 
 # Configure global logging level and formatting
