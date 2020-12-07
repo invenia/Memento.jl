@@ -1,6 +1,6 @@
 # Memento.jl
 
-[![Build Status](https://travis-ci.org/invenia/Memento.jl.svg?branch=master)](https://travis-ci.org/invenia/Memento.jl)
+[![CI](https://github.com/Invenia/Memento.jl/workflows/CI/badge.svg)](https://github.com/Invenia/Memento.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/invenia/Memento.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Memento.jl)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.github.io/Memento.jl/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
