@@ -57,11 +57,10 @@ jobs:
           cache-name: cache-artifacts
         with:
           path: ~/.julia/artifacts
-          key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.test_type }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.test_type }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.test_type }}-test-
-            ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.test_type }}-
+            ${{ runner.os }}-${{ matrix.arch }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-${{ matrix.arch }}-test-
             ${{ runner.os }}-${{ matrix.arch }}-
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
