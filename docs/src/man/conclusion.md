@@ -15,7 +15,7 @@ using Memento
 
 function run(f::Function, args...; kwargs...)
     ret = nothing
-    logger = getlogger(current_module())
+    logger = getlogger(@__MODULE__)
     info(logger, "Got logger $logger")
 
     notice(logger, "Running function...")
@@ -37,7 +37,7 @@ Now we want to start writing our application code that uses this package, but ou
 Requirements:
 
 1. This will be run on Amazon EC2 instances and we want our log message to contain information about the machine the code is being run on.
-2. We want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form `https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>`.
+2. We want our logs to be written to an HTTP REST service (kinda like Loggly), where the endpoint is of the form `https://<account_uri>/<app_name>/<level>?AccessKey=<access_key>`, and an Authorization header and a Content-Type header.
 3. We want our logs to be written in a CSV format... for some reason.
 
 Okay, so how do we address all of those requirements using Memento's API?
@@ -54,7 +54,8 @@ NOTE: The code below is not intended to be a working example because it assumes 
 # myapp.jl
 using Wrapper
 using Memento
-using Requests  # For send logs to our fake logging REST service
+using Memento.TimeZones
+using HTTP  # For send logs to our fake logging REST service
 
 # Start by setting up our basic console logging for the root logger.
 logger = Memento.config!("info"; fmt="[{level} | {name}]: {msg}")
@@ -78,17 +79,17 @@ mutable struct EC2Record <: Record
         trace = Attribute{StackTrace}(get_trace)
 
         EC2Record(
-            Attribute{DateTime}(() -> round(time, Dates.Second)),
-            Attribute(args[:level]),
-            Attribute(args[:levelnum]),
-            Attribute{AbstractString}(get_msg(args[:msg])),
-            Attribute(args[:name]),
-            Attribute(myid()),
-            Attribute{StackFrame}(get_lookup(trace)),
+            Attribute{ZonedDateTime}(() -> Dates.now(tz"UTC")),
+            Attribute(level),
+            Attribute(levelnum),
+            Attribute{AbstractString}(msg),
+            Attribute(name),
+            Attribute(getpid()),
+            Attribute{Union{StackFrame, Nothing}}(get_lookup(trace)),
             trace,
-            Attribute(ENV["INSTANCE_ID"]),
-            Attribute(ENV["PUBLIC_IP"]),
-            Attribute(ENV["IAM_USER"]),
+            Attribute(get(ENV, "INSTANCE_ID", "no INSTANCE_ID")),
+            Attribute(get(ENV, "PUBLIC_IP", "no PUBLIC_IP")),
+            Attribute(get(ENV, "IAM_USER", "no IAM_USER")),
         )
     end
 end
@@ -121,18 +122,45 @@ end
 
 # Our print method builds the correct uri using the log level
 # and sends the put request.
-function println(io::REST, level::AbstractString, msg::AbstractString)
-    uri = "https://$(io.account_uri)/$(io.app_name)/$level?AccessKey=$(io.access_key)"
-    @async put(uri; data=msg)
+global REST_LOG_TASKS = []
+global queue_cleanup = false
+
+function Base.println(io::REST, level::AbstractString, msg::AbstractString)
+    uri = "https://$(io.account_uri)/$(io.app_name)/$(level)?AccessKey=$(io.access_key)"
+    headers = [ "Authorization" => io.access_key,
+                "Content-Type" => "text/csv" ]
+    data = msg
+    t = @async HTTP.post(uri, headers, data)
+
+    # Bookkeeping for handling @async tasks at exit
+    global REST_LOG_TASKS, queue_cleanup
+    push!(REST_LOG_TASKS, t)
+    filter!(t -> !istaskdone(t), REST_LOG_TASKS)
+    if !queue_cleanup
+        queue_cleanup = true
+        Base.atexit(finish_rest_log_tasks)
+    end
+end
+
+# A flush for @async tasks, to guarantee that the logs will have some time to finish writing, hooked in with atexit lazily
+function finish_rest_log_tasks(timeout=5.0)
+    timer = Timer(timeout)
+    while any(t -> !istaskdone(t), REST_LOG_TASKS) && isopen(timer)
+        sleep(0.05)
+        yield()
+        filter!(t -> !istaskdone(t), REST_LOG_TASKS)
+    end
+    if !isopen(timer) && any(t -> !istaskdone(t), REST_LOG_TASKS)
+        error("Some REST_LOG_TASKS did not complete! Gave up after $timeout seconds.")
+    end
 end
 
 # Not relevant, but good to have.
-flush(io::REST) = io
+Base.flush(io::REST) = io
 
-# We still need to special case the `DefaultHandler` `log` method to call  `println(io::REST, level, msg)`
-function log(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}
-    msg = format(handler.fmt, rec)
-    println(handler.io, rec.level, msg)
+# We still need to special case the `DefaultHandler` `emit` method to call  `println(io::REST, level, msg)` otherwise we will get an error "REST does not support byte I/O"
+function emit(handler::DefaultHandler{F, O}, rec::Record) where {F<:Formatter, O<:REST}
+    println(handler.io, getlevel(rec), format(handler.fmt, rec))
     flush(handler.io)
 end
 
@@ -151,6 +179,7 @@ push!(
         )
     )
 )
+
 
 # Don't forget to update the root logger `Record` type.
 setrecord!(logger, EC2Record)
