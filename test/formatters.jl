@@ -53,6 +53,17 @@
                 @test Memento.format(fmt, ts_rec) == string(ts)
             end
         end
+
+        @testset "Date format string" begin
+            date = ZonedDateTime(2012, 1, 1, 3, 1, 1, 123, localzone())
+            formats = ["yyyy", "yyyy-mm-dd HH:MM:SS.s"]
+            date_strings = ["2012", "2012-01-01 03:01:01.123"]
+            for (format, date_string) in zip(formats, date_strings)
+                formatter = DefaultFormatter("{date}"; date_fmt_string=format)
+                record = SimpleRecord("info", "moo", date)
+                @test Memento.format(formatter, record) == date_string
+            end
+        end
     end
 
     @testset "DictFormatter" begin

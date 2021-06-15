@@ -8,7 +8,7 @@ log `Record`.
 abstract type Formatter end
 
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
-const DATE_FMT_STRING = "yyyy-mm-dd HH:MM:SS"
+const DEFAULT_DATE_FMT_STRING = "yyyy-mm-dd HH:MM:SS"
 
 """
     DefaultFormatter
@@ -26,10 +26,12 @@ struct DefaultFormatter <: Formatter
     fmt_str::AbstractString
     tokens::Vector{Pair{Symbol, Bool}}
     output_tz::Union{Dates.TimeZone, Nothing}
+    date_fmt_string::AbstractString
 
     function DefaultFormatter(
         fmt_str::AbstractString=DEFAULT_FMT_STRING,
-        output_tz=nothing,
+        output_tz=nothing;
+        date_fmt_string::AbstractString=DEFAULT_DATE_FMT_STRING,
     )
         #r"(?<={).+?(?=})
         tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
@@ -41,7 +43,7 @@ struct DefaultFormatter <: Formatter
             end
         end
 
-        new(fmt_str, tokens, output_tz)
+        new(fmt_str, tokens, output_tz, date_fmt_string)
     end
 end
 
@@ -80,9 +82,9 @@ function format(fmt::DefaultFormatter, rec::Record)
                 value = if tmp_val isa ZonedDateTime
                     # `localzone` is expensive, so we don't call it until it is required.
                     tzout = fmt.output_tz === nothing ? localzone() : fmt.output_tz
-                    Dates.format(astimezone(tmp_val, tzout), DATE_FMT_STRING)
+                    Dates.format(astimezone(tmp_val, tzout), fmt.date_fmt_string)
                 elseif tmp_val isa DateTime
-                    Dates.format(tmp_val, DATE_FMT_STRING)
+                    Dates.format(tmp_val, fmt.date_fmt_string)
                 else
                     tmp_val
                 end
