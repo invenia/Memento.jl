@@ -8,7 +8,7 @@ log `Record`.
 abstract type Formatter end
 
 const DEFAULT_FMT_STRING = "[{level} | {name}]: {msg}"
-const DEFAULT_DATE_FMT_STRING = "yyyy-mm-dd HH:MM:SS"
+const DEFAULT_DATE_FMT = "yyyy-mm-dd HH:MM:SS"
 
 """
     DefaultFormatter
@@ -31,7 +31,7 @@ struct DefaultFormatter <: Formatter
     function DefaultFormatter(
         fmt_str::AbstractString=DEFAULT_FMT_STRING,
         output_tz=nothing;
-        date_fmt_string::AbstractString=DEFAULT_DATE_FMT_STRING,
+        date_fmt_string::AbstractString=DEFAULT_DATE_FMT,
     )
         #r"(?<={).+?(?=})
         tokens = map(eachmatch(r"({.+?})|(.+?)", fmt_str)) do m
