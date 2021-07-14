@@ -30,6 +30,9 @@
 
             dict = Dict(rec)
             @test rec.date == dict[:date]
+
+            @test haskey(rec, :threadid)
+            @test isinteger(rec.threadid)
         end
     end
 end

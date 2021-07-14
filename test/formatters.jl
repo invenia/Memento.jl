@@ -7,6 +7,7 @@
         Memento.Attribute(rec.date), Memento.Attribute(rec.level),
         Memento.Attribute(rec.levelnum), Memento.Attribute(rec.msg),
         Memento.Attribute(rec.name), Memento.Attribute(rec.pid),
+        Memento.Attribute(rec.threadid),
         Memento.Attribute(nothing), Memento.Attribute(rec.stacktrace)
     )
 
