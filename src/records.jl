@@ -126,6 +126,7 @@ NOTE: if you'd like more logging attributes you can:
 * `msg::Attribute{AbstractString}`: the log message itself
 * `name::Attribute{AbstractString}`: the name of the source logger
 * `pid::Attribute{Int}`: the pid of where the log event occured
+* `threadid::Attribute{Int}`: the thread id of where the log event occured
 * `lookup::Attribute{StackFrame}`: the top StackFrame
 * `stacktrace::Attribute{StackTrace}`: a stacktrace
 """
@@ -136,6 +137,7 @@ struct DefaultRecord <: AttributeRecord
     msg::Attribute
     name::Attribute
     pid::Attribute
+    threadid::Attribute
     lookup::Attribute
     stacktrace::Attribute
 end
@@ -161,6 +163,7 @@ function DefaultRecord(name::AbstractString, level::AbstractString, levelnum::In
         Attribute{AbstractString}(msg),
         Attribute(name),
         Attribute(getpid()),
+        Attribute(Threads.threadid()),
         Attribute{Union{StackFrame, Nothing}}(get_lookup(trace)),
         trace,
     )

@@ -28,6 +28,7 @@ mutable struct EC2Record <: AttributeRecord
     msg::Attribute
     name::Attribute
     pid::Attribute
+    threadid::Attribute
     lookup::Attribute
     stacktrace::Attribute
     instance_id::Attribute
@@ -45,6 +46,7 @@ mutable struct EC2Record <: AttributeRecord
             Attribute{AbstractString}(msg),
             Attribute(name),
             Attribute(getpid()),
+            Attribute(Threads.threadid()),
             Attribute{StackFrame}(get_lookup(trace)),
             trace,
             Attribute(ENV["INSTANCE_ID"]),

@@ -74,6 +74,7 @@ levelnum | The integer value for the log event level
 msg | The source log event message
 name | The name of the source logger
 pid | The pid where the log event occured
+threadid | The thread id where the log event occured
 lookup | The top StackFrame of the stacktrace for the log event
 stacktrace | A StackTrace for the log event
 
