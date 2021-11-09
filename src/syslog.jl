@@ -1,4 +1,4 @@
-using Syslogs
+using .Syslogs
 
 # This is necessary or Memento will attempt to use `println` with one argument (unsupported by Syslog)
 # This should be handled by optional dependency stuff in the future

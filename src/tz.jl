@@ -1,4 +1,4 @@
-using TimeZones
+using .TimeZones
 
 # We're just adding one timezone specific method for constructing and formatting a ZonedDateTime
 function _format_datetime(dt::DateTime, fmt::AbstractString, tz::Dates.TimeZone)
