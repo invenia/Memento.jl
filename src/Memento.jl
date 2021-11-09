@@ -5,11 +5,8 @@ using UUIDs
 using Dates
 using Sockets
 using Distributed
+using Requires
 using Serialization
-
-using Syslogs
-using JSON
-using TimeZones
 
 # We're often extending these methods
 import Base: error, log
@@ -45,7 +42,6 @@ include("filters.jl")
 include("formatters.jl")
 include("handlers.jl")
 include("loggers.jl")
-include("syslog.jl")
 include("stdlib.jl")
 include("config.jl")
 include("exceptions.jl")
@@ -64,6 +60,9 @@ const LOGGER = getlogger(@__MODULE__)
 function __init__()
     Memento.config!(DEFAULT_LOG_LEVEL)
     Memento.register(LOGGER)
+
+    @require TimeZones="f269a46b-ccf7-5d73-abea-4c690281aa53" include("tz.jl")
+    @require Syslogs="cea106d9-e007-5e6c-ad93-58fe2094e9c4" include("syslog.jl")
 end
 
 _precompile_()
