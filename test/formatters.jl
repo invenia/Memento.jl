@@ -48,6 +48,7 @@
                 date = DateTime(2012, 1, 1, 3, 1, 1)
                 notz_rec = SimpleRecord("info", "blah", date)
                 @test Memento.format(fmt, notz_rec) == local_datestr
+                @test Memento.format(utc_fmt, notz_rec) == utc_datestr
 
                 ts = 1531949014
                 ts_rec = SimpleRecord("info", "blah", ts)

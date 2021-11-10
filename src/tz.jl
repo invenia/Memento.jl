@@ -2,7 +2,7 @@ using .TimeZones
 
 # We're just adding one timezone specific method for constructing and formatting a ZonedDateTime
 function _format_datetime(dt::DateTime, fmt::AbstractString, tz::Dates.TimeZone)
-    return Dates.format(ZonedDateTime(dt, tz), fmt)
+    return Dates.format(astimezone(ZonedDateTime(dt, localzone()), tz), fmt)
 end
 
 # Since we already default to local zone in the base case explicitly convert a
