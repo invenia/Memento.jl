@@ -79,15 +79,7 @@ function format(fmt::DefaultFormatter, rec::Record)
 
                 value = string(" stack:[", join(str_frames, ", "), "]")
             elseif content === :date
-                value = if tmp_val isa ZonedDateTime
-                    # `localzone` is expensive, so we don't call it until it is required.
-                    tzout = fmt.output_tz === nothing ? localzone() : fmt.output_tz
-                    Dates.format(astimezone(tmp_val, tzout), fmt.date_fmt_string)
-                elseif tmp_val isa DateTime
-                    Dates.format(tmp_val, fmt.date_fmt_string)
-                else
-                    tmp_val
-                end
+                value = _format_datetime(tmp_val, fmt.date_fmt_string, fmt.output_tz)
             else
                 value = tmp_val
             end
@@ -172,3 +164,7 @@ function format(fmt::DictFormatter, rec::Record)
 
     return fmt.serializer(dict)
 end
+
+# This is overloaded to return a ZonedDateTime only when an output_tz is specified
+_format_datetime(dt, args...) = dt
+_format_datetime(dt::DateTime, fmt::AbstractString, tz::Nothing) = Dates.format(dt, fmt)
