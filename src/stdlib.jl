@@ -36,6 +36,6 @@ function substitute!(level::LogLevel=min_enabled_level(global_logger()))
     notice(getlogger(@__MODULE__), "Substituting global logging with Memento")
 end
 
-# Simple `getlogger` dispatch if the base logging library passes `nothing` as the mod.
-# This just reroutes the message to the root logger similar to calling `getlogger` with no arguments.
+# `getlogger` dispatch to reroute stdlib messages with `mod=nothing` to the root logger, 
+# similar to calling `getlogger` with no arguments.
 getlogger(::Nothing) = getlogger()
