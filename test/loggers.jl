@@ -298,6 +298,10 @@
         Memento.register(Logger("new_logger"))
         logger = getlogger("new_logger")
         @test logger == original_logger
+
+        # Test forced re-registration
+        logger = Memento.register(Logger("new_logger"; level="debug"); force=true)
+        @test logger != original_logger
     end
 
     @testset "No parent logger registered" begin

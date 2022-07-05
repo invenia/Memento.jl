@@ -131,15 +131,20 @@ Get the available log levels for a logger and their associated priorities.
 getlevels(logger::Logger) = logger.levels
 
 """
-    register(::Logger)
+    register(::Logger; force=false)
 
 Register an existing logger with Memento if it has not already been registered.
+
+!!! note `force=true`
+    You can re-register a logger with `force=true`.
+    This may be necessary if you want to explicitly register a parent logger after
+    registering the child one, such as in submodule `__init__` functions.
 """
-function register(logger::Logger)
-    if !haskey(_loggers, logger.name)
+function register(logger::Logger; force=false)
+    if !haskey(_loggers, logger.name) || force
         _loggers[logger.name] = logger
     else
-        debug(LOGGER, "$logger is already registered.")
+        debug(LOGGER, "$logger is already registered and force=false.")
     end
 
     # Call getpath to potentially register any missing parent loggers.
