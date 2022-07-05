@@ -135,9 +135,10 @@ getlevels(logger::Logger) = logger.levels
 
 Register an existing logger with Memento if it has not already been registered.
 
-NOTE: You can re-register a logger with `force=true`.
-This may be necessary if you want to explicitly register a parent logger after
-registering the child one, such as in submodule `__init__` functions.
+!!! note `force=true`
+    You can re-register a logger with `force=true`.
+    This may be necessary if you want to explicitly register a parent logger after
+    registering the child one, such as in submodule `__init__` functions.
 """
 function register(logger::Logger; force=false)
     if !haskey(_loggers, logger.name) || force
