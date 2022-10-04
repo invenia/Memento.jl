@@ -96,7 +96,6 @@
                 msg = "It works!"
                 Memento.info(logger, msg)
                 wait_for_empty(handler.channel)
-                str1 = String(take!(io))
                 @test occursin(msg, String(take!(io)))
 
                 Memento.debug(logger, "This shouldn't get logged")
