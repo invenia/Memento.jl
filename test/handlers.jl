@@ -114,15 +114,17 @@
                     Memento.info(LOGGER, i)  # ERROR: cannot serialize a running Task
                 end
                 =#
-                try
-                    serialize(io, handler)
-                    @test false
-                catch e
-                    @test e isa ErrorException
-                    @test e.msg == "cannot serialize a running Task"
-                end
+                if VERSION < v"1.8.0-beta1"
+                    try
+                        serialize(io, handler)
+                        @test false
+                    catch e
+                        @test e isa ErrorException
+                        @test e.msg == "cannot serialize a running Task"
+                    end
 
-                @test_throws LoggerSerializationError serialize(io, logger)
+                    @test_throws LoggerSerializationError serialize(io, logger)
+                end
             finally
                 close(io)
             end
