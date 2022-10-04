@@ -128,6 +128,7 @@
                 else
                     serialize(deserialized_io, logger)
                     seekstart(deserialized_io)
+                    # Note: The deserialized logger and handler are different than the serialized one
                     l = deserialize(deserialized_io)
                     @test typeof(l) == Logger
                     deserialized_handler = l.handlers["Buffer"]
