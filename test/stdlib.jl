@@ -1,5 +1,6 @@
 @testset "stdlib" begin
     orig_logger = Base.CoreLogging.global_logger()
+    @test getlogger(nothing) == getlogger()
 
     try
         logger = getlogger("Memento")
