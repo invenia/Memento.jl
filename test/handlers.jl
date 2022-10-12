@@ -71,6 +71,7 @@
 
         @testset "AsyncHandler" begin
             io = IOBuffer()
+            deserialized_io = IOBuffer()
 
             function wait_for_empty(c::Channel)
                 while isready(c)
@@ -114,17 +115,28 @@
                     Memento.info(LOGGER, i)  # ERROR: cannot serialize a running Task
                 end
                 =#
-                try
-                    serialize(io, handler)
-                    @test false
-                catch e
-                    @test e isa ErrorException
-                    @test e.msg == "cannot serialize a running Task"
-                end
+                if VERSION < v"1.8.0-beta1"
+                    try
+                        serialize(io, handler)
+                        @test false
+                    catch e
+                        @test e isa ErrorException
+                        @test e.msg == "cannot serialize a running Task"
+                    end
 
-                @test_throws LoggerSerializationError serialize(io, logger)
+                    @test_throws LoggerSerializationError serialize(io, logger)
+                else
+                    serialize(deserialized_io, logger)
+                    seekstart(deserialized_io)
+                    # Note: The deserialized logger and handler are different than the serialized one
+                    l = deserialize(deserialized_io)
+                    @test typeof(l) == Logger
+                    deserialized_handler = l.handlers["Buffer"]
+                    @test typeof(deserialized_handler) == AsyncHandler
+                end
             finally
                 close(io)
+                close(deserialized_io)
             end
         end
     end
