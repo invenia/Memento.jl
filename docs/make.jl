@@ -24,6 +24,7 @@ makedocs(
         "FAQ" => Any[
             "faq/another-logging-lib.md",
             "faq/change-colors.md",
+            "faq/change-date-format.md",
             "faq/config-recipes.md",
             "faq/logging-to-syslog.md",
             "faq/json-formatting.md",
