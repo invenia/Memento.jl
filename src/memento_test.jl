@@ -3,8 +3,8 @@ module TestUtils
 using ..Memento
 using Test
 
-# Needed to extend these macros
-import Test: @test_warn, @test_throws
+# Extend @test_warn so callers using both Test and Memento.TestUtils see one macro
+import Test: @test_warn
 
 export @test_log, @test_nolog
 
@@ -120,7 +120,7 @@ macro test_throws(logger, extype, expr)
     quote
         setlevel!($(esc(logger)), "not_set") do
             setpropagating!($(esc(logger)), false) do
-                @test_throws $(esc(extype)) $(esc(expr))
+                Test.@test_throws $(esc(extype)) $(esc(expr))
             end
         end
     end
