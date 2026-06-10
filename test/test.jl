@@ -35,6 +35,7 @@
 
     @testset "@test_throws" begin
         logger = getlogger("test_log")
-        @test_throws(logger, ErrorException, error(logger, "Error!"))
+        # @test_throws is no longer an extension of Test.@test_throws; use the qualified form
+        Memento.TestUtils.@test_throws(logger, ErrorException, error(logger, "Error!"))
     end
 end
