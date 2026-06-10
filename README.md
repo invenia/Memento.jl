@@ -9,6 +9,12 @@
 
 Memento is flexible hierarchical logging library for julia.
 
+## WARNING 
+
+This package is largely unmaintained as Invenia no longer exists and I (@rofinn) personally don't use Julia anymore.
+If you notice blocking problems, please open an issue. The nightly CI system is often disabled automatically and we don't test on Julia nightly.
+
+
 ## Installation
 
 ```julia
