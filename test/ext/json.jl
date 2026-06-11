@@ -5,7 +5,7 @@ using JSON
 
     fmt = DictFormatter(JSON.json)
     result = Memento.format(fmt, rec)
-    @test isa(JSON.parse(result), Dict)
+    @test isa(JSON.parse(result), JSON.Object)
 
     for key in [:date, :name, :level, :lookup, :stacktrace, :msg]
         @test occursin(string(key), result)
@@ -25,7 +25,7 @@ using JSON
     fmt2 = DictFormatter(aliases, JSON.json)
     result = Memento.format(fmt2, rec)
 
-    @test isa(JSON.parse(result), Dict)
+    @test isa(JSON.parse(result), JSON.Object)
 
     for key in [:location, :message, :timestamp, :process_id]
         @test occursin(string(key), result)
